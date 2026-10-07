@@ -1,15 +1,16 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-slate-50">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Tacunan Integrated Health System') }}</title>
+        <title>{{ config('app.name', 'TacunaCare') }}</title>
+        <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
 
         <!-- Scripts & Styles -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -24,9 +25,14 @@
                 <!-- Top Header -->
                 <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 shadow-xs">
                     <div class="flex items-center gap-3">
-                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Barangay Tacunan Health Center</span>
-                        <span class="text-slate-300">|</span>
-                        <span class="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Davao City</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-black text-slate-900 tracking-tight">Tacuna<span class="text-emerald-600">Care</span></span>
+                            <span class="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded border border-emerald-200">IMS</span>
+                        </div>
+                        <span class="text-slate-300 hidden md:inline">|</span>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 hidden md:inline">Barangay Tacunan Health Center</span>
+                        <span class="text-slate-300 hidden sm:inline">|</span>
+                        <span class="text-xs font-medium text-emerald-800 bg-emerald-50/80 px-2 py-0.5 rounded border border-emerald-200 hidden sm:inline">Davao City</span>
                     </div>
 
                     <div class="flex items-center gap-4">
@@ -39,7 +45,7 @@
                         <div class="flex items-center gap-2">
                             <span class="text-xs font-semibold text-slate-700">{{ Auth::user()->name }}</span>
                             <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
-                                {{ Auth::user()->role }}
+                                {{ Auth::user()->role_display_name }}
                             </span>
                         </div>
                     </div>

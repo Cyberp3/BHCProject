@@ -13,13 +13,13 @@
             </button>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-6 space-y-8">
-            <div class="text-center border-b border-slate-200 pb-4">
-                <h3 class="text-xs uppercase font-bold text-slate-400 tracking-widest">Republic of the Philippines &bull; City of Davao</h3>
-                <h1 class="text-xl font-extrabold text-slate-900 mt-1">Barangay Tacunan Health Center</h1>
-                <h2 class="text-sm font-semibold text-amber-700 mt-0.5">Medicine & Vaccine Inventory Status Report</h2>
-                <p class="text-xs text-slate-400 mt-1">Generated on {{ now()->format('F d, Y h:i A') }}</p>
-            </div>
+        <!-- Official Report Paper Sheet Container -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-6 space-y-8 print:p-0 print:border-none print:shadow-none print:space-y-6">
+            <!-- Official Letterhead Header -->
+            <x-report-header 
+                title="Medicine & Vaccine Inventory Status Report" 
+                subtitle="Stock Balance, Safety Thresholds, and Near-Expiry Tracking" 
+            />
 
             <!-- SECTION 1: LOW STOCK ITEMS (Reorder Alert) -->
             <div>
@@ -145,6 +145,9 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Official Certification & Signatory Section -->
+            <x-report-footer />
         </div>
     </div>
 </x-app-layout>

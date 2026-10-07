@@ -1,14 +1,14 @@
-﻿<aside class="w-64 bg-slate-900 text-slate-100 flex flex-col shrink-0 border-r border-slate-800 min-h-screen">
+<aside class="w-64 bg-slate-900 text-slate-100 flex flex-col shrink-0 border-r border-slate-800 min-h-screen">
     <!-- Branding -->
-    <div class="h-16 flex items-center gap-3 px-6 bg-slate-950/60 border-b border-slate-800">
-        <div class="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-900/30 shrink-0">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
+    <div class="h-16 flex items-center gap-3 px-5 bg-slate-950/80 border-b border-slate-800">
+        <div class="w-10 h-10 rounded-xl overflow-hidden bg-white p-1 shrink-0 shadow-md border border-emerald-500/40">
+            <img src="{{ asset('images/logo.png') }}" alt="TacunaCare Logo" class="w-full h-full object-contain">
         </div>
         <div class="min-w-0">
-            <div class="font-bold text-sm text-white tracking-wide leading-tight truncate">TACUNAN HIMS</div>
-            <div class="text-[11px] text-emerald-400 font-medium tracking-wider">Health Center</div>
+            <div class="font-extrabold text-base text-white tracking-wide leading-tight truncate">
+                Tacuna<span class="text-emerald-400">Care</span>
+            </div>
+            <div class="text-[10px] text-emerald-400 font-semibold tracking-wider uppercase">Tacunan Health Center</div>
         </div>
     </div>
 

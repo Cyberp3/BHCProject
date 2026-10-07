@@ -13,14 +13,13 @@
             </button>
         </div>
 
-        <!-- Official Report Header -->
-        <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-6">
-            <div class="text-center border-b border-slate-200 pb-4">
-                <h3 class="text-xs uppercase font-bold text-slate-400 tracking-widest">Republic of the Philippines &bull; City of Davao</h3>
-                <h1 class="text-xl font-extrabold text-slate-900 mt-1">Barangay Tacunan Health Center</h1>
-                <h2 class="text-sm font-semibold text-emerald-700 mt-0.5">Patient Profiling & Purok Distribution Report</h2>
-                <p class="text-xs text-slate-400 mt-1">Generated on {{ now()->format('F d, Y h:i A') }}</p>
-            </div>
+        <!-- Official Report Paper Sheet Container -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-6 print:p-0 print:border-none print:shadow-none">
+            <!-- Official Letterhead Header -->
+            <x-report-header 
+                title="Patient Profiling & Purok Distribution Report" 
+                subtitle="Barangay Health Registry & Demographics Assessment" 
+            />
 
             <!-- Aggregate Demographic Metrics -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
@@ -118,6 +117,9 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Official Certification & Signatory Section -->
+            <x-report-footer />
         </div>
     </div>
 </x-app-layout>
