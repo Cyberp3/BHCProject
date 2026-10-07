@@ -222,6 +222,8 @@ test('critical user actions generate audit logs', function () {
         'sex' => 'Female',
         'date_of_birth' => '1999-07-10',
         'purok_id' => $this->purok->id,
+        'street_address' => 'Purok 1, Tacunan',
+        'contact_number' => '09123456789',
     ];
 
     $this->actingAs($this->admin)->post(route('patients.store'), $patientData);

@@ -112,4 +112,49 @@ class Patient extends Model
 
         return $query->where('purok_id', $purokId);
     }
+
+    public function scopeFilterSex(Builder $query, ?string $sex): Builder
+    {
+        if (blank($sex)) {
+            return $query;
+        }
+
+        return $query->where('sex', $sex);
+    }
+
+    public function scopeFilterAgeBracket(Builder $query, ?string $bracket): Builder
+    {
+        if (blank($bracket)) {
+            return $query;
+        }
+
+        $today = Carbon::today();
+
+        return match ($bracket) {
+            'infant' => $query->whereDate('date_of_birth', '>', $today->copy()->subYears(2)),
+            'child' => $query->whereDate('date_of_birth', '<=', $today->copy()->subYears(2))
+                ->whereDate('date_of_birth', '>', $today->copy()->subYears(13)),
+            'teen' => $query->whereDate('date_of_birth', '<=', $today->copy()->subYears(13))
+                ->whereDate('date_of_birth', '>', $today->copy()->subYears(18)),
+            'adult' => $query->whereDate('date_of_birth', '<=', $today->copy()->subYears(18))
+                ->whereDate('date_of_birth', '>', $today->copy()->subYears(60)),
+            'senior' => $query->whereDate('date_of_birth', '<=', $today->copy()->subYears(60)),
+            default => $query,
+        };
+    }
+
+    public function scopeFilterService(Builder $query, ?string $serviceType): Builder
+    {
+        if (blank($serviceType)) {
+            return $query;
+        }
+
+        return $query->where(function (Builder $q) use ($serviceType) {
+            $q->whereHas('healthServiceRecords', function (Builder $sq) use ($serviceType) {
+                $sq->where('service_type', $serviceType);
+            })->orWhereHas('appointments', function (Builder $sq) use ($serviceType) {
+                $sq->where('service_type', $serviceType);
+            });
+        });
+    }
 }

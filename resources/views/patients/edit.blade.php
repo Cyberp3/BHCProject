@@ -99,18 +99,21 @@
                     <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Address & Contact Details</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Street Address</label>
-                            <input type="text" name="street_address" value="{{ old('street_address', $patient->street_address) }}" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Street Address <span class="text-rose-500">*</span></label>
+                            <input type="text" name="street_address" value="{{ old('street_address', $patient->street_address) }}" required placeholder="e.g. Block 4 Lot 12, Tacunan Village" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <x-input-error :messages="$errors->get('street_address')" class="mt-1" />
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Contact Phone</label>
-                            <input type="text" name="contact_number" value="{{ old('contact_number', $patient->contact_number) }}" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Contact Phone <span class="text-rose-500">*</span></label>
+                            <input type="text" name="contact_number" value="{{ old('contact_number', $patient->contact_number) }}" required placeholder="09xxxxxxxxx" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <x-input-error :messages="$errors->get('contact_number')" class="mt-1" />
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">PhilHealth Number</label>
-                            <input type="text" name="philhealth_number" value="{{ old('philhealth_number', $patient->philhealth_number) }}" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">PhilHealth Number <span class="text-[11px] font-normal text-slate-400">(Format: XX-XXXXXXXXX-X)</span></label>
+                            <input type="text" name="philhealth_number" value="{{ old('philhealth_number', $patient->philhealth_number) }}" placeholder="12-345678901-2" pattern="[0-9]{2}-[0-9]{9}-[0-9]{1}" title="Format: XX-XXXXXXXXX-X (12 digits, e.g. 12-345678901-2)" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono">
+                            <x-input-error :messages="$errors->get('philhealth_number')" class="mt-1" />
                         </div>
 
                         <div>

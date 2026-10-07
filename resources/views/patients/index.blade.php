@@ -16,38 +16,82 @@
             </div>
         </div>
 
-        <!-- Search & Filter Bar -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-            <form method="GET" action="{{ route('patients.index') }}" class="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                <div class="sm:col-span-6 relative">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name or patient control #..." class="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
+        <!-- Search & Multi-Criteria Filter Bar -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-3">
+            <form method="GET" action="{{ route('patients.index') }}" class="space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
+                    <!-- Search Input -->
+                    <div class="sm:col-span-2 lg:col-span-4 relative">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name or control #..." class="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Purok Filter -->
+                    <div class="sm:col-span-1 lg:col-span-2">
+                        <select name="purok_id" class="w-full py-2 px-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <option value="">Purok: All</option>
+                            @foreach ($puroks as $purok)
+                                <option value="{{ $purok->id }}" {{ request('purok_id') == $purok->id ? 'selected' : '' }}>
+                                    {{ $purok->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Sex Filter -->
+                    <div class="sm:col-span-1 lg:col-span-2">
+                        <select name="sex" class="w-full py-2 px-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <option value="">Sex: All</option>
+                            <option value="Male" {{ request('sex') === 'Male' ? 'selected' : '' }}>Male</option>
+                            <option value="Female" {{ request('sex') === 'Female' ? 'selected' : '' }}>Female</option>
+                        </select>
+                    </div>
+
+                    <!-- Age Bracket Filter -->
+                    <div class="sm:col-span-1 lg:col-span-2">
+                        <select name="age_bracket" class="w-full py-2 px-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <option value="">Age: All</option>
+                            <option value="infant" {{ request('age_bracket') === 'infant' ? 'selected' : '' }}>Infant (0-1 yrs)</option>
+                            <option value="child" {{ request('age_bracket') === 'child' ? 'selected' : '' }}>Child (2-12 yrs)</option>
+                            <option value="teen" {{ request('age_bracket') === 'teen' ? 'selected' : '' }}>Teen (13-17 yrs)</option>
+                            <option value="adult" {{ request('age_bracket') === 'adult' ? 'selected' : '' }}>Adult (18-59 yrs)</option>
+                            <option value="senior" {{ request('age_bracket') === 'senior' ? 'selected' : '' }}>Senior (60+ yrs)</option>
+                        </select>
+                    </div>
+
+                    <!-- Health Service Filter -->
+                    <div class="sm:col-span-1 lg:col-span-2">
+                        <select name="service_type" class="w-full py-2 px-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <option value="">Service: All</option>
+                            @foreach ($services as $srvKey => $srvLabel)
+                                <option value="{{ $srvKey }}" {{ request('service_type') === $srvKey ? 'selected' : '' }}>
+                                    {{ $srvLabel }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
 
-                <div class="sm:col-span-4">
-                    <select name="purok_id" class="w-full py-2 px-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                        <option value="">-- Filter by Purok (All) --</option>
-                        @foreach ($puroks as $purok)
-                            <option value="{{ $purok->id }}" {{ request('purok_id') == $purok->id ? 'selected' : '' }}>
-                                {{ $purok->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="sm:col-span-2 flex gap-2">
-                    <button type="submit" class="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-semibold transition">
-                        Filter
-                    </button>
-                    @if (request()->hasAny(['search', 'purok_id']))
-                        <a href="{{ route('patients.index') }}" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-sm font-medium transition flex items-center justify-center">
-                            Reset
-                        </a>
-                    @endif
+                <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                    <span class="text-slate-500">
+                        Showing <strong class="text-slate-800">{{ $patients->total() }}</strong> patient record{{ $patients->total() === 1 ? '' : 's' }}
+                    </span>
+                    <div class="flex items-center gap-2">
+                        @if (request()->hasAny(['search', 'purok_id', 'sex', 'age_bracket', 'service_type']))
+                            <a href="{{ route('patients.index') }}" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg font-medium transition flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                Clear Filters
+                            </a>
+                        @endif
+                        <button type="submit" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition flex items-center gap-1 shadow-xs">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                            Apply Filter
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

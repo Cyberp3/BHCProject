@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
+use App\Models\HealthServiceRecord;
 use App\Models\Patient;
 use App\Models\Purok;
 use Carbon\Carbon;
@@ -26,10 +27,23 @@ class PatientController extends Controller
             $query->filterPurok($request->input('purok_id'));
         }
 
+        if ($request->filled('sex')) {
+            $query->filterSex($request->input('sex'));
+        }
+
+        if ($request->filled('age_bracket')) {
+            $query->filterAgeBracket($request->input('age_bracket'));
+        }
+
+        if ($request->filled('service_type')) {
+            $query->filterService($request->input('service_type'));
+        }
+
         $patients = $query->paginate(15)->withQueryString();
         $puroks = Purok::orderBy('name')->get();
+        $services = HealthServiceRecord::SERVICES;
 
-        return view('patients.index', compact('patients', 'puroks'));
+        return view('patients.index', compact('patients', 'puroks', 'services'));
     }
 
     public function create(): View
@@ -55,12 +69,16 @@ class PatientController extends Controller
             'date_of_birth' => ['required', 'date', 'before_or_equal:today'],
             'civil_status' => ['nullable', 'string', 'max:30'],
             'purok_id' => ['required', 'exists:puroks,id'],
-            'street_address' => ['nullable', 'string', 'max:255'],
-            'contact_number' => ['nullable', 'string', 'max:30'],
-            'philhealth_number' => ['nullable', 'string', 'max:50'],
+            'street_address' => ['required', 'string', 'max:255'],
+            'contact_number' => ['required', 'string', 'max:30'],
+            'philhealth_number' => ['nullable', 'string', 'regex:/^\d{2}-\d{9}-\d{1}$/'],
             'blood_type' => ['nullable', 'string', 'max:10'],
             'emergency_contact_name' => ['nullable', 'string', 'max:150'],
             'emergency_contact_number' => ['nullable', 'string', 'max:30'],
+        ], [
+            'street_address.required' => 'The street address is required so the patient can be located.',
+            'contact_number.required' => 'The contact number is required to proceed with registration.',
+            'philhealth_number.regex' => 'The PhilHealth number must follow the official format: XX-XXXXXXXXX-X (e.g. 12-345678901-2).',
         ]);
 
         $validated['created_by'] = Auth::id();
@@ -111,12 +129,16 @@ class PatientController extends Controller
             'date_of_birth' => ['required', 'date', 'before_or_equal:today'],
             'civil_status' => ['nullable', 'string', 'max:30'],
             'purok_id' => ['required', 'exists:puroks,id'],
-            'street_address' => ['nullable', 'string', 'max:255'],
-            'contact_number' => ['nullable', 'string', 'max:30'],
-            'philhealth_number' => ['nullable', 'string', 'max:50'],
+            'street_address' => ['required', 'string', 'max:255'],
+            'contact_number' => ['required', 'string', 'max:30'],
+            'philhealth_number' => ['nullable', 'string', 'regex:/^\d{2}-\d{9}-\d{1}$/'],
             'blood_type' => ['nullable', 'string', 'max:10'],
             'emergency_contact_name' => ['nullable', 'string', 'max:150'],
             'emergency_contact_number' => ['nullable', 'string', 'max:30'],
+        ], [
+            'street_address.required' => 'The street address is required so the patient can be located.',
+            'contact_number.required' => 'The contact number is required to proceed with saving changes.',
+            'philhealth_number.regex' => 'The PhilHealth number must follow the official format: XX-XXXXXXXXX-X (e.g. 12-345678901-2).',
         ]);
 
         $patient->update($validated);
