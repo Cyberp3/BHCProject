@@ -12,15 +12,15 @@
                 <p class="text-xs text-slate-500 mt-1">Dispense supplies to a patient or clinic health program using FIFO allocation.</p>
             </div>
 
-            <!-- FIFO System Banner -->
+            <!-- FEFO & Expiry Protection Banner -->
             <div class="p-4 bg-emerald-50/70 border-b border-emerald-100 flex items-start gap-3">
                 <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <div class="text-xs text-emerald-900">
-                    <strong>FIFO Principle Active:</strong> The system will automatically allocate stock from your earliest-expiring active batches first to prevent expiration wastage.
+                <div class="text-xs text-emerald-900 leading-relaxed">
+                    <strong>FEFO Allocation &amp; Expiry Guard Active:</strong> Stock is allocated strictly from the earliest-expiring valid batches. Expired batches are automatically blocked and quarantined from dispensation to guarantee patient safety.
                 </div>
             </div>
 
@@ -34,10 +34,11 @@
                         <option value="">-- Select Medicine / Vaccine --</option>
                         @foreach ($items as $item)
                             @php
-                                $stock = $item->total_stock;
+                                $validStock = $item->dispensable_stock;
+                                $expiredStock = $item->expired_stock;
                             @endphp
-                            <option value="{{ $item->id }}" {{ old('inventory_item_id', $selectedItemId) == $item->id ? 'selected' : '' }} {{ $stock <= 0 ? 'disabled' : '' }}>
-                                {{ $item->name }} ({{ $item->item_code }}) - Available: {{ $stock }} {{ $item->unit_of_measure }} {{ $stock <= 0 ? '[OUT OF STOCK]' : '' }}
+                            <option value="{{ $item->id }}" {{ old('inventory_item_id', $selectedItemId) == $item->id ? 'selected' : '' }} {{ $validStock <= 0 ? 'disabled' : '' }}>
+                                {{ $item->name }} ({{ $item->item_code }}) - Dispensable: {{ $validStock }} {{ $item->unit_of_measure }}@if ($validStock <= 0 && $expiredStock > 0) [EXPIRED / QUARANTINED - CANNOT DISPENSE]@elseif ($validStock <= 0) [OUT OF STOCK]@elseif ($expiredStock > 0) ({{ $expiredStock }} expired quarantined)@endif
                             </option>
                         @endforeach
                     </select>

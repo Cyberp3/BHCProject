@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -46,6 +47,15 @@ class InventoryItem extends Model
             ->orderBy('expiration_date', 'asc'); // FIFO
     }
 
+    public function dispensableBatches(): HasMany
+    {
+        return $this->hasMany(InventoryBatch::class)
+            ->where('status', 'active')
+            ->where('current_quantity', '>', 0)
+            ->whereDate('expiration_date', '>=', Carbon::today())
+            ->orderBy('expiration_date', 'asc'); // FEFO: earliest unexpired first
+    }
+
     public function transactions(): HasMany
     {
         return $this->hasMany(InventoryTransaction::class)->latest('transaction_date');
@@ -58,9 +68,25 @@ class InventoryItem extends Model
             ->sum('current_quantity');
     }
 
+    public function getDispensableStockAttribute(): int
+    {
+        return (int) $this->dispensableBatches()->sum('current_quantity');
+    }
+
+    public function getExpiredStockAttribute(): int
+    {
+        return (int) $this->batches()
+            ->where('current_quantity', '>', 0)
+            ->where(function ($q) {
+                $q->where('status', 'expired')
+                    ->orWhereDate('expiration_date', '<', Carbon::today());
+            })
+            ->sum('current_quantity');
+    }
+
     public function getIsLowStockAttribute(): bool
     {
-        return $this->total_stock <= $this->minimum_stock_alert;
+        return $this->dispensable_stock <= $this->minimum_stock_alert;
     }
 
     public function scopeMedicines(Builder $query): Builder

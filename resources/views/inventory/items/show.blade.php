@@ -56,16 +56,22 @@
                 </div>
 
                 <!-- Stock Counter Card -->
-                <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200/80">
+                <div class="flex flex-wrap items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200/80">
                     <div>
-                        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Active Stock</div>
-                        <div class="text-2xl font-extrabold {{ $item->total_stock <= $item->minimum_stock_alert ? 'text-amber-600' : 'text-slate-900' }}">
-                            {{ number_format($item->total_stock) }} <span class="text-xs font-normal text-slate-500">{{ $item->unit_of_measure }}</span>
+                        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Dispensable Stock (Unexpired)</div>
+                        <div class="text-2xl font-extrabold {{ $item->dispensable_stock <= $item->minimum_stock_alert ? 'text-amber-600' : 'text-slate-900' }}">
+                            {{ number_format($item->dispensable_stock) }} <span class="text-xs font-normal text-slate-500">{{ $item->unit_of_measure }}</span>
                         </div>
                     </div>
-                    @if ($item->total_stock <= $item->minimum_stock_alert)
+                    @if ($item->dispensable_stock <= $item->minimum_stock_alert)
                         <div class="px-2.5 py-1 rounded bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200">
                             Low Stock (Reorder &le; {{ $item->minimum_stock_alert }})
+                        </div>
+                    @endif
+                    @if ($item->expired_stock > 0)
+                        <div class="px-2.5 py-1 rounded bg-rose-100 text-rose-800 text-xs font-bold border border-rose-200 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-rose-600"></span>
+                            {{ number_format($item->expired_stock) }} {{ $item->unit_of_measure }} Quarantined (Expired)
                         </div>
                     @endif
                 </div>
@@ -83,12 +89,13 @@
                     i
                 </div>
                 <h2 class="text-xs font-bold uppercase tracking-wider text-blue-900">
-                    First-Expired, First-Out (FEFO) Multi-Batch Allocation
+                    First-Expired, First-Out (FEFO) Multi-Batch Allocation &amp; Expiry Safety Guard
                 </h2>
             </div>
             <p class="text-xs text-blue-800 leading-relaxed">
                 When new shipments arrive, each delivery is tracked as a <strong>distinct batch</strong> with its own batch number and expiration date so new stock never overwrites or merges with older batches. 
-                When nurses or midwives dispense this item, TacunaCare automatically consumes from the <strong>earliest-expiring batch first</strong> to prevent medicine expiration and waste.
+                When healthcare staff dispense this item, TacunaCare automatically consumes from the <strong>earliest-expiring valid batch first</strong>. 
+                Any batch that reaches its expiration date is <strong>strictly blocked and quarantined</strong> from dispensation to guarantee patient safety.
             </p>
 
             <!-- Visual Queue of Active Batches -->
@@ -126,8 +133,8 @@
         <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-200 bg-slate-50/50 flex items-center justify-between">
                 <div>
-                    <h2 class="font-bold text-slate-800 text-sm">Active Delivery Batches (Earliest Expiry at Top)</h2>
-                    <p class="text-xs text-slate-500">Every batch retains its distinct identity and expiration date.</p>
+                    <h2 class="font-bold text-slate-800 text-sm">Valid Active Batches (Earliest Expiry at Top)</h2>
+                    <p class="text-xs text-slate-500">Only unexpired active batches are eligible for clinic dispensation.</p>
                 </div>
                 <a href="{{ route('inventory.batches.receive', ['item_id' => $item->id]) }}" class="px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-xs font-semibold border border-blue-200 transition">
                     + Receive Additional Batch
@@ -152,7 +159,6 @@
                             @php
                                 $days = $batch->days_until_expiration;
                                 $isNear = $days <= 90 && $days >= 0;
-                                $isExp = $days < 0;
                             @endphp
                             <tr class="hover:bg-slate-50/80 transition {{ $index === 0 ? 'bg-blue-50/20' : '' }}">
                                 <td class="px-5 py-3.5">
@@ -163,16 +169,14 @@
                                 <td class="px-5 py-3.5 font-mono text-xs font-bold text-slate-900">
                                     {{ $batch->batch_number }}
                                 </td>
-                                <td class="px-5 py-3.5 text-xs font-semibold {{ $isExp ? 'text-rose-600 font-bold' : ($isNear ? 'text-amber-600 font-bold' : 'text-slate-800') }}">
+                                <td class="px-5 py-3.5 text-xs font-semibold {{ $isNear ? 'text-amber-600 font-bold' : 'text-slate-800' }}">
                                     {{ $batch->expiration_date->format('M d, Y') }}
                                     @if ($index === 0)
                                         <span class="block text-[10px] font-normal text-blue-600">(Earliest Expiration)</span>
                                     @endif
                                 </td>
                                 <td class="px-5 py-3.5 text-xs">
-                                    @if ($isExp)
-                                        <span class="px-2 py-0.5 rounded bg-rose-100 text-rose-700 font-bold text-[11px]">Expired ({{ abs($days) }} days ago)</span>
-                                    @elseif ($isNear)
+                                    @if ($isNear)
                                         <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-semibold text-[11px]">{{ $days }} days left</span>
                                     @else
                                         <span class="text-slate-600">{{ $days }} days left</span>
@@ -194,7 +198,7 @@
                         @empty
                             <tr>
                                 <td colspan="7" class="px-5 py-8 text-center text-slate-400 text-xs">
-                                    No active stock batches currently available for this item.
+                                    No valid unexpired stock batches currently available for this item.
                                 </td>
                             </tr>
                         @endforelse
@@ -203,11 +207,56 @@
             </div>
         </div>
 
-        <!-- Depleted / Expired Batches Archive -->
+        <!-- Quarantined / Expired Batches Section -->
+        @if ($expiredBatches->count() > 0)
+            <div class="bg-rose-50/60 rounded-xl border border-rose-200 shadow-xs overflow-hidden">
+                <div class="px-5 py-3.5 border-b border-rose-200 bg-rose-100/60 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span>
+                        <h2 class="font-bold text-rose-900 text-xs uppercase tracking-wider">Quarantined / Expired Batches (Blocked from Dispensation)</h2>
+                    </div>
+                    <span class="text-xs font-bold text-rose-700 bg-white/90 px-2.5 py-0.5 rounded border border-rose-300">
+                        {{ $expiredBatches->count() }} {{ Str::plural('Batch', $expiredBatches->count()) }} &bull; {{ number_format($expiredBatches->sum('current_quantity')) }} {{ $item->unit_of_measure }}
+                    </span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-rose-950">
+                        <thead class="bg-rose-100/40 border-b border-rose-200 text-rose-700 uppercase tracking-wider font-semibold">
+                            <tr>
+                                <th class="px-5 py-2.5">Batch / Lot Number</th>
+                                <th class="px-5 py-2.5">Expiration Date</th>
+                                <th class="px-5 py-2.5">Expired Since</th>
+                                <th class="px-5 py-2.5">Quarantined Quantity</th>
+                                <th class="px-5 py-2.5">Supplier / Source</th>
+                                <th class="px-5 py-2.5">Safety Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-rose-100 bg-white/70">
+                            @foreach ($expiredBatches as $batch)
+                                <tr>
+                                    <td class="px-5 py-3 font-mono font-bold text-rose-900">{{ $batch->batch_number }}</td>
+                                    <td class="px-5 py-3 font-semibold text-rose-700">{{ $batch->expiration_date->format('M d, Y') }}</td>
+                                    <td class="px-5 py-3 text-rose-600">{{ abs($batch->days_until_expiration) }} days ago</td>
+                                    <td class="px-5 py-3 font-extrabold text-rose-900">{{ number_format($batch->current_quantity) }} {{ $item->unit_of_measure }}</td>
+                                    <td class="px-5 py-3 text-slate-600">{{ $batch->supplier_or_source ?? 'City Health Office (CHO) Davao' }}</td>
+                                    <td class="px-5 py-3">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                                            BLOCKED / QUARANTINED
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
+
+        <!-- Depleted Batches Archive -->
         @if ($depletedBatches->count() > 0)
             <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
                 <div class="px-5 py-3.5 border-b border-slate-200 bg-slate-50/50">
-                    <h2 class="font-bold text-slate-800 text-xs uppercase tracking-wider">Depleted / Archived Batches</h2>
+                    <h2 class="font-bold text-slate-800 text-xs uppercase tracking-wider">Depleted Batches (Stock Exhausted)</h2>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs text-slate-500">

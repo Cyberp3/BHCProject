@@ -24,13 +24,18 @@ class DashboardController extends Controller
             ->where('status', 'scheduled')
             ->count();
 
-        // Calculate low stock items
+        // Auto-quarantine expired active batches
+        InventoryBatch::where('status', 'active')
+            ->whereDate('expiration_date', '<', $today)
+            ->update(['status' => 'expired']);
+
+        // Calculate low stock items based on valid unexpired stock
         $items = InventoryItem::with(['batches' => function ($query) {
             $query->where('status', 'active');
         }])->get();
 
         $lowStockCount = $items->filter(function ($item) {
-            return $item->batches->sum('current_quantity') <= $item->minimum_stock_alert;
+            return $item->dispensable_stock <= $item->minimum_stock_alert;
         })->count();
 
         $nearExpiryCount = InventoryBatch::nearExpiry(90)->count();

@@ -20,7 +20,7 @@
         </div>
 
         <!-- Metric Badges Alert Banner -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 {{ $expiredBatchesCount > 0 ? 'sm:grid-cols-3' : 'sm:grid-cols-2' }} gap-4">
             <!-- Low stock alert box -->
             <div class="p-4 bg-white rounded-xl border {{ $lowStockCount > 0 ? 'border-amber-300 bg-amber-50/40' : 'border-slate-200' }} shadow-xs flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -32,16 +32,16 @@
                     <div>
                         <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Low Stock Alert</div>
                         <div class="text-lg font-bold text-slate-900">
-                            {{ $lowStockCount }} {{ Str::plural('item', $lowStockCount) }} at or below minimum reorder point
+                            {{ $lowStockCount }} {{ Str::plural('item', $lowStockCount) }} at or below reorder point
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Near expiry alert box -->
-            <div class="p-4 bg-white rounded-xl border {{ $nearExpiryBatches->count() > 0 ? 'border-rose-300 bg-rose-50/40' : 'border-slate-200' }} shadow-xs flex items-center justify-between">
+            <div class="p-4 bg-white rounded-xl border {{ $nearExpiryBatches->count() > 0 ? 'border-amber-300 bg-amber-50/40' : 'border-slate-200' }} shadow-xs flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                    <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -49,11 +49,30 @@
                     <div>
                         <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Near-Expiry Warning</div>
                         <div class="text-lg font-bold text-slate-900">
-                            {{ $nearExpiryBatches->count() }} active {{ Str::plural('batch', $nearExpiryBatches->count()) }} expiring within 90 days
+                            {{ $nearExpiryBatches->count() }} active {{ Str::plural('batch', $nearExpiryBatches->count()) }} expiring &le; 90 days
                         </div>
                     </div>
                 </div>
             </div>
+
+            @if ($expiredBatchesCount > 0)
+                <!-- Quarantined Expired Alert Box -->
+                <div class="p-4 bg-white rounded-xl border border-rose-300 bg-rose-50/40 shadow-xs flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-xs font-semibold uppercase tracking-wider text-rose-700">Quarantined Stock</div>
+                            <div class="text-lg font-bold text-slate-900">
+                                {{ $expiredBatchesCount }} {{ Str::plural('batch', $expiredBatchesCount) }} expired (blocked)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
 
         <!-- Filter Bar -->
@@ -115,7 +134,8 @@
                     <tbody class="divide-y divide-slate-100" x-data="{ expandedBatchId: null }">
                         @forelse ($items as $item)
                             @php
-                                $stock = $item->total_stock;
+                                $stock = $item->dispensable_stock;
+                                $expiredStock = $item->expired_stock;
                                 $isLow = $stock <= $item->minimum_stock_alert;
                                 $batches = $item->batches;
                                 $earliestBatch = $batches->first();
@@ -151,20 +171,24 @@
                                             Low Stock (&le; {{ $item->minimum_stock_alert }})
                                         </span>
                                     @endif
+                                    @if ($expiredStock > 0)
+                                        <span class="inline-flex items-center text-[10px] font-bold text-rose-700 bg-rose-100 px-1.5 py-0.2 rounded mt-0.5">
+                                            {{ $expiredStock }} expired (quarantined)
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="px-5 py-4 text-xs">
                                     @if ($batches->isNotEmpty())
                                         @php
                                             $daysLeft = $earliestBatch->days_until_expiration;
                                             $isNear = $daysLeft <= 90 && $daysLeft >= 0;
-                                            $isExp = $daysLeft < 0;
                                         @endphp
                                         <div class="space-y-1">
                                             <div class="flex items-center gap-1.5 flex-wrap">
                                                 <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
                                                     Earliest (1st Out)
                                                 </span>
-                                                <span class="font-bold {{ $isExp ? 'text-rose-600' : ($isNear ? 'text-amber-600' : 'text-slate-800') }}">
+                                                <span class="font-bold {{ $isNear ? 'text-amber-600' : 'text-slate-800' }}">
                                                     {{ $earliestBatch->expiration_date->format('M d, Y') }}
                                                 </span>
                                             </div>
@@ -243,7 +267,6 @@
                                                     @php
                                                         $bDays = $b->days_until_expiration;
                                                         $bNear = $bDays <= 90 && $bDays >= 0;
-                                                        $bExp = $bDays < 0;
                                                     @endphp
                                                     <div class="p-3 rounded-lg border text-xs transition {{ $index === 0 ? 'bg-emerald-50/50 border-emerald-300 ring-1 ring-emerald-300' : 'bg-slate-50 border-slate-200' }}">
                                                         <div class="flex items-center justify-between mb-1.5">
@@ -255,7 +278,7 @@
                                                         <div class="space-y-1 text-[11px] pt-1 border-t border-slate-200/60">
                                                             <div class="flex items-center justify-between">
                                                                 <span class="text-slate-500">Expiration:</span>
-                                                                <span class="font-bold {{ $bExp ? 'text-rose-600' : ($bNear ? 'text-amber-600' : 'text-slate-800') }}">
+                                                                <span class="font-bold {{ $bNear ? 'text-amber-600' : 'text-slate-800' }}">
                                                                     {{ $b->expiration_date->format('M d, Y') }}
                                                                     @if ($index === 0)
                                                                         <span class="text-[9px] font-normal text-emerald-700">(Earliest)</span>
