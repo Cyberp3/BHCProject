@@ -16,6 +16,96 @@
             </div>
         </div>
 
+        <!-- Official Weekly Clinic Service Schedule Reference -->
+        <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-sky-50 border border-emerald-200/80 rounded-xl p-4 shadow-2xs">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="p-1.5 bg-emerald-600 text-white rounded-lg shadow-2xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </span>
+                    <div>
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-800">Barangay Tacunan Health Center &bull; Official Clinic Service Schedule</h2>
+                        <p class="text-[11px] text-slate-500">Service appointments follow strict official days and designated operating sessions.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-[11px] font-semibold px-2.5 py-0.5 bg-emerald-100 text-emerald-800 rounded-full border border-emerald-200">
+                        Operating Hours: 8:00 AM - 5:00 PM
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mt-3 pt-3 border-t border-emerald-200/60 text-xs">
+                <div class="p-2.5 bg-white/90 rounded-lg border border-slate-200 shadow-2xs">
+                    <div class="font-bold text-slate-900 flex items-center justify-between">
+                        <span>Monday</span>
+                        <span class="text-[10px] text-slate-400 font-normal">Day 1</span>
+                    </div>
+                    <div class="mt-1.5 space-y-1 text-[11px]">
+                        <div class="font-medium text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200/60">
+                            <span class="font-bold">AM:</span> NTP (TB-DOTS)
+                        </div>
+                        <div class="font-medium text-purple-800 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200/60">
+                            <span class="font-bold">PM:</span> Family Planning
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-2.5 bg-white/90 rounded-lg border border-slate-200 shadow-2xs">
+                    <div class="font-bold text-slate-900 flex items-center justify-between">
+                        <span>Tuesday</span>
+                        <span class="text-[10px] text-slate-400 font-normal">Day 2</span>
+                    </div>
+                    <div class="mt-1.5 space-y-1 text-[11px]">
+                        <div class="font-medium text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200/60">
+                            <span class="font-bold">AM:</span> NTP (TB-DOTS)
+                        </div>
+                        <div class="font-medium text-purple-800 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200/60">
+                            <span class="font-bold">PM:</span> Family Planning
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-2.5 bg-white/90 rounded-lg border border-slate-200 shadow-2xs">
+                    <div class="font-bold text-slate-900 flex items-center justify-between">
+                        <span>Wednesday</span>
+                        <span class="text-[10px] text-slate-400 font-normal">Day 3</span>
+                    </div>
+                    <div class="mt-1.5 text-[11px]">
+                        <div class="font-semibold text-emerald-800 bg-emerald-50 px-1.5 py-1.5 rounded border border-emerald-200/60">
+                            Child Immunization (EPI)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-2.5 bg-white/90 rounded-lg border border-slate-200 shadow-2xs">
+                    <div class="font-bold text-slate-900 flex items-center justify-between">
+                        <span>Thursday</span>
+                        <span class="text-[10px] text-slate-400 font-normal">Day 4</span>
+                    </div>
+                    <div class="mt-1.5 text-[11px]">
+                        <div class="font-medium text-teal-800 bg-teal-50 px-1.5 py-1.5 rounded border border-teal-200/60">
+                            Purok Kalusugan / BNS
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-2.5 bg-white/90 rounded-lg border border-slate-200 shadow-2xs col-span-2 sm:col-span-1">
+                    <div class="font-bold text-slate-900 flex items-center justify-between">
+                        <span>Friday</span>
+                        <span class="text-[10px] text-slate-400 font-normal">Day 5</span>
+                    </div>
+                    <div class="mt-1.5 text-[11px]">
+                        <div class="font-medium text-rose-800 bg-rose-50 px-1.5 py-1.5 rounded border border-rose-200/60">
+                            CVD Screening / PhilPEN
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Filter Bar & Date Tabs -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-4">
             <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">

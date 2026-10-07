@@ -71,11 +71,21 @@ class AppointmentController extends Controller
             'patient_id' => ['required', 'exists:patients,id'],
             'service_type' => ['required', 'string', 'max:50'],
             'appointment_date' => ['required', 'date'],
-            'appointment_time' => ['nullable', 'date_format:H:i'],
-            'appointment_time' => ['nullable', 'date_format:H:i,H:i:s'],
+            'appointment_time' => ['nullable', 'string'],
             'purpose' => ['required', 'string', 'max:255'],
             'status_notes' => ['nullable', 'string'],
         ]);
+
+        $appDate = Carbon::parse($validated['appointment_date']);
+        $scheduleError = Appointment::validateClinicSchedule(
+            $validated['service_type'],
+            $appDate,
+            $validated['appointment_time'] ?? null
+        );
+
+        if ($scheduleError) {
+            return back()->withInput()->withErrors(['appointment_date' => $scheduleError]);
+        }
 
         $validated['scheduled_by'] = Auth::id();
         $validated['status'] = 'scheduled';
@@ -108,12 +118,22 @@ class AppointmentController extends Controller
         $validated = $request->validate([
             'service_type' => ['required', 'string', 'max:50'],
             'appointment_date' => ['required', 'date'],
-            'appointment_time' => ['nullable', 'date_format:H:i'],
-            'appointment_time' => ['nullable', 'date_format:H:i,H:i:s'],
+            'appointment_time' => ['nullable', 'string'],
             'purpose' => ['required', 'string', 'max:255'],
             'status' => ['required', 'in:scheduled,attended,cancelled,missed'],
             'status_notes' => ['nullable', 'string'],
         ]);
+
+        $appDate = Carbon::parse($validated['appointment_date']);
+        $scheduleError = Appointment::validateClinicSchedule(
+            $validated['service_type'],
+            $appDate,
+            $validated['appointment_time'] ?? null
+        );
+
+        if ($scheduleError) {
+            return back()->withInput()->withErrors(['appointment_date' => $scheduleError]);
+        }
 
         $appointment->update($validated);
 
