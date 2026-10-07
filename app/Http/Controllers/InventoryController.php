@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class InventoryController extends Controller
 {
@@ -136,6 +137,25 @@ class InventoryController extends Controller
             ->with('success', "Item {$item->name} updated successfully.");
     }
 
+    public function showItem(InventoryItem $item): View
+    {
+        $item->load([
+            'batches' => function ($q) {
+                $q->orderBy('expiration_date', 'asc');
+            },
+            'transactions' => function ($q) {
+                $q->with(['batch', 'user', 'patient'])->latest('transaction_date')->latest('id');
+            },
+        ]);
+
+        $activeBatches = $item->batches->where('status', 'active')->where('current_quantity', '>', 0);
+        $depletedBatches = $item->batches->filter(function ($b) {
+            return $b->status !== 'active' || $b->current_quantity <= 0;
+        });
+
+        return view('inventory.items.show', compact('item', 'activeBatches', 'depletedBatches'));
+    }
+
     public function receiveBatchForm(Request $request): View
     {
         $items = InventoryItem::orderBy('name')->get();
@@ -149,12 +169,22 @@ class InventoryController extends Controller
     {
         $validated = $request->validate([
             'inventory_item_id' => ['required', 'exists:inventory_items,id'],
-            'batch_number' => ['required', 'string', 'max:100'],
+            'batch_number' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('inventory_batches')->where(function ($query) use ($request) {
+                    return $query->where('inventory_item_id', $request->input('inventory_item_id'))
+                        ->where('status', 'active');
+                }),
+            ],
             'date_received' => ['required', 'date', 'before_or_equal:today'],
             'expiration_date' => ['required', 'date', 'after:date_received'],
             'quantity_received' => ['required', 'integer', 'min:1'],
             'supplier_or_source' => ['nullable', 'string', 'max:150'],
             'remarks' => ['nullable', 'string'],
+        ], [
+            'batch_number.unique' => 'This batch number is already active for this item with an existing expiration date. Each new delivery must have a distinct batch/lot number.',
         ]);
 
         DB::transaction(function () use ($validated) {
@@ -165,9 +195,9 @@ class InventoryController extends Controller
                 'expiration_date' => $validated['expiration_date'],
                 'quantity_received' => $validated['quantity_received'],
                 'current_quantity' => $validated['quantity_received'],
-                'supplier_or_source' => $validated['supplier_or_source'],
+                'supplier_or_source' => $validated['supplier_or_source'] ?? null,
                 'status' => 'active',
-                'remarks' => $validated['remarks'],
+                'remarks' => $validated['remarks'] ?? null,
             ]);
 
             InventoryTransaction::create([

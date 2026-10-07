@@ -12,6 +12,21 @@
                 <p class="text-xs text-slate-500 mt-1">Record a newly delivered supply shipment into inventory with expiration and lot tracking.</p>
             </div>
 
+            <!-- Multi-Batch Isolation Notice -->
+            <div class="px-6 py-4 bg-blue-50/80 border-b border-blue-100 flex items-start gap-3">
+                <svg class="w-5 h-5 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="text-xs text-blue-900 space-y-1">
+                    <span class="font-bold block">Batch Isolation &amp; FEFO Priority:</span>
+                    <p class="text-blue-800 leading-relaxed">
+                        Every incoming delivery creates an independent batch record with its own Batch/Lot number and Expiration Date. 
+                        It will <strong>never merge with older deliveries</strong> even for the same medicine (e.g. Paracetamol). 
+                        TacunaCare maintains both expiration dates in the queue and automatically prioritizes the earliest-expiring batch first during dispensation.
+                    </p>
+                </div>
+            </div>
+
             <form method="POST" action="{{ route('inventory.batches.store') }}" class="p-6 space-y-6">
                 @csrf
 
@@ -26,6 +41,9 @@
                             </option>
                         @endforeach
                     </select>
+                    @error('inventory_item_id')
+                        <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Batch Number & Quantity -->
@@ -33,11 +51,17 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Batch / Lot Number <span class="text-rose-500">*</span></label>
                         <input type="text" name="batch_number" value="{{ old('batch_number') }}" placeholder="e.g. LOT-2026-X99" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono">
+                        @error('batch_number')
+                            <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Quantity Received <span class="text-rose-500">*</span></label>
                         <input type="number" min="1" name="quantity_received" value="{{ old('quantity_received') }}" placeholder="e.g. 100" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-bold">
+                        @error('quantity_received')
+                            <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
@@ -46,12 +70,18 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Date Received <span class="text-rose-500">*</span></label>
                         <input type="date" name="date_received" value="{{ old('date_received', $today) }}" max="{{ date('Y-m-d') }}" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        @error('date_received')
+                            <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Expiration Date <span class="text-rose-500">*</span></label>
                         <input type="date" name="expiration_date" value="{{ old('expiration_date') }}" min="{{ date('Y-m-d', strtotime('+1 day')) }}" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                        <span class="text-[11px] text-slate-400">Used for automatic FIFO dispensation.</span>
+                        <span class="text-[11px] text-slate-400">Used for automatic FEFO dispensation queue.</span>
+                        @error('expiration_date')
+                            <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
@@ -59,12 +89,18 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Supplier / Allocation Source</label>
                     <input type="text" name="supplier_or_source" value="{{ old('supplier_or_source', 'City Health Office (CHO) Davao') }}" placeholder="e.g. CHO Davao, DOH Central, Barangay Purchase" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    @error('supplier_or_source')
+                        <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Remarks -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Intake Remarks / Storage Location</label>
                     <textarea name="remarks" rows="2" placeholder="e.g. Stored in Refrigerator 1, Shelf B..." class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">{{ old('remarks') }}</textarea>
+                    @error('remarks')
+                        <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Actions -->

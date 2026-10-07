@@ -41,6 +41,9 @@
                             </option>
                         @endforeach
                     </select>
+                    @error('inventory_item_id')
+                        <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Patient (Optional) -->
@@ -54,18 +57,27 @@
                             </option>
                         @endforeach
                     </select>
+                    @error('patient_id')
+                        <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Quantity -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Quantity to Dispense <span class="text-rose-500">*</span></label>
                     <input type="number" min="1" name="quantity" value="{{ old('quantity', 1) }}" required class="w-full sm:w-48 text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-bold text-base">
+                    @error('quantity')
+                        <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Remarks -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Dispensation Reason / Clinical Notes</label>
                     <input type="text" name="remarks" value="{{ old('remarks') }}" placeholder="e.g. 5-day course prescribed by Nurse, routine infant immunization, oral rehydration therapy" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    @error('remarks')
+                        <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Actions -->

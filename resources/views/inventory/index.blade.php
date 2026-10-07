@@ -107,24 +107,31 @@
                             <th class="px-5 py-3.5">Item & Generic Name</th>
                             <th class="px-5 py-3.5">Category</th>
                             <th class="px-5 py-3.5">Active Stock</th>
-                            <th class="px-5 py-3.5">Earliest Batch Expiry</th>
+                            <th class="px-5 py-3.5">Batches &amp; Expiry (FEFO Queue)</th>
                             <th class="px-5 py-3.5">Cold Chain</th>
                             <th class="px-5 py-3.5 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100" x-data="{ expandedBatchId: null }">
                         @forelse ($items as $item)
                             @php
                                 $stock = $item->total_stock;
                                 $isLow = $stock <= $item->minimum_stock_alert;
-                                $earliestBatch = $item->batches->sortBy('expiration_date')->first();
+                                $batches = $item->batches;
+                                $earliestBatch = $batches->first();
+                                $batchCount = $batches->count();
                             @endphp
                             <tr class="hover:bg-slate-50/80 transition">
                                 <td class="px-5 py-4 font-mono text-xs font-bold text-slate-700">
                                     {{ $item->item_code }}
                                 </td>
                                 <td class="px-5 py-4">
-                                    <div class="font-bold text-slate-900">{{ $item->name }}</div>
+                                    <a href="{{ route('inventory.items.show', $item) }}" class="font-bold text-slate-900 hover:text-blue-600 transition inline-flex items-center gap-1 group">
+                                        <span>{{ $item->name }}</span>
+                                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                    </a>
                                     <div class="text-xs text-slate-500">{{ $item->generic_name ?? 'N/A' }} &bull; {{ $item->dosage_form }}</div>
                                 </td>
                                 <td class="px-5 py-4">
@@ -146,17 +153,39 @@
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-xs">
-                                    @if ($earliestBatch)
+                                    @if ($batches->isNotEmpty())
                                         @php
                                             $daysLeft = $earliestBatch->days_until_expiration;
                                             $isNear = $daysLeft <= 90 && $daysLeft >= 0;
                                             $isExp = $daysLeft < 0;
                                         @endphp
-                                        <div class="font-medium {{ $isExp ? 'text-rose-600 font-bold' : ($isNear ? 'text-amber-600 font-semibold' : 'text-slate-700') }}">
-                                            {{ $earliestBatch->expiration_date->format('M d, Y') }}
-                                        </div>
-                                        <div class="text-[11px] text-slate-400 font-mono">
-                                            Batch: {{ $earliestBatch->batch_number }} ({{ $earliestBatch->current_quantity }} left)
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-1.5 flex-wrap">
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                    Earliest (1st Out)
+                                                </span>
+                                                <span class="font-bold {{ $isExp ? 'text-rose-600' : ($isNear ? 'text-amber-600' : 'text-slate-800') }}">
+                                                    {{ $earliestBatch->expiration_date->format('M d, Y') }}
+                                                </span>
+                                            </div>
+                                            <div class="text-[11px] text-slate-500 font-mono">
+                                                Lot {{ $earliestBatch->batch_number }} &bull; <strong class="text-slate-700">{{ number_format($earliestBatch->current_quantity) }}</strong> {{ $item->unit_of_measure }} left
+                                            </div>
+
+                                            @if ($batchCount > 1)
+                                                <div class="pt-1">
+                                                    <button type="button" 
+                                                            @click="expandedBatchId = expandedBatchId === {{ $item->id }} ? null : {{ $item->id }}" 
+                                                            class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-800 transition">
+                                                        <span x-text="expandedBatchId === {{ $item->id }} ? 'Hide batch breakdown' : '+ {{ $batchCount - 1 }} newer {{ Str::plural('batch', $batchCount - 1) }} in stock'"></span>
+                                                        <svg class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': expandedBatchId === {{ $item->id }} }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            @else
+                                                <div class="text-[10px] text-slate-400">1 active batch</div>
+                                            @endif
                                         </div>
                                     @else
                                         <span class="text-slate-400">No active batches</span>
@@ -175,7 +204,10 @@
                                         <span class="text-slate-400">Standard Room Temp</span>
                                     @endif
                                 </td>
-                                <td class="px-5 py-4 text-right space-x-1">
+                                <td class="px-5 py-4 text-right space-x-1 whitespace-nowrap">
+                                    <a href="{{ route('inventory.items.show', $item) }}" class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition" title="View Batches &amp; Expiration Queue">
+                                        Batches
+                                    </a>
                                     <a href="{{ route('inventory.batches.receive', ['item_id' => $item->id]) }}" class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">
                                         + Receive
                                     </a>
@@ -187,6 +219,65 @@
                                     </a>
                                 </td>
                             </tr>
+                            @if ($item->batches->count() > 1)
+                                <tr x-show="expandedBatchId === {{ $item->id }}" x-cloak class="bg-blue-50/40 border-b border-blue-100 transition-all">
+                                    <td colspan="7" class="px-6 py-4">
+                                        <div class="rounded-xl bg-white border border-blue-200 p-4 space-y-3 shadow-xs">
+                                            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-100 text-blue-800">
+                                                        Multi-Batch Separation
+                                                    </span>
+                                                    <h4 class="text-xs font-bold text-slate-800">
+                                                        Active Delivery Batches for <span class="text-blue-700">{{ $item->name }}</span> (Earliest Expiry at Top &bull; FEFO Queue)
+                                                    </h4>
+                                                </div>
+                                                <a href="{{ route('inventory.items.show', $item) }}" class="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">
+                                                    <span>Full Item Audit &amp; Batches</span>
+                                                    &rarr;
+                                                </a>
+                                            </div>
+
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                                @foreach ($item->batches as $index => $b)
+                                                    @php
+                                                        $bDays = $b->days_until_expiration;
+                                                        $bNear = $bDays <= 90 && $bDays >= 0;
+                                                        $bExp = $bDays < 0;
+                                                    @endphp
+                                                    <div class="p-3 rounded-lg border text-xs transition {{ $index === 0 ? 'bg-emerald-50/50 border-emerald-300 ring-1 ring-emerald-300' : 'bg-slate-50 border-slate-200' }}">
+                                                        <div class="flex items-center justify-between mb-1.5">
+                                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase {{ $index === 0 ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700' }}">
+                                                                {{ $index === 0 ? 'Priority #1 (Dispenses 1st)' : 'Queue #'.($index + 1).' (Newer Supply)' }}
+                                                            </span>
+                                                            <span class="font-mono font-bold text-slate-700">{{ $b->batch_number }}</span>
+                                                        </div>
+                                                        <div class="space-y-1 text-[11px] pt-1 border-t border-slate-200/60">
+                                                            <div class="flex items-center justify-between">
+                                                                <span class="text-slate-500">Expiration:</span>
+                                                                <span class="font-bold {{ $bExp ? 'text-rose-600' : ($bNear ? 'text-amber-600' : 'text-slate-800') }}">
+                                                                    {{ $b->expiration_date->format('M d, Y') }}
+                                                                    @if ($index === 0)
+                                                                        <span class="text-[9px] font-normal text-emerald-700">(Earliest)</span>
+                                                                    @endif
+                                                                </span>
+                                                            </div>
+                                                            <div class="flex items-center justify-between">
+                                                                <span class="text-slate-500">Remaining Stock:</span>
+                                                                <span class="font-extrabold text-slate-800">{{ number_format($b->current_quantity) }} / {{ number_format($b->quantity_received) }} {{ $item->unit_of_measure }}</span>
+                                                            </div>
+                                                            <div class="flex items-center justify-between text-[10px] text-slate-400 pt-0.5">
+                                                                <span>Delivered: {{ $b->date_received->format('M d, Y') }}</span>
+                                                                <span>{{ $b->supplier_or_source ?? 'CHO Davao' }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
                         @empty
                             <tr>
                                 <td colspan="7" class="px-5 py-12 text-center text-slate-400">

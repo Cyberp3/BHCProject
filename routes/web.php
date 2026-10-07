@@ -45,6 +45,7 @@ Route::middleware(['auth', 'active_user'])->group(function () {
         Route::get('/', [InventoryController::class, 'index'])->name('index');
         Route::get('/items/create', [InventoryController::class, 'createItem'])->name('items.create');
         Route::post('/items', [InventoryController::class, 'storeItem'])->name('items.store');
+        Route::get('/items/{item}', [InventoryController::class, 'showItem'])->name('items.show');
         Route::get('/items/{item}/edit', [InventoryController::class, 'editItem'])->name('items.edit');
         Route::put('/items/{item}', [InventoryController::class, 'updateItem'])->name('items.update');
 
