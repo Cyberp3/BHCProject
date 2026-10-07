@@ -26,13 +26,13 @@
                 <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 shadow-xs">
                     <div class="flex items-center gap-3">
                         <div class="flex items-center gap-2">
-                            <span class="text-sm font-black text-slate-900 tracking-tight">Tacuna<span class="text-emerald-600">Care</span></span>
-                            <span class="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded border border-emerald-200">IMS</span>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200/80 text-xs">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                Workstation Active
+                            </span>
+                            <span class="text-slate-300 hidden md:inline">|</span>
+                            <span class="text-xs font-medium text-slate-500 hidden md:inline">Tugbok District Health Services &bull; Davao City</span>
                         </div>
-                        <span class="text-slate-300 hidden md:inline">|</span>
-                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 hidden md:inline">Barangay Tacunan Health Center</span>
-                        <span class="text-slate-300 hidden sm:inline">|</span>
-                        <span class="text-xs font-medium text-emerald-800 bg-emerald-50/80 px-2 py-0.5 rounded border border-emerald-200 hidden sm:inline">Davao City</span>
                     </div>
 
                     <div class="flex items-center gap-4">
@@ -42,12 +42,15 @@
 
                         <div class="h-4 w-px bg-slate-200 hidden sm:block"></div>
 
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-semibold text-slate-700">{{ Auth::user()->name }}</span>
-                            <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
-                                {{ Auth::user()->role_display_name }}
-                            </span>
-                        </div>
+                        <a href="{{ route('profile.edit') }}" class="flex items-center gap-2.5 group hover:opacity-90 transition" title="View Profile">
+                            <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center border border-emerald-200 shadow-xs group-hover:ring-2 group-hover:ring-emerald-400">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            </div>
+                            <div class="text-left">
+                                <div class="text-xs font-semibold text-slate-800 leading-tight group-hover:text-emerald-700 transition">{{ Auth::user()->name }}</div>
+                                <div class="text-[10px] font-bold uppercase tracking-wider text-emerald-700">{{ Auth::user()->role_display_name }}</div>
+                            </div>
+                        </a>
                     </div>
                 </header>
 

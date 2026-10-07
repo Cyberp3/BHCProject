@@ -12,15 +12,6 @@
         </div>
     </div>
 
-    <!-- User Profile Badge -->
-    <div class="px-5 py-4 border-b border-slate-800 bg-slate-900/50">
-        <div class="text-xs text-slate-400">Signed in as:</div>
-        <div class="font-semibold text-sm text-white truncate">{{ Auth::user()->name }}</div>
-        <div class="mt-1 inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-900/80 text-emerald-300 border border-emerald-700/50">
-            {{ Auth::user()->role_display_name }}
-        </div>
-    </div>
-
     <!-- Navigation Links -->
     <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         <!-- Dashboard -->
