@@ -156,6 +156,8 @@ class PatientController extends Controller
 
     public function destroy(Patient $patient): RedirectResponse
     {
+        abort_unless(Auth::user()->isAdmin(), 403, 'Unauthorized: Only health center administrators are authorized to archive patient records.');
+
         $name = $patient->full_name;
         $id = $patient->id;
 
@@ -164,11 +166,11 @@ class PatientController extends Controller
         AuditLog::log(
             'DELETE_PATIENT',
             'Patients',
-            "Deleted patient record: {$name}",
+            "Archived patient record: {$name} (Soft Deleted)",
             $id
         );
 
         return redirect()->route('patients.index')
-            ->with('success', 'Patient record deleted successfully.');
+            ->with('success', 'Patient record archived successfully.');
     }
 }
