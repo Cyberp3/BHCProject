@@ -15,25 +15,16 @@
         <!-- Scripts & Styles -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="h-full font-sans antialiased text-slate-800 bg-slate-50">
-        <div class="min-h-screen flex">
+    <body class="h-full font-sans antialiased text-slate-800 bg-slate-50 overflow-hidden">
+        <div class="h-screen flex overflow-hidden">
             <!-- Sidebar Navigation -->
             @include('layouts.navigation')
 
             <!-- Main Page Wrapper -->
-            <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
                 <!-- Top Header -->
                 <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 shadow-xs">
-                    <div class="flex items-center gap-3">
-                        <div class="flex items-center gap-2">
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200/80 text-xs">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                Workstation Active
-                            </span>
-                            <span class="text-slate-300 hidden md:inline">|</span>
-                            <span class="text-xs font-medium text-slate-500 hidden md:inline">Tugbok District Health Services &bull; Davao City</span>
-                        </div>
-                    </div>
+                    <div></div>
 
                     <div class="flex items-center gap-4">
                         <div class="text-xs text-slate-500 font-medium hidden sm:block">
@@ -99,7 +90,7 @@
                 </div>
 
                 <!-- Page Content Body -->
-                <main class="flex-1 overflow-y-auto p-6 bg-slate-50">
+                <main class="flex-1 overflow-y-auto p-6 bg-slate-50 min-h-0">
                     {{ $slot }}
                 </main>
             </div>
