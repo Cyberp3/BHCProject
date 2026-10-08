@@ -24,6 +24,7 @@
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Patient Control Number <span class="text-rose-500">*</span></label>
                             <input type="text" name="patient_control_number" value="{{ old('patient_control_number', $suggestedControlNumber) }}" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono">
                             <span class="text-[11px] text-slate-400">Standard auto-generated ID for Tacunan Health Center.</span>
+                            <x-input-error :messages="$errors->get('patient_control_number')" class="mt-1" />
                         </div>
 
                         <div>
@@ -36,6 +37,7 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <x-input-error :messages="$errors->get('purok_id')" class="mt-1" />
                         </div>
                     </div>
                 </div>
@@ -49,21 +51,25 @@
                         <div class="sm:col-span-1">
                             <label class="block text-xs font-semibold text-slate-700 mb-1">First Name <span class="text-rose-500">*</span></label>
                             <input type="text" name="first_name" value="{{ old('first_name') }}" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <x-input-error :messages="$errors->get('first_name')" class="mt-1" />
                         </div>
 
                         <div class="sm:col-span-1">
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Middle Name</label>
                             <input type="text" name="middle_name" value="{{ old('middle_name') }}" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <x-input-error :messages="$errors->get('middle_name')" class="mt-1" />
                         </div>
 
                         <div class="sm:col-span-1">
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Last Name <span class="text-rose-500">*</span></label>
                             <input type="text" name="last_name" value="{{ old('last_name') }}" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <x-input-error :messages="$errors->get('last_name')" class="mt-1" />
                         </div>
 
                         <div class="sm:col-span-1">
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Suffix (e.g. Jr, Sr, III)</label>
                             <input type="text" name="suffix" value="{{ old('suffix') }}" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <x-input-error :messages="$errors->get('suffix')" class="mt-1" />
                         </div>
                     </div>
 
@@ -75,11 +81,13 @@
                                 <option value="Male" {{ old('sex') == 'Male' ? 'selected' : '' }}>Male</option>
                                 <option value="Female" {{ old('sex') == 'Female' ? 'selected' : '' }}>Female</option>
                             </select>
+                            <x-input-error :messages="$errors->get('sex')" class="mt-1" />
                         </div>
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Date of Birth <span class="text-rose-500">*</span></label>
                             <input type="date" name="date_of_birth" value="{{ old('date_of_birth') }}" max="{{ date('Y-m-d') }}" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <x-input-error :messages="$errors->get('date_of_birth')" class="mt-1" />
                         </div>
 
                         <div>
@@ -90,6 +98,7 @@
                                     <option value="{{ $status }}" {{ old('civil_status') == $status ? 'selected' : '' }}>{{ $status }}</option>
                                 @endforeach
                             </select>
+                            <x-input-error :messages="$errors->get('civil_status')" class="mt-1" />
                         </div>
                     </div>
                 </div>
@@ -126,6 +135,7 @@
                                     <option value="{{ $bt }}" {{ old('blood_type') == $bt ? 'selected' : '' }}>{{ $bt }}</option>
                                 @endforeach
                             </select>
+                            <x-input-error :messages="$errors->get('blood_type')" class="mt-1" />
                         </div>
                     </div>
                 </div>
@@ -139,11 +149,13 @@
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Emergency Contact Name</label>
                             <input type="text" name="emergency_contact_name" value="{{ old('emergency_contact_name') }}" placeholder="Full Name" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <x-input-error :messages="$errors->get('emergency_contact_name')" class="mt-1" />
                         </div>
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Emergency Contact Number</label>
                             <input type="text" name="emergency_contact_number" value="{{ old('emergency_contact_number') }}" placeholder="09xxxxxxxxx" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <x-input-error :messages="$errors->get('emergency_contact_number')" class="mt-1" />
                         </div>
                     </div>
                 </div>

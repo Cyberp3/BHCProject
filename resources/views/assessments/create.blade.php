@@ -38,6 +38,7 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Assessment Date <span class="text-rose-500">*</span></label>
                     <input type="date" name="assessment_date" value="{{ old('assessment_date', $today) }}" max="{{ date('Y-m-d') }}" required class="w-full sm:w-64 text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <x-input-error :messages="$errors->get('assessment_date')" class="mt-1" />
                 </div>
 
                 <!-- Anthropometrics (BNS) -->
@@ -47,12 +48,14 @@
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Weight (kg)</label>
                             <input type="number" step="0.1" min="1" max="300" name="weight_kg" value="{{ old('weight_kg') }}" placeholder="e.g. 55.4" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <x-input-error :messages="$errors->get('weight_kg')" class="mt-1" />
                         </div>
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Height (cm)</label>
                             <input type="number" step="0.1" min="30" max="250" name="height_cm" value="{{ old('height_cm') }}" placeholder="e.g. 162.5" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                             <span class="text-[11px] text-slate-400">BMI will be calculated automatically upon saving ($kg / m^2$).</span>
+                            <x-input-error :messages="$errors->get('height_cm')" class="mt-1" />
                         </div>
                     </div>
                 </div>
@@ -66,26 +69,31 @@
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Blood Pressure - Systolic (mmHg)</label>
                             <input type="number" min="50" max="260" name="systolic_bp" value="{{ old('systolic_bp') }}" placeholder="e.g. 120" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <x-input-error :messages="$errors->get('systolic_bp')" class="mt-1" />
                         </div>
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Blood Pressure - Diastolic (mmHg)</label>
                             <input type="number" min="30" max="160" name="diastolic_bp" value="{{ old('diastolic_bp') }}" placeholder="e.g. 80" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <x-input-error :messages="$errors->get('diastolic_bp')" class="mt-1" />
                         </div>
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Pulse / Heart Rate (bpm)</label>
                             <input type="number" min="30" max="220" name="pulse_rate" value="{{ old('pulse_rate') }}" placeholder="e.g. 75" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <x-input-error :messages="$errors->get('pulse_rate')" class="mt-1" />
                         </div>
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Respiratory Rate (breaths/min)</label>
                             <input type="number" min="10" max="80" name="respiratory_rate" value="{{ old('respiratory_rate') }}" placeholder="e.g. 18" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <x-input-error :messages="$errors->get('respiratory_rate')" class="mt-1" />
                         </div>
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Body Temperature (&deg;C)</label>
                             <input type="number" step="0.1" min="30" max="45" name="temperature_celsius" value="{{ old('temperature_celsius') }}" placeholder="e.g. 36.6" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <x-input-error :messages="$errors->get('temperature_celsius')" class="mt-1" />
                         </div>
 
                         <div>
@@ -99,6 +107,7 @@
                                 <option value="Wasted" {{ old('nutritional_status') == 'Wasted' ? 'selected' : '' }}>Wasted (Acute Malnutrition)</option>
                                 <option value="Stunted" {{ old('nutritional_status') == 'Stunted' ? 'selected' : '' }}>Stunted (Chronic Malnutrition)</option>
                             </select>
+                            <x-input-error :messages="$errors->get('nutritional_status')" class="mt-1" />
                         </div>
                     </div>
                 </div>
@@ -109,6 +118,7 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Observation Notes / Remarks</label>
                     <textarea name="notes" rows="3" placeholder="Enter any observable symptoms, patient complaints, or nutritional notes..." class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">{{ old('notes') }}</textarea>
+                    <x-input-error :messages="$errors->get('notes')" class="mt-1" />
                 </div>
 
                 <!-- Form Action Buttons -->

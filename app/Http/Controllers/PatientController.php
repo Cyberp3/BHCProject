@@ -11,6 +11,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class PatientController extends Controller
 {
@@ -61,23 +62,34 @@ class PatientController extends Controller
     {
         $validated = $request->validate([
             'patient_control_number' => ['required', 'string', 'max:50', 'unique:patients,patient_control_number'],
-            'first_name' => ['required', 'string', 'max:100'],
-            'middle_name' => ['nullable', 'string', 'max:100'],
-            'last_name' => ['required', 'string', 'max:100'],
-            'suffix' => ['nullable', 'string', 'max:20'],
+            'first_name' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\-\.\']+$/u'],
+            'middle_name' => ['nullable', 'string', 'max:100', 'regex:/^[\pL\s\-\.\']+$/u'],
+            'last_name' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\-\.\']+$/u'],
+            'suffix' => ['nullable', 'string', 'max:20', 'regex:/^[\pL\s\-\.\']+$/u'],
             'sex' => ['required', 'in:Male,Female'],
-            'date_of_birth' => ['required', 'date', 'before_or_equal:today'],
-            'civil_status' => ['nullable', 'string', 'max:30'],
+            'date_of_birth' => ['required', 'date', 'before_or_equal:today', 'after:1900-01-01'],
+            'civil_status' => ['nullable', 'string', Rule::in(['Single', 'Married', 'Widowed', 'Separated', 'Live-in'])],
             'purok_id' => ['required', 'exists:puroks,id'],
             'street_address' => ['required', 'string', 'max:255'],
-            'contact_number' => ['required', 'string', 'max:30'],
+            'contact_number' => ['required', 'string', 'regex:/^(09|\+639)\d{9}$/'],
             'philhealth_number' => ['nullable', 'string', 'regex:/^\d{2}-\d{9}-\d{1}$/'],
-            'blood_type' => ['nullable', 'string', 'max:10'],
-            'emergency_contact_name' => ['nullable', 'string', 'max:150'],
-            'emergency_contact_number' => ['nullable', 'string', 'max:30'],
+            'blood_type' => ['nullable', 'string', Rule::in(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])],
+            'emergency_contact_name' => ['nullable', 'string', 'max:150', 'regex:/^[\pL\s\-\.\']+$/u'],
+            'emergency_contact_number' => ['nullable', 'string', 'regex:/^(09|\+639)\d{9}$/'],
         ], [
+            'first_name.regex' => 'First name may only contain letters, spaces, hyphens, and periods.',
+            'last_name.regex' => 'Last name may only contain letters, spaces, hyphens, and periods.',
+            'middle_name.regex' => 'Middle name may only contain letters, spaces, hyphens, and periods.',
+            'suffix.regex' => 'Suffix may only contain letters, spaces, hyphens, and periods.',
+            'date_of_birth.before_or_equal' => 'The date of birth cannot be a future date.',
+            'date_of_birth.after' => 'The date of birth must be after January 1, 1900.',
             'street_address.required' => 'The street address is required so the patient can be located.',
             'contact_number.required' => 'The contact number is required to proceed with registration.',
+            'contact_number.regex' => 'The contact number must be a valid Philippine mobile number (e.g. 09123456789 or +639123456789).',
+            'emergency_contact_name.regex' => 'Emergency contact name may only contain letters, spaces, hyphens, and periods.',
+            'emergency_contact_number.regex' => 'Emergency contact number must be a valid Philippine mobile number (e.g. 09123456789 or +639123456789).',
+            'civil_status.in' => 'Please select a valid civil status option.',
+            'blood_type.in' => 'Please select a valid blood type (A+, A-, B+, B-, AB+, AB-, O+, O-).',
             'philhealth_number.regex' => 'The PhilHealth number must follow the official format: XX-XXXXXXXXX-X (e.g. 12-345678901-2).',
         ]);
 
@@ -121,23 +133,34 @@ class PatientController extends Controller
     {
         $validated = $request->validate([
             'patient_control_number' => ['required', 'string', 'max:50', 'unique:patients,patient_control_number,'.$patient->id],
-            'first_name' => ['required', 'string', 'max:100'],
-            'middle_name' => ['nullable', 'string', 'max:100'],
-            'last_name' => ['required', 'string', 'max:100'],
-            'suffix' => ['nullable', 'string', 'max:20'],
+            'first_name' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\-\.\']+$/u'],
+            'middle_name' => ['nullable', 'string', 'max:100', 'regex:/^[\pL\s\-\.\']+$/u'],
+            'last_name' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\-\.\']+$/u'],
+            'suffix' => ['nullable', 'string', 'max:20', 'regex:/^[\pL\s\-\.\']+$/u'],
             'sex' => ['required', 'in:Male,Female'],
-            'date_of_birth' => ['required', 'date', 'before_or_equal:today'],
-            'civil_status' => ['nullable', 'string', 'max:30'],
+            'date_of_birth' => ['required', 'date', 'before_or_equal:today', 'after:1900-01-01'],
+            'civil_status' => ['nullable', 'string', Rule::in(['Single', 'Married', 'Widowed', 'Separated', 'Live-in'])],
             'purok_id' => ['required', 'exists:puroks,id'],
             'street_address' => ['required', 'string', 'max:255'],
-            'contact_number' => ['required', 'string', 'max:30'],
+            'contact_number' => ['required', 'string', 'regex:/^(09|\+639)\d{9}$/'],
             'philhealth_number' => ['nullable', 'string', 'regex:/^\d{2}-\d{9}-\d{1}$/'],
-            'blood_type' => ['nullable', 'string', 'max:10'],
-            'emergency_contact_name' => ['nullable', 'string', 'max:150'],
-            'emergency_contact_number' => ['nullable', 'string', 'max:30'],
+            'blood_type' => ['nullable', 'string', Rule::in(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])],
+            'emergency_contact_name' => ['nullable', 'string', 'max:150', 'regex:/^[\pL\s\-\.\']+$/u'],
+            'emergency_contact_number' => ['nullable', 'string', 'regex:/^(09|\+639)\d{9}$/'],
         ], [
+            'first_name.regex' => 'First name may only contain letters, spaces, hyphens, and periods.',
+            'last_name.regex' => 'Last name may only contain letters, spaces, hyphens, and periods.',
+            'middle_name.regex' => 'Middle name may only contain letters, spaces, hyphens, and periods.',
+            'suffix.regex' => 'Suffix may only contain letters, spaces, hyphens, and periods.',
+            'date_of_birth.before_or_equal' => 'The date of birth cannot be a future date.',
+            'date_of_birth.after' => 'The date of birth must be after January 1, 1900.',
             'street_address.required' => 'The street address is required so the patient can be located.',
             'contact_number.required' => 'The contact number is required to proceed with saving changes.',
+            'contact_number.regex' => 'The contact number must be a valid Philippine mobile number (e.g. 09123456789 or +639123456789).',
+            'emergency_contact_name.regex' => 'Emergency contact name may only contain letters, spaces, hyphens, and periods.',
+            'emergency_contact_number.regex' => 'Emergency contact number must be a valid Philippine mobile number (e.g. 09123456789 or +639123456789).',
+            'civil_status.in' => 'Please select a valid civil status option.',
+            'blood_type.in' => 'Please select a valid blood type (A+, A-, B+, B-, AB+, AB-, O+, O-).',
             'philhealth_number.regex' => 'The PhilHealth number must follow the official format: XX-XXXXXXXXX-X (e.g. 12-345678901-2).',
         ]);
 
