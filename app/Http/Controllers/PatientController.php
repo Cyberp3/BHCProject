@@ -21,6 +21,13 @@ class PatientController extends Controller
     {
         $query = Patient::with('purok')->latest();
 
+        $status = $request->input('status', 'active');
+        if ($status === 'archived') {
+            $query->onlyTrashed();
+        } elseif ($status === 'all') {
+            $query->withTrashed();
+        }
+
         if ($request->filled('search')) {
             $query->search($request->input('search'));
         }
@@ -146,6 +153,7 @@ class PatientController extends Controller
         /** @var User $user */
         $user = Auth::user();
         abort_if($user->isAdmin(), 403, 'Unauthorized: Patient personal and medical records may only be edited by authorized healthcare personnel.');
+        abort_if($patient->trashed(), 422, 'Cannot edit an archived patient record. Please restore the patient first.');
 
         $puroks = Purok::orderBy('id')->get();
 
@@ -157,6 +165,7 @@ class PatientController extends Controller
         /** @var User $user */
         $user = Auth::user();
         abort_if($user->isAdmin(), 403, 'Unauthorized: Patient personal and medical records may only be edited by authorized healthcare personnel.');
+        abort_if($patient->trashed(), 422, 'Cannot update an archived patient record. Please restore the patient first.');
 
         $validated = $request->validate([
             'patient_control_number' => ['required', 'string', 'max:50', 'unique:patients,patient_control_number,'.$patient->id],
@@ -225,5 +234,25 @@ class PatientController extends Controller
 
         return redirect()->route('patients.index')
             ->with('success', 'Patient record archived successfully.');
+    }
+
+    public function restore(Patient $patient): RedirectResponse
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        abort_unless($user?->isAdmin(), 403, 'Unauthorized: Only health center administrators are authorized to restore archived patient records.');
+
+        $patient->restore();
+
+        AuditLog::log(
+            'RESTORE_PATIENT',
+            'Patients',
+            "Restored archived patient record: {$patient->full_name} ({$patient->patient_control_number})",
+            $patient->id
+        );
+
+        return redirect()->route('patients.show', $patient)
+            ->with('success', 'Patient record restored successfully.');
     }
 }

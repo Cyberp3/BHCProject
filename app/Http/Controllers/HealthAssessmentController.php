@@ -22,6 +22,7 @@ class HealthAssessmentController extends Controller
         /** @var User $user */
         $user = Auth::user();
         abort_if($user->isAdmin(), 403, 'Unauthorized: Health assessments and vital signs must be conducted and recorded by authorized healthcare personnel.');
+        abort_if($patient->trashed(), 422, 'Cannot record health assessment for an archived patient record. Please restore the patient first.');
 
         $today = Carbon::today()->format('Y-m-d');
 
@@ -33,6 +34,7 @@ class HealthAssessmentController extends Controller
         /** @var User $user */
         $user = Auth::user();
         abort_if($user->isAdmin(), 403, 'Unauthorized: Health assessments and vital signs must be conducted and recorded by authorized healthcare personnel.');
+        abort_if($patient->trashed(), 422, 'Cannot record health assessment for an archived patient record. Please restore the patient first.');
 
         $validator = Validator::make($request->all(), [
             'assessment_date' => ['required', 'date', 'before_or_equal:today', 'after:1900-01-01'],

@@ -130,7 +130,7 @@ class Patient extends Model
 
     public function inventoryTransactions(): HasMany
     {
-        return $this->hasMany(InventoryTransaction::class);
+        return $this->hasMany(InventoryTransaction::class)->latest('transaction_date');
     }
 
     public function scopeSearch(Builder $query, ?string $term): Builder
@@ -139,11 +139,27 @@ class Patient extends Model
             return $query;
         }
 
-        return $query->where(function (Builder $q) use ($term) {
+        $term = trim($term);
+        $words = array_values(array_filter(preg_split('/\s+/', str_replace(',', ' ', $term))));
+
+        return $query->where(function (Builder $q) use ($term, $words) {
             $q->where('patient_control_number', 'like', "%{$term}%")
                 ->orWhere('first_name', 'like', "%{$term}%")
                 ->orWhere('last_name', 'like', "%{$term}%")
                 ->orWhere('middle_name', 'like', "%{$term}%");
+
+            if (count($words) > 1) {
+                $q->orWhere(function (Builder $sub) use ($words) {
+                    foreach ($words as $word) {
+                        $sub->where(function (Builder $w) use ($word) {
+                            $w->where('first_name', 'like', "%{$word}%")
+                                ->orWhere('last_name', 'like', "%{$word}%")
+                                ->orWhere('middle_name', 'like', "%{$word}%")
+                                ->orWhere('patient_control_number', 'like', "%{$word}%");
+                        });
+                    }
+                });
+            }
         });
     }
 

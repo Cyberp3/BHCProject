@@ -454,4 +454,3 @@ class DemoPatientSeeder extends Seeder
         ]);
     }
 }
-

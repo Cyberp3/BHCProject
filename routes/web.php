@@ -26,7 +26,8 @@ Route::middleware(['auth', 'active_user'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Module 1 & 2: Patients & Vitals/Assessments
-    Route::resource('patients', PatientController::class);
+    Route::patch('patients/{patient}/restore', [PatientController::class, 'restore'])->name('patients.restore')->withTrashed();
+    Route::resource('patients', PatientController::class)->withTrashed(['show']);
     Route::get('patients/{patient}/assessments/create', [HealthAssessmentController::class, 'create'])->name('assessments.create');
     Route::post('patients/{patient}/assessments', [HealthAssessmentController::class, 'store'])->name('assessments.store');
 

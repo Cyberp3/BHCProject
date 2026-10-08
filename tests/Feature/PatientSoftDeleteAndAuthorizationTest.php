@@ -3,6 +3,7 @@
 use App\Models\Appointment;
 use App\Models\AuditLog;
 use App\Models\HealthServiceRecord;
+use App\Models\InventoryItem;
 use App\Models\Patient;
 use App\Models\Purok;
 use App\Models\User;
@@ -353,4 +354,134 @@ test('consultation detail screen renders protected health information confidenti
     $nurseView->assertStatus(200);
     $nurseView->assertSee('Protected Health Information (PHI)');
     $nurseView->assertSee('Attending Healthcare Personnel View');
+});
+
+test('administrator can restore an archived patient and action is recorded in audit log', function () {
+    $this->patient->delete();
+    expect($this->patient->fresh()->trashed())->toBeTrue();
+
+    $response = $this->actingAs($this->admin)->patch(route('patients.restore', $this->patient));
+
+    $response->assertRedirect(route('patients.show', $this->patient));
+    $response->assertSessionHas('success', 'Patient record restored successfully.');
+
+    expect($this->patient->fresh()->trashed())->toBeFalse();
+
+    $log = AuditLog::where('module', 'Patients')
+        ->where('action', 'RESTORE_PATIENT')
+        ->where('record_id', $this->patient->id)
+        ->first();
+
+    expect($log)->not->toBeNull();
+    expect($log->description)->toContain('Restored archived patient record');
+});
+
+test('non-admin personnel cannot restore an archived patient and receive 403', function () {
+    $this->patient->delete();
+
+    $response = $this->actingAs($this->nurse)->patch(route('patients.restore', $this->patient));
+    $response->assertForbidden();
+
+    expect($this->patient->fresh()->trashed())->toBeTrue();
+});
+
+test('archived patient can be viewed on show route and displays archived notice and restore option for admin', function () {
+    $this->patient->delete();
+
+    $response = $this->actingAs($this->admin)->get(route('patients.show', $this->patient));
+    $response->assertStatus(200);
+    $response->assertSee('Archived Patient Record');
+    $response->assertSee('Restore Patient');
+    $response->assertSee('Archived Record (New entries suspended)');
+});
+
+test('healthcare staff cannot edit or update an archived patient record', function () {
+    $this->patient->delete();
+
+    $editResponse = $this->actingAs($this->nurse)->get(route('patients.edit', $this->patient));
+    $editResponse->assertNotFound();
+
+    $updateResponse = $this->actingAs($this->nurse)->put(route('patients.update', $this->patient), [
+        'patient_control_number' => $this->patient->patient_control_number,
+        'first_name' => 'Roberto',
+        'last_name' => 'Gomez',
+        'sex' => 'Male',
+        'date_of_birth' => '1980-01-15',
+        'purok_id' => $this->purok->id,
+        'street_address' => 'Purok 1 Interior',
+        'contact_number' => '09170003344',
+    ]);
+    $updateResponse->assertNotFound();
+});
+
+test('multi-word patient search matches full name and comma-separated name', function () {
+    $responseFullName = $this->actingAs($this->admin)->get(route('patients.index', ['search' => 'Roberto Gomez']));
+    $responseFullName->assertStatus(200);
+    $responseFullName->assertSee($this->patient->patient_control_number);
+
+    $responseReverse = $this->actingAs($this->admin)->get(route('patients.index', ['search' => 'Gomez, Roberto']));
+    $responseReverse->assertStatus(200);
+    $responseReverse->assertSee($this->patient->patient_control_number);
+});
+
+test('patients directory status filter isolates active and archived records', function () {
+    $archivedPatient = Patient::create([
+        'patient_control_number' => 'TAC-STATUS-ARC-'.uniqid(),
+        'first_name' => 'Archived',
+        'last_name' => 'Person',
+        'sex' => 'Female',
+        'date_of_birth' => '1995-05-05',
+        'purok_id' => $this->purok->id,
+        'street_address' => 'Purok 1 Interior',
+        'contact_number' => '09170009988',
+        'created_by' => $this->admin->id,
+    ]);
+    $archivedPatient->delete();
+
+    // Default or active status: only active patient appears
+    $responseActive = $this->actingAs($this->admin)->get(route('patients.index', ['status' => 'active']));
+    $responseActive->assertStatus(200);
+    $responseActive->assertSee($this->patient->patient_control_number);
+    $responseActive->assertDontSee($archivedPatient->patient_control_number);
+
+    // Archived status: only archived patient appears
+    $responseArchived = $this->actingAs($this->admin)->get(route('patients.index', ['status' => 'archived']));
+    $responseArchived->assertStatus(200);
+    $responseArchived->assertDontSee($this->patient->patient_control_number);
+    $responseArchived->assertSee($archivedPatient->patient_control_number);
+
+    // All status: both patients appear
+    $responseAll = $this->actingAs($this->admin)->get(route('patients.index', ['status' => 'all']));
+    $responseAll->assertStatus(200);
+    $responseAll->assertSee($this->patient->patient_control_number);
+    $responseAll->assertSee($archivedPatient->patient_control_number);
+});
+
+test('appointment creation and inventory dispense reject archived patients', function () {
+    $this->patient->delete();
+
+    $nextWednesday = Carbon::now()->next(Carbon::WEDNESDAY)->format('Y-m-d');
+    $apptResponse = $this->actingAs($this->admin)->post(route('appointments.store'), [
+        'patient_id' => $this->patient->id,
+        'service_type' => 'immunization',
+        'appointment_date' => $nextWednesday,
+        'appointment_time' => '09:00',
+        'purpose' => 'Post-archive checkup',
+    ]);
+    $apptResponse->assertSessionHasErrors(['patient_id']);
+
+    $item = InventoryItem::create([
+        'item_code' => 'TEST-MED-'.uniqid(),
+        'name' => 'Paracetamol 500mg',
+        'category' => 'medicine',
+        'unit_of_measure' => 'tablet',
+        'minimum_stock_alert' => 50,
+    ]);
+
+    $dispenseResponse = $this->actingAs($this->nurse)->post(route('inventory.dispense.process'), [
+        'inventory_item_id' => $item->id,
+        'patient_id' => $this->patient->id,
+        'quantity' => 10,
+    ]);
+    $dispenseResponse->assertSessionHasErrors(['patient_id']);
 });

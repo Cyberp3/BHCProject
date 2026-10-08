@@ -277,9 +277,11 @@ class InventoryController extends Controller
     {
         $validated = $request->validate([
             'inventory_item_id' => ['required', 'exists:inventory_items,id'],
-            'patient_id' => ['nullable', 'exists:patients,id'],
+            'patient_id' => ['nullable', Rule::exists('patients', 'id')->whereNull('deleted_at')],
             'quantity' => ['required', 'integer', 'min:1'],
             'remarks' => ['nullable', 'string', 'max:255'],
+        ], [
+            'patient_id.exists' => 'The selected patient record does not exist or has been archived.',
         ]);
 
         $today = Carbon::today();

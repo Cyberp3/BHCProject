@@ -11,6 +11,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class AppointmentController extends Controller
 {
@@ -67,12 +68,14 @@ class AppointmentController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'patient_id' => ['required', 'exists:patients,id'],
+            'patient_id' => ['required', Rule::exists('patients', 'id')->whereNull('deleted_at')],
             'service_type' => ['required', 'string', 'max:50'],
             'appointment_date' => ['required', 'date'],
             'appointment_time' => ['nullable', 'string'],
             'purpose' => ['required', 'string', 'max:255'],
             'status_notes' => ['nullable', 'string'],
+        ], [
+            'patient_id.exists' => 'The selected patient record does not exist or has been archived.',
         ]);
 
         $appDate = Carbon::parse($validated['appointment_date']);

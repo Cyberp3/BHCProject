@@ -36,13 +36,22 @@
             <form method="GET" action="{{ route('patients.index') }}" class="space-y-3">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
                     <!-- Search Input -->
-                    <div class="sm:col-span-2 lg:col-span-4 relative">
+                    <div class="sm:col-span-2 lg:col-span-3 relative">
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name or control #..." class="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div class="sm:col-span-1 lg:col-span-2">
+                        <select name="status" class="w-full py-2 px-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <option value="active" {{ request('status', 'active') === 'active' ? 'selected' : '' }}>Status: Active</option>
+                            <option value="archived" {{ request('status') === 'archived' ? 'selected' : '' }}>Status: Archived</option>
+                            <option value="all" {{ request('status') === 'all' ? 'selected' : '' }}>Status: All Records</option>
+                        </select>
                     </div>
 
                     <!-- Purok Filter -->
@@ -58,7 +67,7 @@
                     </div>
 
                     <!-- Sex Filter -->
-                    <div class="sm:col-span-1 lg:col-span-2">
+                    <div class="sm:col-span-1 lg:col-span-1">
                         <select name="sex" class="w-full py-2 px-3 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                             <option value="">Sex: All</option>
                             <option value="Male" {{ request('sex') === 'Male' ? 'selected' : '' }}>Male</option>
@@ -96,7 +105,7 @@
                         Showing <strong class="text-slate-800">{{ $patients->total() }}</strong> patient record{{ $patients->total() === 1 ? '' : 's' }}
                     </span>
                     <div class="flex items-center gap-2">
-                        @if (request()->hasAny(['search', 'purok_id', 'sex', 'age_bracket', 'service_type']))
+                        @if (request()->hasAny(['search', 'purok_id', 'sex', 'age_bracket', 'service_type']) || (request('status') && request('status') !== 'active'))
                             <a href="{{ route('patients.index') }}" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg font-medium transition flex items-center gap-1">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                 Clear Filters
@@ -133,14 +142,21 @@
                                     {{ $patient->patient_control_number }}
                                 </td>
                                 <td class="px-5 py-4">
-                                    <a href="{{ route('patients.show', $patient) }}" class="font-semibold text-slate-900 hover:text-emerald-600">
-                                        {{ $patient->full_name }}
-                                    </a>
-                                    @if ($patient->blood_type)
-                                        <span class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 font-bold border border-rose-200">
-                                            {{ $patient->blood_type }}
-                                        </span>
-                                    @endif
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <a href="{{ route('patients.show', $patient) }}" class="font-semibold text-slate-900 hover:text-emerald-600">
+                                            {{ $patient->full_name }}
+                                        </a>
+                                        @if ($patient->trashed())
+                                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-bold border border-amber-200">
+                                                Archived
+                                            </span>
+                                        @endif
+                                        @if ($patient->blood_type)
+                                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 font-bold border border-rose-200">
+                                                {{ $patient->blood_type }}
+                                            </span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="px-5 py-4 text-xs">
                                     {{ $patient->sex }} &bull; {{ $patient->age }} yrs old
@@ -162,9 +178,15 @@
                                         View Profile
                                     </a>
                                     @if (! Auth::user()->isAdmin())
-                                        <a href="{{ route('patients.edit', $patient) }}" class="inline-flex items-center px-2.5 py-1.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
-                                            Edit Patient
-                                        </a>
+                                        @if (! $patient->trashed())
+                                            <a href="{{ route('patients.edit', $patient) }}" class="inline-flex items-center px-2.5 py-1.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                                                Edit Patient
+                                            </a>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                                                Archived
+                                            </span>
+                                        @endif
                                     @else
                                         <span class="inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-slate-50 text-slate-400 border border-slate-200/60">
                                             Read-Only
