@@ -143,6 +143,10 @@ class PatientController extends Controller
 
     public function edit(Patient $patient): View
     {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_if($user->isAdmin(), 403, 'Unauthorized: Patient personal and medical records may only be edited by authorized healthcare personnel.');
+
         $puroks = Purok::orderBy('id')->get();
 
         return view('patients.edit', compact('patient', 'puroks'));
@@ -150,6 +154,10 @@ class PatientController extends Controller
 
     public function update(Request $request, Patient $patient): RedirectResponse
     {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_if($user->isAdmin(), 403, 'Unauthorized: Patient personal and medical records may only be edited by authorized healthcare personnel.');
+
         $validated = $request->validate([
             'patient_control_number' => ['required', 'string', 'max:50', 'unique:patients,patient_control_number,'.$patient->id],
             'first_name' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\-\.\']+$/u'],

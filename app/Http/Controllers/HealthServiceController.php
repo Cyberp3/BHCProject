@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AuditLog;
 use App\Models\HealthServiceRecord;
 use App\Models\Patient;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -48,6 +49,10 @@ class HealthServiceController extends Controller
 
     public function create(Request $request): View
     {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_if($user->isAdmin(), 403, 'Unauthorized: Health program consultations and clinical care must be conducted and recorded by authorized healthcare personnel.');
+
         $patient = null;
         if ($request->filled('patient_id')) {
             $patient = Patient::findOrFail($request->input('patient_id'));
@@ -67,6 +72,10 @@ class HealthServiceController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_if($user->isAdmin(), 403, 'Unauthorized: Health program consultations and clinical care must be conducted and recorded by authorized healthcare personnel.');
+
         $validated = $request->validate([
             'patient_id' => ['required', Rule::exists('patients', 'id')->whereNull('deleted_at')],
             'service_type' => ['required', Rule::in(array_keys(HealthServiceRecord::SERVICES))],

@@ -76,7 +76,17 @@ class User extends Authenticatable
 
     public function isClinicalStaff(): bool
     {
-        return in_array(strtolower(trim((string) $this->role)), ['admin', 'nurse', 'midwife'], true);
+        return in_array(strtolower(trim((string) $this->role)), ['nurse', 'midwife'], true);
+    }
+
+    public function isHealthPersonnel(): bool
+    {
+        return in_array(strtolower(trim((string) $this->role)), ['nurse', 'midwife', 'bns', 'bhw', 'bhv'], true);
+    }
+
+    public function canRecordClinicalCare(): bool
+    {
+        return ! $this->isAdmin() && $this->isHealthPersonnel();
     }
 
     public function getRoleDisplayNameAttribute(): string

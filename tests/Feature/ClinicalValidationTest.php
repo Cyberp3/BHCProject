@@ -19,6 +19,16 @@ beforeEach(function () {
         ]
     );
 
+    $this->nurse = User::firstOrCreate(
+        ['email' => 'nurse@tacunan.gov.ph'],
+        [
+            'name' => 'Nurse Joy',
+            'password' => bcrypt('password123'),
+            'role' => 'nurse',
+            'is_active' => true,
+        ]
+    );
+
     $this->purok = Purok::first();
 });
 
@@ -129,7 +139,7 @@ test('health assessment requires assessment date to not be in the future', funct
         'created_by' => $this->admin->id,
     ]);
 
-    $response = $this->actingAs($this->admin)->post(route('assessments.store', $patient), [
+    $response = $this->actingAs($this->nurse)->post(route('assessments.store', $patient), [
         'assessment_date' => Carbon::tomorrow()->format('Y-m-d'),
         'systolic_bp' => 120,
         'diastolic_bp' => 80,
@@ -152,14 +162,14 @@ test('health assessment blood pressure fields must be paired', function () {
     ]);
 
     // Systolic provided without diastolic
-    $response1 = $this->actingAs($this->admin)->post(route('assessments.store', $patient), [
+    $response1 = $this->actingAs($this->nurse)->post(route('assessments.store', $patient), [
         'assessment_date' => Carbon::today()->format('Y-m-d'),
         'systolic_bp' => 120,
     ]);
     $response1->assertSessionHasErrors(['diastolic_bp']);
 
     // Diastolic provided without systolic
-    $response2 = $this->actingAs($this->admin)->post(route('assessments.store', $patient), [
+    $response2 = $this->actingAs($this->nurse)->post(route('assessments.store', $patient), [
         'assessment_date' => Carbon::today()->format('Y-m-d'),
         'diastolic_bp' => 80,
     ]);
@@ -179,7 +189,7 @@ test('health assessment enforces physiological rule that systolic BP must be hig
         'created_by' => $this->admin->id,
     ]);
 
-    $response = $this->actingAs($this->admin)->post(route('assessments.store', $patient), [
+    $response = $this->actingAs($this->nurse)->post(route('assessments.store', $patient), [
         'assessment_date' => Carbon::today()->format('Y-m-d'),
         'systolic_bp' => 70,
         'diastolic_bp' => 110, // Inverted BP
@@ -203,7 +213,7 @@ test('health assessment cannot be submitted completely blank without any clinica
         'created_by' => $this->admin->id,
     ]);
 
-    $response = $this->actingAs($this->admin)->post(route('assessments.store', $patient), [
+    $response = $this->actingAs($this->nurse)->post(route('assessments.store', $patient), [
         'assessment_date' => Carbon::today()->format('Y-m-d'),
         'weight_kg' => null,
         'height_cm' => null,
@@ -234,7 +244,7 @@ test('patient update enforces the same demographic validation rules', function (
         'created_by' => $this->admin->id,
     ]);
 
-    $response = $this->actingAs($this->admin)->put(route('patients.update', $patient), [
+    $response = $this->actingAs($this->nurse)->put(route('patients.update', $patient), [
         'patient_control_number' => 'TAC-VAL-UPDATE-01',
         'first_name' => 'Roberto99', // Invalid name
         'last_name' => 'Dalisay',

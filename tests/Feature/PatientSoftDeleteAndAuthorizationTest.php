@@ -134,7 +134,7 @@ test('suggested control number accounts for soft-deleted patients and never coll
 test('health service follow-up advisory date must be a future date', function () {
     $yesterday = Carbon::yesterday()->format('Y-m-d');
 
-    $response = $this->actingAs($this->admin)->post(route('services.store'), [
+    $response = $this->actingAs($this->nurse)->post(route('services.store'), [
         'patient_id' => $this->patient->id,
         'service_type' => 'immunization',
         'service_date' => Carbon::today()->format('Y-m-d'),
@@ -147,7 +147,7 @@ test('health service follow-up advisory date must be a future date', function ()
 test('health service creation rejects archived soft-deleted patients', function () {
     $this->patient->delete();
 
-    $response = $this->actingAs($this->admin)->post(route('services.store'), [
+    $response = $this->actingAs($this->nurse)->post(route('services.store'), [
         'patient_id' => $this->patient->id,
         'service_type' => 'immunization',
         'service_date' => Carbon::today()->format('Y-m-d'),
@@ -160,7 +160,7 @@ test('health service creation rejects archived soft-deleted patients', function 
 test('health service consultation index and show pages render cleanly for archived patients', function () {
     $record = HealthServiceRecord::create([
         'patient_id' => $this->patient->id,
-        'user_id' => $this->admin->id,
+        'user_id' => $this->nurse->id,
         'service_type' => 'cvd_screening',
         'service_date' => Carbon::today()->format('Y-m-d'),
         'complaint_or_reason' => 'Hypertension checkup',
@@ -187,7 +187,7 @@ test('health service consultation index and show pages render cleanly for archiv
 });
 
 test('health service data storage strictly sanitizes and whitelists program parameters', function () {
-    $response = $this->actingAs($this->admin)->post(route('services.store'), [
+    $response = $this->actingAs($this->nurse)->post(route('services.store'), [
         'patient_id' => $this->patient->id,
         'service_type' => 'immunization',
         'service_date' => Carbon::today()->format('Y-m-d'),
@@ -222,7 +222,7 @@ test('health service data storage strictly sanitizes and whitelists program para
 test('services index search finds consultations by clinical findings and complaints', function () {
     HealthServiceRecord::create([
         'patient_id' => $this->patient->id,
-        'user_id' => $this->admin->id,
+        'user_id' => $this->nurse->id,
         'service_type' => 'cvd_screening',
         'service_date' => Carbon::today()->format('Y-m-d'),
         'complaint_or_reason' => 'Dizziness and blurred vision',
@@ -238,4 +238,59 @@ test('services index search finds consultations by clinical findings and complai
     $searchResponse2 = $this->actingAs($this->admin)->get(route('services.index', ['search' => 'blurred vision']));
     $searchResponse2->assertStatus(200);
     $searchResponse2->assertSee('Amlodipine');
+});
+
+test('admin is forbidden from editing patient records and receives 403', function () {
+    $editPage = $this->actingAs($this->admin)->get(route('patients.edit', $this->patient));
+    $editPage->assertForbidden();
+
+    $updateReq = $this->actingAs($this->admin)->put(route('patients.update', $this->patient), [
+        'patient_control_number' => $this->patient->patient_control_number,
+        'first_name' => 'Roberto',
+        'last_name' => 'Gomez',
+        'sex' => 'Male',
+        'date_of_birth' => '1980-01-15',
+        'purok_id' => $this->purok->id,
+        'street_address' => 'Purok 1 Interior',
+        'contact_number' => '09170003344',
+    ]);
+    $updateReq->assertForbidden();
+});
+
+test('admin is forbidden from creating clinical health assessments and receives 403', function () {
+    $createPage = $this->actingAs($this->admin)->get(route('assessments.create', $this->patient));
+    $createPage->assertForbidden();
+
+    $storeReq = $this->actingAs($this->admin)->post(route('assessments.store', $this->patient), [
+        'assessment_date' => Carbon::today()->format('Y-m-d'),
+        'weight_kg' => 65.0,
+        'height_cm' => 170.0,
+        'systolic_bp' => 120,
+        'diastolic_bp' => 80,
+    ]);
+    $storeReq->assertForbidden();
+});
+
+test('admin is forbidden from recording health service consultations and receives 403', function () {
+    $createPage = $this->actingAs($this->admin)->get(route('services.create'));
+    $createPage->assertForbidden();
+
+    $storeReq = $this->actingAs($this->admin)->post(route('services.store'), [
+        'patient_id' => $this->patient->id,
+        'service_type' => 'immunization',
+        'service_date' => Carbon::today()->format('Y-m-d'),
+        'complaint_or_reason' => 'Routine vaccine',
+    ]);
+    $storeReq->assertForbidden();
+});
+
+test('clinical health personnel can edit patient records and record consultations', function () {
+    $editPage = $this->actingAs($this->nurse)->get(route('patients.edit', $this->patient));
+    $editPage->assertStatus(200);
+
+    $servicePage = $this->actingAs($this->nurse)->get(route('services.create', ['patient_id' => $this->patient->id]));
+    $servicePage->assertStatus(200);
+
+    $assessmentPage = $this->actingAs($this->nurse)->get(route('assessments.create', $this->patient));
+    $assessmentPage->assertStatus(200);
 });

@@ -22,6 +22,15 @@ beforeEach(function () {
             'is_active' => true,
         ]
     );
+    $this->nurse = User::firstOrCreate(
+        ['email' => 'nurse@tacunan.gov.ph'],
+        [
+            'name' => 'Barangay Nurse',
+            'password' => bcrypt('password123'),
+            'role' => 'nurse',
+            'is_active' => true,
+        ]
+    );
 });
 
 test('admin can access dashboard and view core operational metrics', function () {
@@ -86,7 +95,7 @@ test('can record vital signs and BMI is auto-calculated', function () {
         'notes' => 'Patient in good condition',
     ];
 
-    $response = $this->actingAs($this->admin)->post(route('assessments.store', $patient), $vitalsData);
+    $response = $this->actingAs($this->nurse)->post(route('assessments.store', $patient), $vitalsData);
 
     $response->assertRedirect(route('patients.show', $patient));
 
@@ -124,7 +133,7 @@ test('can log health service consultation visit record', function () {
         'next_follow_up_date' => $followUpDate,
     ];
 
-    $response = $this->actingAs($this->admin)->post(route('services.store'), $serviceData);
+    $response = $this->actingAs($this->nurse)->post(route('services.store'), $serviceData);
 
     $response->assertRedirect(route('patients.show', $patient));
 
@@ -262,16 +271,24 @@ test('all application view screens render successfully without errors', function
         'status' => 'scheduled',
     ]);
 
-    $urls = [
+    $clinicalUrls = [
+        route('patients.edit', $patient),
+        route('assessments.create', $patient),
+        route('services.create'),
+        route('services.create', ['patient_id' => $patient->id]),
+    ];
+
+    foreach ($clinicalUrls as $url) {
+        $response = $this->actingAs($this->nurse)->get($url);
+        $response->assertStatus(200);
+    }
+
+    $adminUrls = [
         route('dashboard'),
         route('patients.index'),
         route('patients.create'),
         route('patients.show', $patient),
-        route('patients.edit', $patient),
-        route('assessments.create', $patient),
         route('services.index'),
-        route('services.create'),
-        route('services.create', ['patient_id' => $patient->id]),
         route('appointments.index'),
         route('appointments.create'),
         route('appointments.create', ['patient_id' => $patient->id]),
@@ -295,7 +312,7 @@ test('all application view screens render successfully without errors', function
         route('audit-logs.index'),
     ];
 
-    foreach ($urls as $url) {
+    foreach ($adminUrls as $url) {
         $response = $this->actingAs($this->admin)->get($url);
         $response->assertStatus(200);
     }

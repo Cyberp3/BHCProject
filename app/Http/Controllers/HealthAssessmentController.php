@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AuditLog;
 use App\Models\HealthAssessment;
 use App\Models\Patient;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -18,6 +19,10 @@ class HealthAssessmentController extends Controller
     //
     public function create(Patient $patient): View
     {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_if($user->isAdmin(), 403, 'Unauthorized: Health assessments and vital signs must be conducted and recorded by authorized healthcare personnel.');
+
         $today = Carbon::today()->format('Y-m-d');
 
         return view('assessments.create', compact('patient', 'today'));
@@ -25,6 +30,10 @@ class HealthAssessmentController extends Controller
 
     public function store(Request $request, Patient $patient): RedirectResponse
     {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_if($user->isAdmin(), 403, 'Unauthorized: Health assessments and vital signs must be conducted and recorded by authorized healthcare personnel.');
+
         $validator = Validator::make($request->all(), [
             'assessment_date' => ['required', 'date', 'before_or_equal:today', 'after:1900-01-01'],
             'weight_kg' => ['nullable', 'numeric', 'min:0.5', 'max:300'],
