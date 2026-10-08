@@ -6,7 +6,14 @@
                 <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Health Center Services</h1>
                 <p class="text-sm text-slate-500 mt-1">Official health programs and service delivery records for Barangay Tacunan.</p>
             </div>
-            <div>
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    RA 10173 Protected
+                </span>
+
                 @if (! Auth::user()->isAdmin())
                     <a href="{{ route('services.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold shadow-sm transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -15,11 +22,11 @@
                         New Consultation Record
                     </a>
                 @else
-                    <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 shadow-2xs">
                         <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        Administrative Mode (Read-Only)
+                        Administrative Oversight (Read-Only)
                     </span>
                 @endif
             </div>
@@ -66,6 +73,10 @@
                                 <a href="{{ route('services.create', ['type' => $key]) }}" class="text-xs font-semibold px-2 py-1 bg-slate-50 hover:bg-emerald-50 hover:text-emerald-700 rounded border border-slate-200 text-slate-700 transition">
                                     + Record Visit
                                 </a>
+                            @else
+                                <span class="text-[11px] font-medium text-slate-400 px-1.5 py-0.5 rounded bg-slate-50 border border-slate-200/60">
+                                    Read-Only
+                                </span>
                             @endif
                         </div>
                     </div>

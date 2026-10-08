@@ -1,11 +1,19 @@
 <x-app-layout>
-    <div class="space-y-6" x-data="{ activeTab: 'assessments' }">
-        <!-- Breadcrumb -->
+    <div class="space-y-6" x-data="{ activeTab: 'assessments', privacyMask: {{ Auth::user()->isAdmin() ? 'true' : 'false' }} }">
+        <!-- Breadcrumb & Privacy Controls -->
         <div class="flex items-center justify-between">
             <a href="{{ route('patients.index') }}" class="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1">
                 &larr; Back to Patient Directory
             </a>
             <div class="flex items-center gap-2">
+                <!-- Privacy Shield Toggle -->
+                <button type="button" @click="privacyMask = !privacyMask" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition shadow-2xs" :class="privacyMask ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span x-text="privacyMask ? 'Privacy Shield: Masked' : 'Privacy Shield: Visible'"></span>
+                </button>
+
                 @if (! Auth::user()->isAdmin())
                     <a href="{{ route('patients.edit', $patient) }}" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 transition shadow-2xs">
                         Edit Profile
@@ -25,6 +33,36 @@
                 @endif
             </div>
         </div>
+
+        <!-- Administrative Privacy & Medical Confidentiality Notice -->
+        @if (Auth::user()->isAdmin())
+            <div class="p-4 bg-amber-50/90 border border-amber-200 rounded-xl text-amber-900 text-xs shadow-2xs flex items-start gap-3">
+                <div class="p-2 bg-amber-100 text-amber-800 rounded-lg shrink-0 mt-0.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+                <div class="space-y-1 flex-1">
+                    <div class="font-bold text-amber-950 flex flex-wrap items-center gap-2">
+                        <span>Administrative Read-Only View &bull; Medical Confidentiality Enforced</span>
+                        <span class="px-2 py-0.5 rounded bg-amber-200/80 text-amber-900 text-[10px] font-bold uppercase tracking-wider">RA 10173 Compliance</span>
+                    </div>
+                    <p class="text-amber-800 leading-relaxed">
+                        In accordance with Republic Act 10173 (Philippine Data Privacy Act of 2012) and health center policy, patient personal demographics, vital sign assessments, and consultation entries are restricted from administrative alteration. Clinical actions are reserved exclusively for licensed and frontline health personnel (Nurses, Midwives, BHWs, and BNS).
+                    </p>
+                </div>
+            </div>
+        @else
+            <div class="px-4 py-2 bg-emerald-50/80 border border-emerald-200 rounded-lg text-emerald-900 text-xs flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <span class="font-semibold">Authorized Healthcare Personnel Access &bull; Confidential Medical Record</span>
+                </div>
+                <span class="text-[10px] uppercase tracking-wider font-bold text-emerald-700">DOH & RA 10173 Protected</span>
+            </div>
+        @endif
 
         <!-- Patient Header Card -->
         <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-6">
@@ -116,9 +154,17 @@
         <!-- TAB 1: VITALS & BNS ASSESSMENTS -->
         <div x-show="activeTab === 'assessments'" class="space-y-4">
             <div class="flex items-center justify-between">
-                <h2 class="font-bold text-slate-800 text-base">Recorded Vital Signs & Anthropometrics</h2>
+                <div class="flex items-center gap-2">
+                    <h2 class="font-bold text-slate-800 text-base">Recorded Vital Signs & Anthropometrics</h2>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                        <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        PHI Confidential
+                    </span>
+                </div>
                 @if (! Auth::user()->isAdmin())
                     <a href="{{ route('assessments.create', $patient) }}" class="text-xs text-emerald-600 hover:underline font-semibold">+ Record New Vitals</a>
+                @else
+                    <span class="text-xs text-slate-400 italic">Clinical entry restricted to healthcare personnel</span>
                 @endif
             </div>
 
@@ -189,9 +235,17 @@
         <!-- TAB 2: HEALTH SERVICES RECORDS (8 PROGRAMS) -->
         <div x-show="activeTab === 'services'" class="space-y-4" style="display: none;">
             <div class="flex items-center justify-between">
-                <h2 class="font-bold text-slate-800 text-base">Health Center Consultations & Programs</h2>
+                <div class="flex items-center gap-2">
+                    <h2 class="font-bold text-slate-800 text-base">Health Center Consultations & Programs</h2>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                        <svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        PHI Confidential
+                    </span>
+                </div>
                 @if (! Auth::user()->isAdmin())
                     <a href="{{ route('services.create', ['patient_id' => $patient->id]) }}" class="text-xs text-blue-600 hover:underline font-semibold">+ Add Service Record</a>
+                @else
+                    <span class="text-xs text-slate-400 italic">Consultations restricted to healthcare personnel</span>
                 @endif
             </div>
 
@@ -359,11 +413,26 @@
 
         <!-- TAB 5: FULL DEMOGRAPHICS & CONTACTS -->
         <div x-show="activeTab === 'info'" class="bg-white rounded-xl border border-slate-200 shadow-xs p-6" style="display: none;">
-            <h2 class="font-bold text-slate-800 text-sm mb-4">Complete Demographic Details</h2>
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <h2 class="font-bold text-slate-800 text-sm">Complete Demographic Details</h2>
+                    <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                        PII Protected
+                    </span>
+                </div>
+                <button type="button" @click="privacyMask = !privacyMask" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span x-text="privacyMask ? 'Reveal PII' : 'Mask PII'"></span>
+                </button>
+            </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-sm">
                 <div>
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Street Address</span>
-                    <span class="text-slate-800 font-medium">{{ $patient->street_address ?? 'None provided' }}</span>
+                    <span class="text-slate-800 font-medium" x-show="!privacyMask">{{ $patient->street_address ?? 'None provided' }}</span>
+                    <span class="text-slate-400 font-medium font-mono" x-show="privacyMask" style="display: none;">••••••••••••••••</span>
                 </div>
                 <div>
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Purok</span>
@@ -371,11 +440,13 @@
                 </div>
                 <div>
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Contact Phone Number</span>
-                    <span class="text-slate-800 font-medium">{{ $patient->contact_number ?? 'None' }}</span>
+                    <span class="text-slate-800 font-medium" x-show="!privacyMask">{{ $patient->contact_number ?? 'None' }}</span>
+                    <span class="text-slate-500 font-medium font-mono" x-show="privacyMask" style="display: none;">{{ $patient->masked_contact_number ?? 'None' }}</span>
                 </div>
                 <div>
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">PhilHealth ID Number</span>
-                    <span class="text-slate-800 font-mono font-medium">{{ $patient->philhealth_number ?? 'None' }}</span>
+                    <span class="text-slate-800 font-mono font-medium" x-show="!privacyMask">{{ $patient->philhealth_number ?? 'None' }}</span>
+                    <span class="text-slate-500 font-mono font-medium" x-show="privacyMask" style="display: none;">{{ $patient->masked_philhealth_number ?? 'None' }}</span>
                 </div>
                 <div>
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Emergency Contact Person</span>
@@ -383,7 +454,8 @@
                 </div>
                 <div>
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Emergency Contact Phone</span>
-                    <span class="text-slate-800 font-medium">{{ $patient->emergency_contact_number ?? 'None' }}</span>
+                    <span class="text-slate-800 font-medium" x-show="!privacyMask">{{ $patient->emergency_contact_number ?? 'None' }}</span>
+                    <span class="text-slate-500 font-medium font-mono" x-show="privacyMask" style="display: none;">{{ $patient->masked_emergency_contact_number ?? 'None' }}</span>
                 </div>
                 <div>
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Registered By</span>

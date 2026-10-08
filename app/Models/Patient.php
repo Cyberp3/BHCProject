@@ -61,6 +61,48 @@ class Patient extends Model
         return $this->date_of_birth ? Carbon::parse($this->date_of_birth)->age : 0;
     }
 
+    public function getMaskedContactNumberAttribute(): ?string
+    {
+        if (blank($this->contact_number)) {
+            return null;
+        }
+
+        $length = strlen($this->contact_number);
+        if ($length <= 6) {
+            return str_repeat('•', $length);
+        }
+
+        return substr($this->contact_number, 0, 4).'••••'.substr($this->contact_number, -3);
+    }
+
+    public function getMaskedPhilhealthNumberAttribute(): ?string
+    {
+        if (blank($this->philhealth_number)) {
+            return null;
+        }
+
+        $parts = explode('-', $this->philhealth_number);
+        if (count($parts) === 3) {
+            return $parts[0].'-•••••••'.substr($parts[1], -2).'-'.$parts[2];
+        }
+
+        return substr($this->philhealth_number, 0, 3).'••••••••'.substr($this->philhealth_number, -2);
+    }
+
+    public function getMaskedEmergencyContactNumberAttribute(): ?string
+    {
+        if (blank($this->emergency_contact_number)) {
+            return null;
+        }
+
+        $length = strlen($this->emergency_contact_number);
+        if ($length <= 6) {
+            return str_repeat('•', $length);
+        }
+
+        return substr($this->emergency_contact_number, 0, 4).'••••'.substr($this->emergency_contact_number, -3);
+    }
+
     public function purok(): BelongsTo
     {
         return $this->belongsTo(Purok::class);

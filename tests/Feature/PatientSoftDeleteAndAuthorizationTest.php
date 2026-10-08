@@ -294,3 +294,63 @@ test('clinical health personnel can edit patient records and record consultation
     $assessmentPage = $this->actingAs($this->nurse)->get(route('assessments.create', $this->patient));
     $assessmentPage->assertStatus(200);
 });
+
+test('patient model accessors correctly mask sensitive personally identifiable information', function () {
+    $this->patient->update([
+        'contact_number' => '09171234567',
+        'philhealth_number' => '12-345678901-2',
+        'emergency_contact_number' => '09189876543',
+    ]);
+
+    expect($this->patient->masked_contact_number)->toBe('0917••••567')
+        ->and($this->patient->masked_philhealth_number)->toBe('12-•••••••01-2')
+        ->and($this->patient->masked_emergency_contact_number)->toBe('0918••••543');
+});
+
+test('patient profile screen renders medical confidentiality banner and hides edit actions for admin', function () {
+    $adminView = $this->actingAs($this->admin)->get(route('patients.show', $this->patient));
+    $adminView->assertStatus(200);
+    $adminView->assertSee('Administrative Read-Only View');
+    $adminView->assertSee('Medical Confidentiality Enforced');
+    $adminView->assertSee('Privacy Shield');
+    $adminView->assertDontSee('Edit Profile');
+
+    $nurseView = $this->actingAs($this->nurse)->get(route('patients.show', $this->patient));
+    $nurseView->assertStatus(200);
+    $nurseView->assertSee('Authorized Healthcare Personnel Access');
+    $nurseView->assertSee('Edit Profile');
+});
+
+test('patient directory screen renders privacy safeguards and hides edit buttons for admin', function () {
+    $adminIndex = $this->actingAs($this->admin)->get(route('patients.index'));
+    $adminIndex->assertStatus(200);
+    $adminIndex->assertSee('RA 10173 Protected');
+    $adminIndex->assertSee('Privacy Shield');
+    $adminIndex->assertSee('Read-Only');
+    $adminIndex->assertDontSee('Edit Patient');
+
+    $nurseIndex = $this->actingAs($this->nurse)->get(route('patients.index'));
+    $nurseIndex->assertStatus(200);
+    $nurseIndex->assertSee('Edit Patient');
+    $nurseIndex->assertDontSee('Read-Only');
+});
+
+test('consultation detail screen renders protected health information confidentiality safeguards', function () {
+    $record = HealthServiceRecord::create([
+        'patient_id' => $this->patient->id,
+        'user_id' => $this->nurse->id,
+        'service_type' => 'immunization',
+        'service_date' => Carbon::today()->format('Y-m-d'),
+        'complaint_or_reason' => 'Routine childhood vaccine',
+    ]);
+
+    $adminView = $this->actingAs($this->admin)->get(route('services.show', $record));
+    $adminView->assertStatus(200);
+    $adminView->assertSee('Protected Health Information (PHI)');
+    $adminView->assertSee('Administrative Oversight (Read-Only)');
+
+    $nurseView = $this->actingAs($this->nurse)->get(route('services.show', $record));
+    $nurseView->assertStatus(200);
+    $nurseView->assertSee('Protected Health Information (PHI)');
+    $nurseView->assertSee('Attending Healthcare Personnel View');
+});

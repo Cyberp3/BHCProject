@@ -16,6 +16,27 @@
             </a>
         </div>
 
+        <!-- PHI Confidentiality Notice -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 py-2.5 bg-slate-100/90 border border-slate-200 rounded-lg text-xs text-slate-600 gap-2">
+            <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <span class="font-semibold text-slate-700">Protected Health Information (PHI)</span>
+                <span>&bull;</span>
+                <span class="text-slate-500">Official Clinical Care Record (RA 10173 Compliant)</span>
+            </div>
+            @if (Auth::user()->isAdmin())
+                <span class="text-[11px] font-semibold px-2.5 py-0.5 bg-amber-100 text-amber-800 rounded border border-amber-200 self-start sm:self-auto">
+                    Administrative Oversight (Read-Only)
+                </span>
+            @else
+                <span class="text-[11px] font-semibold px-2.5 py-0.5 bg-emerald-100 text-emerald-800 rounded border border-emerald-200 self-start sm:self-auto">
+                    Attending Healthcare Personnel View
+                </span>
+            @endif
+        </div>
+
         <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
             <!-- Header -->
             <div class="p-6 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -103,6 +124,11 @@
                         </a>
                     </div>
                 @endif
+            </div>
+
+            <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between text-[11px] text-slate-400 gap-1">
+                <span>🔒 Confidentiality Notice: This medical record is protected under RA 10173 and DOH Clinical Practice Guidelines.</span>
+                <span class="font-medium text-slate-500">Barangay Tacunan Health Center</span>
             </div>
         </div>
     </div>

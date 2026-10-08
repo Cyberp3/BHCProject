@@ -1,12 +1,27 @@
 <x-app-layout>
-    <div class="space-y-6">
+    <div class="space-y-6" x-data="{ privacyMask: {{ Auth::user()->isAdmin() ? 'true' : 'false' }} }">
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Patient Directory</h1>
                 <p class="text-sm text-slate-500 mt-1">Manage and access patient health records in Barangay Tacunan.</p>
             </div>
-            <div>
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    RA 10173 Protected
+                </span>
+
+                <!-- Privacy Shield Toggle -->
+                <button type="button" @click="privacyMask = !privacyMask" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition shadow-2xs" :class="privacyMask ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span x-text="privacyMask ? 'Privacy Shield: Masked' : 'Privacy Shield: Visible'"></span>
+                </button>
+
                 <a href="{{ route('patients.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold shadow-sm transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -135,18 +150,26 @@
                                     {{ $patient->purok->name }}
                                 </td>
                                 <td class="px-5 py-4 text-xs text-slate-500">
-                                    {{ $patient->contact_number ?? 'None recorded' }}
+                                    <span x-show="!privacyMask">{{ $patient->contact_number ?? 'None recorded' }}</span>
+                                    <span x-show="privacyMask" style="display: none;" class="font-mono text-slate-400 font-medium">{{ $patient->masked_contact_number ?? 'None recorded' }}</span>
                                 </td>
                                 <td class="px-5 py-4 text-xs font-mono text-slate-500">
-                                    {{ $patient->philhealth_number ?? 'None' }}
+                                    <span x-show="!privacyMask">{{ $patient->philhealth_number ?? 'None' }}</span>
+                                    <span x-show="privacyMask" style="display: none;" class="font-mono text-slate-400 font-medium">{{ $patient->masked_philhealth_number ?? 'None' }}</span>
                                 </td>
                                 <td class="px-5 py-4 text-right space-x-2">
                                     <a href="{{ route('patients.show', $patient) }}" class="inline-flex items-center px-2.5 py-1.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition">
                                         View Profile
                                     </a>
-                                    <a href="{{ route('patients.edit', $patient) }}" class="inline-flex items-center px-2.5 py-1.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
-                                        Edit
-                                    </a>
+                                    @if (! Auth::user()->isAdmin())
+                                        <a href="{{ route('patients.edit', $patient) }}" class="inline-flex items-center px-2.5 py-1.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                                            Edit Patient
+                                        </a>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-1 rounded text-[11px] font-medium bg-slate-50 text-slate-400 border border-slate-200/60">
+                                            Read-Only
+                                        </span>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
