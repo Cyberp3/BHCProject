@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\HealthServiceRecord;
 use App\Models\Patient;
 use App\Models\Purok;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -197,7 +198,10 @@ class PatientController extends Controller
 
     public function destroy(Patient $patient): RedirectResponse
     {
-        abort_unless(Auth::user()?->isAdmin(), 403, 'Unauthorized: Only health center administrators are authorized to archive patient records.');
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        abort_unless($user?->isAdmin(), 403, 'Unauthorized: Only health center administrators are authorized to archive patient records.');
 
         $name = $patient->full_name;
         $id = $patient->id;
