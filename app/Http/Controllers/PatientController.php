@@ -40,7 +40,7 @@ class PatientController extends Controller
         }
 
         $patients = $query->paginate(15)->withQueryString();
-        $puroks = Purok::orderBy('name')->get();
+        $puroks = Purok::orderBy('id')->get();
         $services = HealthServiceRecord::SERVICES;
 
         return view('patients.index', compact('patients', 'puroks', 'services'));
@@ -52,7 +52,7 @@ class PatientController extends Controller
         $countThisYear = Patient::whereYear('created_at', $year)->count() + 1;
         $suggestedControlNumber = sprintf('TAC-%d-%04d', $year, $countThisYear);
 
-        $puroks = Purok::orderBy('name')->get();
+        $puroks = Purok::orderBy('id')->get();
 
         return view('patients.create', compact('suggestedControlNumber', 'puroks'));
     }
@@ -112,7 +112,7 @@ class PatientController extends Controller
 
     public function edit(Patient $patient): View
     {
-        $puroks = Purok::orderBy('name')->get();
+        $puroks = Purok::orderBy('id')->get();
 
         return view('patients.edit', compact('patient', 'puroks'));
     }

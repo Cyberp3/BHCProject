@@ -29,7 +29,7 @@ class ReportController extends Controller
         $femaleCount = Patient::where('sex', 'Female')->count();
 
         $purokStats = Purok::withCount('patients')
-            ->orderBy('name')
+            ->orderBy('id')
             ->get();
 
         $selectedPurokId = $request->input('purok_id');
