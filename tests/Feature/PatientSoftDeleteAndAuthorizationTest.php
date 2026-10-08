@@ -130,16 +130,14 @@ test('suggested control number accounts for soft-deleted patients and never coll
     $response->assertSee($expectedSecond);
 });
 
-test('health service auto-scheduling follow-up validates clinic schedule rules', function () {
-    $nextThursday = Carbon::now()->next(Carbon::THURSDAY)->format('Y-m-d');
+test('health service follow-up advisory date must be a future date', function () {
+    $yesterday = Carbon::yesterday()->format('Y-m-d');
 
-    // Immunization is only on Wednesday, so Thursday follow-up should fail
     $response = $this->actingAs($this->admin)->post(route('services.store'), [
         'patient_id' => $this->patient->id,
         'service_type' => 'immunization',
         'service_date' => Carbon::today()->format('Y-m-d'),
-        'next_follow_up_date' => $nextThursday,
-        'schedule_follow_up' => '1',
+        'next_follow_up_date' => $yesterday,
     ]);
 
     $response->assertSessionHasErrors(['next_follow_up_date']);

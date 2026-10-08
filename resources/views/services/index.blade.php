@@ -34,22 +34,27 @@
                 @endphp
 
                 @foreach ($services as $key => $title)
-                    <div class="bg-white rounded-xl border border-slate-200 shadow-2xs p-4 flex flex-col justify-between hover:border-emerald-300 transition">
+                    <div class="bg-white rounded-xl border {{ request('service_type') === $key ? 'border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/10' : 'border-slate-200' }} shadow-2xs p-4 flex flex-col justify-between hover:border-emerald-300 transition">
                         <div>
-                            <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $programIcons[$key] ?? 'M9 12h6m-6 4h6' }}" />
-                                </svg>
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $programIcons[$key] ?? 'M9 12h6m-6 4h6' }}" />
+                                    </svg>
+                                </div>
+                                <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{ ($programCounts[$key] ?? 0) > 0 ? 'bg-slate-100 text-slate-700' : 'bg-slate-50 text-slate-400' }}">
+                                    {{ $programCounts[$key] ?? 0 }} {{ ($programCounts[$key] ?? 0) === 1 ? 'log' : 'logs' }}
+                                </span>
                             </div>
                             <h3 class="font-bold text-sm text-slate-800">{{ $title }}</h3>
                             <p class="text-xs text-slate-400 mt-1">Barangay Tacunan health program</p>
                         </div>
                         <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                            <a href="{{ route('services.index', ['service_type' => $key]) }}" class="text-xs font-semibold text-emerald-600 hover:underline">
-                                Filter records &rarr;
+                            <a href="{{ route('services.index', ['service_type' => $key]) }}" class="text-xs font-semibold {{ request('service_type') === $key ? 'text-emerald-700 font-bold' : 'text-emerald-600 hover:underline' }}">
+                                View logs &rarr;
                             </a>
-                            <a href="{{ route('services.create', ['type' => $key]) }}" class="text-xs font-semibold text-slate-600 hover:text-slate-900">
-                                + Log visit
+                            <a href="{{ route('services.create', ['type' => $key]) }}" class="text-xs font-semibold px-2 py-1 bg-slate-50 hover:bg-emerald-50 hover:text-emerald-700 rounded border border-slate-200 text-slate-700 transition">
+                                + Record Visit
                             </a>
                         </div>
                     </div>

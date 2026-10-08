@@ -97,7 +97,7 @@ test('can record vital signs and BMI is auto-calculated', function () {
     expect($assessment->blood_pressure)->toBe('120/80 mmHg');
 });
 
-test('can log health service consultation and auto-schedule follow-up', function () {
+test('can log health service consultation visit record', function () {
     $patient = Patient::create([
         'patient_control_number' => 'TAC-SRV-001',
         'first_name' => 'Ana',
@@ -122,7 +122,6 @@ test('can log health service consultation and auto-schedule follow-up', function
             'admin_site' => 'Left Thigh',
         ],
         'next_follow_up_date' => $followUpDate,
-        'schedule_follow_up' => '1',
     ];
 
     $response = $this->actingAs($this->admin)->post(route('services.store'), $serviceData);
@@ -132,11 +131,11 @@ test('can log health service consultation and auto-schedule follow-up', function
     $record = HealthServiceRecord::where('patient_id', $patient->id)->first();
     expect($record)->not->toBeNull();
     expect($record->service_title)->toBe('Immunization');
+    expect($record->next_follow_up_date->format('Y-m-d'))->toBe($followUpDate);
 
-    // Verify appointment was automatically scheduled
+    // Verify appointment was NOT automatically scheduled (appointments module handles calendar bookings)
     $appointment = Appointment::where('patient_id', $patient->id)->first();
-    expect($appointment)->not->toBeNull();
-    expect($appointment->appointment_date->format('Y-m-d'))->toBe($followUpDate);
+    expect($appointment)->toBeNull();
 });
 
 test('inventory dispensing adheres strictly to FIFO allocation', function () {

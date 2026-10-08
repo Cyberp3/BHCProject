@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Appointment;
 use App\Models\AuditLog;
 use App\Models\HealthServiceRecord;
 use App\Models\Patient;
@@ -11,6 +10,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class HealthServiceController extends Controller
@@ -34,7 +34,12 @@ class HealthServiceController extends Controller
         $records = $query->paginate(15)->withQueryString();
         $services = HealthServiceRecord::SERVICES;
 
-        return view('services.index', compact('records', 'services'));
+        $programCounts = HealthServiceRecord::select('service_type', DB::raw('count(*) as count'))
+            ->groupBy('service_type')
+            ->pluck('count', 'service_type')
+            ->toArray();
+
+        return view('services.index', compact('records', 'services', 'programCounts'));
     }
 
     public function create(Request $request): View
@@ -62,36 +67,12 @@ class HealthServiceController extends Controller
             'findings_and_notes' => ['nullable', 'string'],
             'service_specific_data' => ['nullable', 'array'],
             'next_follow_up_date' => ['nullable', 'date', 'after:today'],
-            'schedule_follow_up' => ['nullable', 'boolean'],
         ]);
-
-        if (! empty($validated['next_follow_up_date']) && $request->boolean('schedule_follow_up')) {
-            $followUpDate = Carbon::parse($validated['next_follow_up_date']);
-            $scheduleError = Appointment::validateClinicSchedule($validated['service_type'], $followUpDate);
-
-            if ($scheduleError) {
-                return back()->withInput()->withErrors([
-                    'next_follow_up_date' => "Invalid follow-up date: {$scheduleError}",
-                ]);
-            }
-        }
 
         $validated['user_id'] = Auth::id();
 
         $record = HealthServiceRecord::create($validated);
         $patient = Patient::findOrFail($validated['patient_id']);
-
-        // If follow-up date was provided and user checked auto-schedule
-        if (! empty($validated['next_follow_up_date']) && $request->boolean('schedule_follow_up')) {
-            Appointment::create([
-                'patient_id' => $patient->id,
-                'scheduled_by' => Auth::id(),
-                'appointment_date' => $validated['next_follow_up_date'],
-                'service_type' => $validated['service_type'],
-                'purpose' => "Follow-up for {$record->service_title}",
-                'status' => 'scheduled',
-            ]);
-        }
 
         AuditLog::log(
             'RECORD_SERVICE',

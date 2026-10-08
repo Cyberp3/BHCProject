@@ -235,29 +235,10 @@
                     </div>
                 </div>
 
-                <hr class="border-slate-100">
-
-                <!-- Follow-up Scheduling Section -->
-                <div class="p-4 bg-blue-50/50 rounded-xl border border-blue-100 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-blue-900">Follow-up Scheduling</h3>
-                            <p class="text-[11px] text-blue-700">Schedule the next visit directly without manual calendar cross-referencing.</p>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Next Follow-up Date</label>
-                            <input type="date" name="next_follow_up_date" min="{{ date('Y-m-d', strtotime('+1 day')) }}" value="{{ old('next_follow_up_date') }}" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                        </div>
-
-                        <div class="flex items-center pt-6">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" name="schedule_follow_up" value="1" checked class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
-                                <span class="text-xs font-semibold text-slate-700">Auto-create entry in Appointments Calendar</span>
-                            </label>
-                        </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Recommended Next Follow-up Date <span class="text-slate-400 font-normal">(Optional clinical advisory note)</span></label>
+                        <input type="date" name="next_follow_up_date" min="{{ date('Y-m-d', strtotime('+1 day')) }}" value="{{ old('next_follow_up_date') }}" class="w-full sm:w-64 text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <span class="text-[11px] text-slate-400 block mt-1">Stores an advisory return note on the patient's record. Official clinic appointments are managed in the <a href="{{ route('appointments.index') }}" class="text-emerald-600 underline font-medium">Appointments</a> module.</span>
                     </div>
                 </div>
 
