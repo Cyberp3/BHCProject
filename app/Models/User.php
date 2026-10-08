@@ -58,21 +58,25 @@ class User extends Authenticatable
 
     public function hasRole(string|array $roles): bool
     {
+        $currentRole = strtolower(trim((string) $this->role));
+
         if (is_array($roles)) {
-            return in_array($this->role, $roles, true);
+            $normalizedRoles = array_map(fn ($r) => strtolower(trim((string) $r)), $roles);
+
+            return in_array($currentRole, $normalizedRoles, true);
         }
 
-        return $this->role === $roles;
+        return $currentRole === strtolower(trim((string) $roles));
     }
 
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return strtolower(trim((string) $this->role)) === 'admin';
     }
 
     public function isClinicalStaff(): bool
     {
-        return in_array($this->role, ['admin', 'nurse', 'midwife'], true);
+        return in_array(strtolower(trim((string) $this->role)), ['admin', 'nurse', 'midwife'], true);
     }
 
     public function getRoleDisplayNameAttribute(): string

@@ -101,3 +101,46 @@ test('historical clinical records remain intact after patient is soft deleted', 
     // The soft-deleted patient can still be accessed via withTrashed relationship
     expect(Patient::withTrashed()->find($preservedAppt->patient_id)->full_name)->toBe('Gomez, Roberto');
 });
+
+test('suggested control number accounts for soft-deleted patients and never collides', function () {
+    $year = Carbon::now()->year;
+    $firstNumber = sprintf('TAC-%d-0001', $year);
+
+    $patient1 = Patient::create([
+        'patient_control_number' => $firstNumber,
+        'first_name' => 'First',
+        'last_name' => 'Patient',
+        'sex' => 'Male',
+        'date_of_birth' => '1990-01-01',
+        'purok_id' => $this->purok->id,
+        'street_address' => 'Purok 1',
+        'contact_number' => '09171112233',
+        'created_by' => $this->admin->id,
+    ]);
+
+    // Archive (soft delete) patient #1
+    $patient1->delete();
+
+    // Now visit the create form
+    $response = $this->actingAs($this->admin)->get(route('patients.create'));
+
+    $response->assertStatus(200);
+    // Should suggest 0002, NOT 0001 which already exists in soft-deleted state
+    $expectedSecond = sprintf('TAC-%d-0002', $year);
+    $response->assertSee($expectedSecond);
+});
+
+test('health service auto-scheduling follow-up validates clinic schedule rules', function () {
+    $nextThursday = Carbon::now()->next(Carbon::THURSDAY)->format('Y-m-d');
+
+    // Immunization is only on Wednesday, so Thursday follow-up should fail
+    $response = $this->actingAs($this->admin)->post(route('services.store'), [
+        'patient_id' => $this->patient->id,
+        'service_type' => 'immunization',
+        'service_date' => Carbon::today()->format('Y-m-d'),
+        'next_follow_up_date' => $nextThursday,
+        'schedule_follow_up' => '1',
+    ]);
+
+    $response->assertSessionHasErrors(['next_follow_up_date']);
+});

@@ -50,8 +50,25 @@ class PatientController extends Controller
     public function create(): View
     {
         $year = Carbon::now()->year;
-        $countThisYear = Patient::whereYear('created_at', $year)->count() + 1;
-        $suggestedControlNumber = sprintf('TAC-%d-%04d', $year, $countThisYear);
+        $prefix = sprintf('TAC-%d-', $year);
+
+        $latestSequence = Patient::withTrashed()
+            ->where('patient_control_number', 'like', $prefix.'%')
+            ->pluck('patient_control_number')
+            ->map(function ($cn) use ($prefix) {
+                $suffix = substr($cn, strlen($prefix));
+
+                return is_numeric($suffix) ? (int) $suffix : 0;
+            })
+            ->max();
+
+        $nextSeq = ($latestSequence ?? 0) + 1;
+        $suggestedControlNumber = sprintf('TAC-%d-%04d', $year, $nextSeq);
+
+        while (Patient::withTrashed()->where('patient_control_number', $suggestedControlNumber)->exists()) {
+            $nextSeq++;
+            $suggestedControlNumber = sprintf('TAC-%d-%04d', $year, $nextSeq);
+        }
 
         $puroks = Purok::orderBy('id')->get();
 
@@ -117,6 +134,7 @@ class PatientController extends Controller
             'healthServiceRecords.user',
             'appointments.scheduledBy',
             'inventoryTransactions.item',
+            'inventoryTransactions.batch',
         ]);
 
         return view('patients.show', compact('patient'));
@@ -179,7 +197,7 @@ class PatientController extends Controller
 
     public function destroy(Patient $patient): RedirectResponse
     {
-        abort_unless(Auth::user()->isAdmin(), 403, 'Unauthorized: Only health center administrators are authorized to archive patient records.');
+        abort_unless(Auth::user()?->isAdmin(), 403, 'Unauthorized: Only health center administrators are authorized to archive patient records.');
 
         $name = $patient->full_name;
         $id = $patient->id;

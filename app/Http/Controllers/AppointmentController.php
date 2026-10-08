@@ -57,7 +57,6 @@ class AppointmentController extends Controller
             $patient = Patient::findOrFail($request->input('patient_id'));
         }
 
-        $patients = Patient::orderBy('last_name')->get();
         $patients = Patient::with('purok')->orderBy('last_name')->get();
         $services = HealthServiceRecord::SERVICES;
         $tomorrow = Carbon::tomorrow()->format('Y-m-d');
@@ -106,7 +105,6 @@ class AppointmentController extends Controller
 
     public function edit(Appointment $appointment): View
     {
-        $appointment->load('patient');
         $appointment->load('patient.purok');
         $services = HealthServiceRecord::SERVICES;
 

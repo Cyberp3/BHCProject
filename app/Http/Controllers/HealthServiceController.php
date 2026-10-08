@@ -47,7 +47,6 @@ class HealthServiceController extends Controller
         $selectedType = $request->input('type', 'family_planning');
         $services = HealthServiceRecord::SERVICES;
         $today = Carbon::today()->format('Y-m-d');
-        $patients = Patient::orderBy('last_name')->get();
         $patients = Patient::with('purok')->orderBy('last_name')->get();
 
         return view('services.create', compact('patient', 'patients', 'selectedType', 'services', 'today'));
@@ -65,6 +64,17 @@ class HealthServiceController extends Controller
             'next_follow_up_date' => ['nullable', 'date', 'after:today'],
             'schedule_follow_up' => ['nullable', 'boolean'],
         ]);
+
+        if (! empty($validated['next_follow_up_date']) && $request->boolean('schedule_follow_up')) {
+            $followUpDate = Carbon::parse($validated['next_follow_up_date']);
+            $scheduleError = Appointment::validateClinicSchedule($validated['service_type'], $followUpDate);
+
+            if ($scheduleError) {
+                return back()->withInput()->withErrors([
+                    'next_follow_up_date' => "Invalid follow-up date: {$scheduleError}",
+                ]);
+            }
+        }
 
         $validated['user_id'] = Auth::id();
 

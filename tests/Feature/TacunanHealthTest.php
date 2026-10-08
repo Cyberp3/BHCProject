@@ -108,7 +108,7 @@ test('can log health service consultation and auto-schedule follow-up', function
         'created_by' => $this->admin->id,
     ]);
 
-    $followUpDate = Carbon::tomorrow()->addWeeks(2)->format('Y-m-d');
+    $followUpDate = Carbon::now()->next(Carbon::WEDNESDAY)->addWeek()->format('Y-m-d');
 
     $serviceData = [
         'patient_id' => $patient->id,
