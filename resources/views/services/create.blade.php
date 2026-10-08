@@ -65,159 +65,156 @@
                     <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Program-Specific Details</h2>
 
                     <!-- 1. Family Planning -->
-                    <div x-show="programType === 'family_planning'" class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                    <fieldset :disabled="programType !== 'family_planning'" x-show="programType === 'family_planning'" class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Method Provided</label>
                             <select name="service_specific_data[method]" class="w-full text-sm rounded-lg border-slate-300">
                                 <option value="">-- Select Method --</option>
-                                <option value="Pills (COC/POP)">Pills (COC / POP)</option>
-                                <option value="Injectable (DMPA)">Injectable (DMPA)</option>
-                                <option value="Condoms">Condoms</option>
-                                <option value="IUD">IUD (Intrauterine Device)</option>
-                                <option value="Implant">Subdermal Implant</option>
-                                <option value="NFP-BOM">Natural FP (BOM / STM / LAM)</option>
+                                @foreach(['Pills (COC/POP)' => 'Pills (COC / POP)', 'Injectable (DMPA)' => 'Injectable (DMPA)', 'Condoms' => 'Condoms', 'IUD' => 'IUD (Intrauterine Device)', 'Implant' => 'Subdermal Implant', 'NFP-BOM' => 'Natural FP (BOM / STM / LAM)'] as $mVal => $mLbl)
+                                    <option value="{{ $mVal }}" {{ old('service_specific_data.method') === $mVal ? 'selected' : '' }}>{{ $mLbl }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Client Type</label>
                             <select name="service_specific_data[client_type]" class="w-full text-sm rounded-lg border-slate-300">
-                                <option value="New Acceptor">New Acceptor</option>
-                                <option value="Current User">Current User (Resupply)</option>
-                                <option value="Changing Method">Changing Method</option>
-                                <option value="Dropout Restart">Dropout Restart</option>
+                                <option value="">-- Select Client Type --</option>
+                                @foreach(['New Acceptor', 'Current User', 'Changing Method', 'Dropout Restart'] as $cType)
+                                    <option value="{{ $cType }}" {{ old('service_specific_data.client_type') === $cType ? 'selected' : '' }}>{{ $cType }}</option>
+                                @endforeach
                             </select>
                         </div>
-                    </div>
+                    </fieldset>
 
                     <!-- 2. Prenatal Care -->
-                    <div x-show="programType === 'prenatal_care'" class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200" style="display: none;">
+                    <fieldset :disabled="programType !== 'prenatal_care'" x-show="programType === 'prenatal_care'" class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200" style="display: none;">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Last Menstrual Period (LMP)</label>
-                            <input type="date" name="service_specific_data[lmp]" class="w-full text-sm rounded-lg border-slate-300">
+                            <input type="date" name="service_specific_data[lmp]" value="{{ old('service_specific_data.lmp') }}" class="w-full text-sm rounded-lg border-slate-300">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Expected Date of Confinement (EDC)</label>
-                            <input type="date" name="service_specific_data[edc]" class="w-full text-sm rounded-lg border-slate-300">
+                            <input type="date" name="service_specific_data[edc]" value="{{ old('service_specific_data.edc') }}" class="w-full text-sm rounded-lg border-slate-300">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Trimester / Visit #</label>
                             <select name="service_specific_data[trimester]" class="w-full text-sm rounded-lg border-slate-300">
-                                <option value="1st Trimester (Visit 1)">1st Trimester (Visit 1)</option>
-                                <option value="2nd Trimester (Visit 2)">2nd Trimester (Visit 2)</option>
-                                <option value="3rd Trimester (Visit 3)">3rd Trimester (Visit 3)</option>
-                                <option value="3rd Trimester (Visit 4+)">3rd Trimester (Visit 4+)</option>
+                                <option value="">-- Select Trimester --</option>
+                                @foreach(['1st Trimester (Visit 1)', '2nd Trimester (Visit 2)', '3rd Trimester (Visit 3)', '3rd Trimester (Visit 4+)'] as $tri)
+                                    <option value="{{ $tri }}" {{ old('service_specific_data.trimester') === $tri ? 'selected' : '' }}>{{ $tri }}</option>
+                                @endforeach
                             </select>
                         </div>
-                    </div>
+                    </fieldset>
 
                     <!-- 3. Immunization -->
-                    <div x-show="programType === 'immunization'" class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200" style="display: none;">
+                    <fieldset :disabled="programType !== 'immunization'" x-show="programType === 'immunization'" class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200" style="display: none;">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Vaccine Administered</label>
                             <select name="service_specific_data[vaccine_name]" class="w-full text-sm rounded-lg border-slate-300">
-                                <option value="BCG">BCG</option>
-                                <option value="Hepatitis B">Hepatitis B (Birth dose)</option>
-                                <option value="Pentavalent (DTP-HepB-Hib)">Pentavalent (DTP-HepB-Hib)</option>
-                                <option value="OPV (Oral Polio)">OPV (Oral Polio)</option>
-                                <option value="IPV (Inactivated Polio)">IPV (Inactivated Polio)</option>
-                                <option value="PCV (Pneumococcal)">PCV (Pneumococcal)</option>
-                                <option value="MMR (Measles-Mumps-Rubella)">MMR (Measles-Mumps-Rubella)</option>
-                                <option value="Td (Tetanus Diphtheria)">Td (Tetanus Diphtheria)</option>
+                                <option value="">-- Select Vaccine --</option>
+                                @foreach(['BCG', 'Hepatitis B', 'Pentavalent (DTP-HepB-Hib)', 'OPV (Oral Polio)', 'IPV (Inactivated Polio)', 'PCV (Pneumococcal)', 'MMR (Measles-Mumps-Rubella)', 'Td (Tetanus Diphtheria)'] as $vax)
+                                    <option value="{{ $vax }}" {{ old('service_specific_data.vaccine_name') === $vax ? 'selected' : '' }}>{{ $vax }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Dose Sequence</label>
                             <select name="service_specific_data[dose_sequence]" class="w-full text-sm rounded-lg border-slate-300">
-                                <option value="Dose 1">Dose 1</option>
-                                <option value="Dose 2">Dose 2</option>
-                                <option value="Dose 3">Dose 3</option>
-                                <option value="Booster">Booster</option>
+                                <option value="">-- Select Dose --</option>
+                                @foreach(['Dose 1', 'Dose 2', 'Dose 3', 'Booster'] as $dose)
+                                    <option value="{{ $dose }}" {{ old('service_specific_data.dose_sequence') === $dose ? 'selected' : '' }}>{{ $dose }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Administration Site</label>
-                            <input type="text" name="service_specific_data[admin_site]" placeholder="e.g. Left Deltoid, Right Thigh" class="w-full text-sm rounded-lg border-slate-300">
+                            <input type="text" name="service_specific_data[admin_site]" value="{{ old('service_specific_data.admin_site') }}" placeholder="e.g. Left Deltoid, Right Thigh" class="w-full text-sm rounded-lg border-slate-300">
                         </div>
-                    </div>
+                    </fieldset>
 
                     <!-- 4. CVD Screening -->
-                    <div x-show="programType === 'cvd_screening'" class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200" style="display: none;">
+                    <fieldset :disabled="programType !== 'cvd_screening'" x-show="programType === 'cvd_screening'" class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200" style="display: none;">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Cardiovascular Risk Category</label>
                             <select name="service_specific_data[cvd_risk]" class="w-full text-sm rounded-lg border-slate-300">
-                                <option value="Low (<10%)">Low (&lt; 10%)</option>
-                                <option value="Moderate (10% to <20%)">Moderate (10% to &lt; 20%)</option>
-                                <option value="High (>=20%)">High (&ge; 20%)</option>
+                                <option value="">-- Select Risk Category --</option>
+                                @foreach(['Low (<10%)' => 'Low (< 10%)', 'Moderate (10% to <20%)' => 'Moderate (10% to < 20%)', 'High (>=20%)' => 'High (>= 20%)'] as $cVal => $cLbl)
+                                    <option value="{{ $cVal }}" {{ old('service_specific_data.cvd_risk') === $cVal ? 'selected' : '' }}>{{ $cLbl }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Target Organ Damage Screen</label>
-                            <input type="text" name="service_specific_data[organ_damage]" placeholder="e.g. None reported, hypertensive retinopathy" class="w-full text-sm rounded-lg border-slate-300">
+                            <input type="text" name="service_specific_data[organ_damage]" value="{{ old('service_specific_data.organ_damage') }}" placeholder="e.g. None reported, hypertensive retinopathy" class="w-full text-sm rounded-lg border-slate-300">
                         </div>
-                    </div>
+                    </fieldset>
 
                     <!-- 5. PhilPEN -->
-                    <div x-show="programType === 'philpen'" class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200" style="display: none;">
+                    <fieldset :disabled="programType !== 'philpen'" x-show="programType === 'philpen'" class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200" style="display: none;">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Tobacco Exposure</label>
                             <select name="service_specific_data[tobacco_use]" class="w-full text-sm rounded-lg border-slate-300">
-                                <option value="Non-smoker">Non-smoker</option>
-                                <option value="Current smoker">Current smoker</option>
-                                <option value="Ex-smoker">Ex-smoker</option>
+                                <option value="">-- Select Status --</option>
+                                @foreach(['Non-smoker', 'Current smoker', 'Ex-smoker'] as $tobacco)
+                                    <option value="{{ $tobacco }}" {{ old('service_specific_data.tobacco_use') === $tobacco ? 'selected' : '' }}>{{ $tobacco }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Alcohol Consumption</label>
                             <select name="service_specific_data[alcohol_use]" class="w-full text-sm rounded-lg border-slate-300">
-                                <option value="None">None</option>
-                                <option value="Occasional drinker">Occasional drinker</option>
-                                <option value="Binge / Heavy drinker">Binge / Heavy drinker</option>
+                                <option value="">-- Select Status --</option>
+                                @foreach(['None', 'Occasional drinker', 'Binge / Heavy drinker'] as $alc)
+                                    <option value="{{ $alc }}" {{ old('service_specific_data.alcohol_use') === $alc ? 'selected' : '' }}>{{ $alc }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Fasting Blood Sugar (mg/dL)</label>
-                            <input type="number" step="0.1" name="service_specific_data[fbs]" placeholder="e.g. 95" class="w-full text-sm rounded-lg border-slate-300">
+                            <input type="number" step="0.1" name="service_specific_data[fbs]" value="{{ old('service_specific_data.fbs') }}" placeholder="e.g. 95" class="w-full text-sm rounded-lg border-slate-300">
                         </div>
-                    </div>
+                    </fieldset>
 
                     <!-- 6. NTP -->
-                    <div x-show="programType === 'ntp'" class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200" style="display: none;">
+                    <fieldset :disabled="programType !== 'ntp'" x-show="programType === 'ntp'" class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200" style="display: none;">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Cough Duration</label>
                             <select name="service_specific_data[cough_duration]" class="w-full text-sm rounded-lg border-slate-300">
-                                <option value="No cough">No cough</option>
-                                <option value="Less than 2 weeks">Less than 2 weeks</option>
-                                <option value="2 weeks or more (Presumptive TB)">2 weeks or more (Presumptive TB)</option>
+                                <option value="">-- Select Cough Duration --</option>
+                                @foreach(['No cough', 'Less than 2 weeks', '2 weeks or more (Presumptive TB)'] as $cough)
+                                    <option value="{{ $cough }}" {{ old('service_specific_data.cough_duration') === $cough ? 'selected' : '' }}>{{ $cough }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Sputum / GeneXpert Status</label>
-                            <input type="text" name="service_specific_data[tb_testing]" placeholder="e.g. Specimen collected, referred for X-ray" class="w-full text-sm rounded-lg border-slate-300">
+                            <input type="text" name="service_specific_data[tb_testing]" value="{{ old('service_specific_data.tb_testing') }}" placeholder="e.g. Specimen collected, referred for X-ray" class="w-full text-sm rounded-lg border-slate-300">
                         </div>
-                    </div>
+                    </fieldset>
 
                     <!-- 7. Purok Kalusugan -->
-                    <div x-show="programType === 'purok_kalusugan'" class="p-4 bg-slate-50 rounded-xl border border-slate-200" style="display: none;">
+                    <fieldset :disabled="programType !== 'purok_kalusugan'" x-show="programType === 'purok_kalusugan'" class="p-4 bg-slate-50 rounded-xl border border-slate-200" style="display: none;">
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Purok Activity / Household Outreach Notes</label>
-                        <input type="text" name="service_specific_data[outreach_activity]" placeholder="e.g. Purok household check, environmental sanitation visit" class="w-full text-sm rounded-lg border-slate-300">
-                    </div>
+                        <input type="text" name="service_specific_data[outreach_activity]" value="{{ old('service_specific_data.outreach_activity') }}" placeholder="e.g. Purok household check, environmental sanitation visit" class="w-full text-sm rounded-lg border-slate-300">
+                    </fieldset>
 
                     <!-- 8. BNS Program -->
-                    <div x-show="programType === 'bns_program'" class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200" style="display: none;">
+                    <fieldset :disabled="programType !== 'bns_program'" x-show="programType === 'bns_program'" class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200" style="display: none;">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">BNS Intervention</label>
                             <select name="service_specific_data[bns_intervention]" class="w-full text-sm rounded-lg border-slate-300">
-                                <option value="Supplementary Feeding Intake">Supplementary Feeding Intake</option>
-                                <option value="Micronutrient Supplementation (Vit A / Iron)">Micronutrient Supplementation (Vit A / Iron)</option>
-                                <option value="Deworming Tablet Administered">Deworming Tablet Administered</option>
-                                <option value="Infant and Young Child Feeding Counseling">Infant and Young Child Feeding Counseling</option>
+                                <option value="">-- Select Intervention --</option>
+                                @foreach(['Supplementary Feeding Intake', 'Micronutrient Supplementation (Vit A / Iron)', 'Deworming Tablet Administered', 'Infant and Young Child Feeding Counseling'] as $bns)
+                                    <option value="{{ $bns }}" {{ old('service_specific_data.bns_intervention') === $bns ? 'selected' : '' }}>{{ $bns }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Nutritional Category</label>
-                            <input type="text" name="service_specific_data[bns_category]" placeholder="e.g. Target for 120-day feeding" class="w-full text-sm rounded-lg border-slate-300">
+                            <input type="text" name="service_specific_data[bns_category]" value="{{ old('service_specific_data.bns_category') }}" placeholder="e.g. Target for 120-day feeding" class="w-full text-sm rounded-lg border-slate-300">
                         </div>
-                    </div>
+                    </fieldset>
                 </div>
 
                 <hr class="border-slate-100">
@@ -233,7 +230,6 @@
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Findings, Care Delivered & Clinical Notes</label>
                         <textarea name="findings_and_notes" rows="4" placeholder="Detail the assessment findings, health education provided, and actions taken..." class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">{{ old('findings_and_notes') }}</textarea>
                     </div>
-                </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Recommended Next Follow-up Date <span class="text-slate-400 font-normal">(Optional clinical advisory note)</span></label>

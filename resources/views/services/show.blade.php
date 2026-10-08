@@ -2,9 +2,15 @@
     <div class="max-w-3xl mx-auto space-y-6">
         <!-- Breadcrumb -->
         <div class="flex items-center justify-between">
-            <a href="{{ route('patients.show', $serviceRecord->patient) }}" class="text-xs font-semibold text-slate-500 hover:text-slate-800">
-                &larr; Back to {{ $serviceRecord->patient->full_name }} Profile
-            </a>
+            @if ($serviceRecord->patient)
+                <a href="{{ route('patients.show', $serviceRecord->patient) }}" class="text-xs font-semibold text-slate-500 hover:text-slate-800">
+                    &larr; Back to {{ $serviceRecord->patient->full_name }} Profile
+                </a>
+            @else
+                <a href="{{ route('services.index') }}" class="text-xs font-semibold text-slate-500 hover:text-slate-800">
+                    &larr; Back to Consultation Logs
+                </a>
+            @endif
             <a href="{{ route('services.index') }}" class="text-xs font-semibold text-slate-500 hover:text-slate-800">
                 All Services Log &rarr;
             </a>
@@ -30,14 +36,21 @@
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-xs">
                 <div>
                     <span class="text-slate-500">Patient:</span>
-                    <a href="{{ route('patients.show', $serviceRecord->patient) }}" class="font-bold text-slate-800 hover:text-emerald-600 ml-1">
-                        {{ $serviceRecord->patient->full_name }}
-                    </a>
-                    <span class="text-slate-400 font-mono ml-1">({{ $serviceRecord->patient->patient_control_number }})</span>
+                    @if ($serviceRecord->patient)
+                        <a href="{{ route('patients.show', $serviceRecord->patient) }}" class="font-bold text-slate-800 hover:text-emerald-600 ml-1">
+                            {{ $serviceRecord->patient->full_name }}
+                        </a>
+                        @if ($serviceRecord->patient->trashed())
+                            <span class="inline-block px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded text-[10px] font-semibold ml-1">Archived</span>
+                        @endif
+                        <span class="text-slate-400 font-mono ml-1">({{ $serviceRecord->patient->patient_control_number }})</span>
+                    @else
+                        <span class="font-bold text-slate-400 italic ml-1">Archived / Unavailable</span>
+                    @endif
                 </div>
                 <div>
                     <span class="text-slate-500">Purok:</span>
-                    <span class="font-semibold text-slate-800 ml-1">{{ $serviceRecord->patient->purok->name }}</span>
+                    <span class="font-semibold text-slate-800 ml-1">{{ $serviceRecord->patient?->purok?->name ?? 'N/A' }}</span>
                 </div>
             </div>
 
@@ -58,7 +71,7 @@
                             @foreach ($serviceRecord->service_specific_data as $key => $val)
                                 <div>
                                     <span class="text-slate-500 font-medium uppercase tracking-wider block">{{ str_replace('_', ' ', $key) }}</span>
-                                    <span class="text-slate-900 font-semibold">{{ $val ?? 'N/A' }}</span>
+                                    <span class="text-slate-900 font-semibold">{{ filled($val) ? (is_array($val) ? implode(', ', $val) : $val) : 'N/A' }}</span>
                                 </div>
                             @endforeach
                         </div>

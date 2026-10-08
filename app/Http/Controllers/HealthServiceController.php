@@ -26,8 +26,12 @@ class HealthServiceController extends Controller
 
         if ($request->filled('search')) {
             $term = $request->input('search');
-            $query->whereHas('patient', function ($q) use ($term) {
-                $q->search($term);
+            $query->where(function ($q) use ($term) {
+                $q->whereHas('patient', function ($pq) use ($term) {
+                    $pq->withTrashed()->search($term);
+                })
+                    ->orWhere('complaint_or_reason', 'like', "%{$term}%")
+                    ->orWhere('findings_and_notes', 'like', "%{$term}%");
             });
         }
 
@@ -49,7 +53,11 @@ class HealthServiceController extends Controller
             $patient = Patient::findOrFail($request->input('patient_id'));
         }
 
-        $selectedType = $request->input('type', 'family_planning');
+        $selectedType = $request->input('type');
+        if (! array_key_exists((string) $selectedType, HealthServiceRecord::SERVICES)) {
+            $selectedType = 'family_planning';
+        }
+
         $services = HealthServiceRecord::SERVICES;
         $today = Carbon::today()->format('Y-m-d');
         $patients = Patient::with('purok')->orderBy('last_name')->get();
@@ -60,14 +68,42 @@ class HealthServiceController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'patient_id' => ['required', 'exists:patients,id'],
+            'patient_id' => ['required', Rule::exists('patients', 'id')->whereNull('deleted_at')],
             'service_type' => ['required', Rule::in(array_keys(HealthServiceRecord::SERVICES))],
-            'service_date' => ['required', 'date', 'before_or_equal:today'],
-            'complaint_or_reason' => ['nullable', 'string'],
+            'service_date' => ['required', 'date', 'before_or_equal:today', 'after:2000-01-01'],
+            'complaint_or_reason' => ['nullable', 'string', 'max:1000'],
             'findings_and_notes' => ['nullable', 'string'],
             'service_specific_data' => ['nullable', 'array'],
             'next_follow_up_date' => ['nullable', 'date', 'after:today'],
+        ], [
+            'patient_id.exists' => 'The selected patient record does not exist or has been archived.',
+            'service_date.after' => 'Service date cannot be earlier than January 1, 2000.',
+            'service_date.before_or_equal' => 'Service date cannot be a future date.',
         ]);
+
+        $allowedKeys = match ($validated['service_type']) {
+            'family_planning' => ['method', 'client_type'],
+            'prenatal_care' => ['lmp', 'edc', 'trimester', 'gravida', 'para', 'fundic_height_cm', 'fetal_heart_tone', 'tetanus_toxoid_status'],
+            'immunization' => ['vaccine_name', 'dose_sequence', 'admin_site', 'batch_lot_number', 'adverse_events'],
+            'cvd_screening' => ['cvd_risk', 'organ_damage', 'systolic_bp', 'diastolic_bp', 'smoker_status', 'cvd_risk_level', 'has_hypertension_history', 'has_diabetes_history'],
+            'philpen' => ['tobacco_use', 'alcohol_use', 'fbs', 'total_cholesterol', 'risk_stratification', 'alcohol_consumption', 'fasting_blood_sugar'],
+            'ntp' => ['cough_duration', 'tb_testing'],
+            'purok_kalusugan' => ['outreach_activity'],
+            'bns_program' => ['bns_intervention', 'bns_category'],
+            default => [],
+        };
+
+        if (! empty($validated['service_specific_data']) && is_array($validated['service_specific_data'])) {
+            $filtered = [];
+            foreach ($allowedKeys as $key) {
+                if (isset($validated['service_specific_data'][$key]) && $validated['service_specific_data'][$key] !== '') {
+                    $filtered[$key] = $validated['service_specific_data'][$key];
+                }
+            }
+            $validated['service_specific_data'] = ! empty($filtered) ? $filtered : null;
+        } else {
+            $validated['service_specific_data'] = null;
+        }
 
         $validated['user_id'] = Auth::id();
 

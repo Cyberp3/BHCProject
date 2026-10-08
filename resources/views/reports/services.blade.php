@@ -94,8 +94,8 @@
                             @forelse ($records as $record)
                                 <tr class="hover:bg-slate-50">
                                     <td class="p-2.5 border font-medium">{{ $record->service_date->format('M d, Y') }}</td>
-                                    <td class="p-2.5 border font-semibold">{{ $record->patient->full_name }}</td>
-                                    <td class="p-2.5 border">{{ $record->patient->purok->name }}</td>
+                                    <td class="p-2.5 border font-semibold">{{ $record->patient?->full_name ?? 'Archived Patient' }}</td>
+                                    <td class="p-2.5 border">{{ $record->patient?->purok?->name ?? 'N/A' }}</td>
                                     <td class="p-2.5 border">{{ $record->service_title }}</td>
                                     <td class="p-2.5 border max-w-xs truncate">{{ $record->findings_and_notes ?? $record->complaint_or_reason ?? '-' }}</td>
                                     <td class="p-2.5 border">{{ $record->user ? $record->user->name : 'N/A' }}</td>

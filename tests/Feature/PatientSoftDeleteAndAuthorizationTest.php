@@ -2,6 +2,7 @@
 
 use App\Models\Appointment;
 use App\Models\AuditLog;
+use App\Models\HealthServiceRecord;
 use App\Models\Patient;
 use App\Models\Purok;
 use App\Models\User;
@@ -141,4 +142,100 @@ test('health service follow-up advisory date must be a future date', function ()
     ]);
 
     $response->assertSessionHasErrors(['next_follow_up_date']);
+});
+
+test('health service creation rejects archived soft-deleted patients', function () {
+    $this->patient->delete();
+
+    $response = $this->actingAs($this->admin)->post(route('services.store'), [
+        'patient_id' => $this->patient->id,
+        'service_type' => 'immunization',
+        'service_date' => Carbon::today()->format('Y-m-d'),
+        'complaint_or_reason' => 'Routine vaccine',
+    ]);
+
+    $response->assertSessionHasErrors(['patient_id']);
+});
+
+test('health service consultation index and show pages render cleanly for archived patients', function () {
+    $record = HealthServiceRecord::create([
+        'patient_id' => $this->patient->id,
+        'user_id' => $this->admin->id,
+        'service_type' => 'cvd_screening',
+        'service_date' => Carbon::today()->format('Y-m-d'),
+        'complaint_or_reason' => 'Hypertension checkup',
+        'findings_and_notes' => 'Blood pressure controlled at 120/80',
+        'service_specific_data' => [
+            'cvd_risk' => 'Low (<10%)',
+        ],
+    ]);
+
+    // Admin archives patient
+    $this->patient->delete();
+
+    // Index page should render without errors and display Archived badge
+    $indexResponse = $this->actingAs($this->admin)->get(route('services.index'));
+    $indexResponse->assertStatus(200);
+    $indexResponse->assertSee('Archived');
+    $indexResponse->assertSee('Gomez, Roberto');
+
+    // Show page should render without crashing on null patient
+    $showResponse = $this->actingAs($this->admin)->get(route('services.show', $record));
+    $showResponse->assertStatus(200);
+    $showResponse->assertSee('Gomez, Roberto');
+    $showResponse->assertSee('Archived');
+});
+
+test('health service data storage strictly sanitizes and whitelists program parameters', function () {
+    $response = $this->actingAs($this->admin)->post(route('services.store'), [
+        'patient_id' => $this->patient->id,
+        'service_type' => 'immunization',
+        'service_date' => Carbon::today()->format('Y-m-d'),
+        'complaint_or_reason' => 'Measles vaccine',
+        'service_specific_data' => [
+            // Valid immunization parameters
+            'vaccine_name' => 'MMR (Measles-Mumps-Rubella)',
+            'dose_sequence' => 'Dose 1',
+            'admin_site' => 'Right Deltoid',
+            // Leaked fields from other programs (should be stripped!)
+            'method' => 'Pills (COC/POP)',
+            'trimester' => '1st Trimester (Visit 1)',
+            'cvd_risk' => 'Low (<10%)',
+            'tobacco_use' => 'Non-smoker',
+            'empty_field' => '',
+        ],
+    ]);
+
+    $response->assertRedirect(route('patients.show', $this->patient));
+
+    $record = HealthServiceRecord::where('patient_id', $this->patient->id)->latest()->first();
+    expect($record->service_specific_data)->toHaveKey('vaccine_name');
+    expect($record->service_specific_data)->toHaveKey('dose_sequence');
+    expect($record->service_specific_data)->toHaveKey('admin_site');
+    // Ensure cross-program keys were stripped
+    expect($record->service_specific_data)->not->toHaveKey('method');
+    expect($record->service_specific_data)->not->toHaveKey('trimester');
+    expect($record->service_specific_data)->not->toHaveKey('cvd_risk');
+    expect($record->service_specific_data)->not->toHaveKey('tobacco_use');
+});
+
+test('services index search finds consultations by clinical findings and complaints', function () {
+    HealthServiceRecord::create([
+        'patient_id' => $this->patient->id,
+        'user_id' => $this->admin->id,
+        'service_type' => 'cvd_screening',
+        'service_date' => Carbon::today()->format('Y-m-d'),
+        'complaint_or_reason' => 'Dizziness and blurred vision',
+        'findings_and_notes' => 'Prescribed Amlodipine 5mg OD for elevated BP',
+    ]);
+
+    // Search by diagnosis / medication
+    $searchResponse = $this->actingAs($this->admin)->get(route('services.index', ['search' => 'Amlodipine']));
+    $searchResponse->assertStatus(200);
+    $searchResponse->assertSee('Dizziness and blurred vision');
+
+    // Search by symptom / complaint
+    $searchResponse2 = $this->actingAs($this->admin)->get(route('services.index', ['search' => 'blurred vision']));
+    $searchResponse2->assertStatus(200);
+    $searchResponse2->assertSee('Amlodipine');
 });
