@@ -7,12 +7,19 @@
                 <p class="text-sm text-slate-500 mt-1">Official health programs and service delivery records for Barangay Tacunan.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                @if (! Auth::user()->isAdmin())
+                @if (Auth::user()->isClinicalStaff())
                     <a href="{{ route('services.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold shadow-sm transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
                         New Consultation Record
+                    </a>
+                @elseif (Auth::user()->isBhw())
+                    <a href="{{ route('services.create', ['type' => 'purok_kalusugan']) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold shadow-sm transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Log Community Outreach
                     </a>
                 @else
                     <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 shadow-2xs">
@@ -62,7 +69,7 @@
                             <a href="{{ route('services.index', ['service_type' => $key]) }}" class="text-xs font-semibold {{ request('service_type') === $key ? 'text-emerald-700 font-bold' : 'text-emerald-600 hover:underline' }}">
                                 View logs &rarr;
                             </a>
-                            @if (! Auth::user()->isAdmin())
+                            @if (Auth::user()->canConductService($key))
                                 <a href="{{ route('services.create', ['type' => $key]) }}" class="text-xs font-semibold px-2 py-1 bg-slate-50 hover:bg-emerald-50 hover:text-emerald-700 rounded border border-slate-200 text-slate-700 transition">
                                     + Record Visit
                                 </a>

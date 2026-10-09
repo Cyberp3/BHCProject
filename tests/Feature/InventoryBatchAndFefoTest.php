@@ -15,6 +15,16 @@ beforeEach(function () {
             'is_active' => true,
         ]
     );
+
+    $this->nurse = User::firstOrCreate(
+        ['email' => 'nurse@tacunan.gov.ph'],
+        [
+            'name' => 'Nurse Maria Santos',
+            'password' => bcrypt('password123'),
+            'role' => 'nurse',
+            'is_active' => true,
+        ]
+    );
 });
 
 test('inventory stores incoming deliveries as distinct batches and isolates expiration dates', function () {
@@ -108,7 +118,7 @@ test('dispensing automatically deducts from earliest expiring batch first using 
     ]);
 
     // Dispense 70 capsules: should take all 50 from Early batch and 20 from Late batch
-    $res = $this->actingAs($this->admin)->post(route('inventory.dispense.process'), [
+    $res = $this->actingAs($this->nurse)->post(route('inventory.dispense.process'), [
         'inventory_item_id' => $item->id,
         'quantity' => 70,
         'remarks' => 'FEFO test dispensing to community health outreach',

@@ -84,9 +84,58 @@ class User extends Authenticatable
         return in_array(strtolower(trim((string) $this->role)), ['nurse', 'midwife', 'bns', 'bhw', 'bhv'], true);
     }
 
+    public function isBhw(): bool
+    {
+        return strtolower(trim((string) $this->role)) === 'bhw';
+    }
+
+    public function isNurse(): bool
+    {
+        return strtolower(trim((string) $this->role)) === 'nurse';
+    }
+
+    public function isMidwife(): bool
+    {
+        return strtolower(trim((string) $this->role)) === 'midwife';
+    }
+
     public function canRecordClinicalCare(): bool
     {
         return ! $this->isAdmin() && $this->isHealthPersonnel();
+    }
+
+    public function canDispenseMedicine(): bool
+    {
+        return $this->isClinicalStaff();
+    }
+
+    /**
+     * Get the health service programs this user is authorized to conduct.
+     *
+     * @return array<string, string>
+     */
+    public function allowedHealthServices(): array
+    {
+        if ($this->isAdmin()) {
+            return [];
+        }
+
+        if ($this->isClinicalStaff()) {
+            return HealthServiceRecord::SERVICES;
+        }
+
+        if ($this->isBhw() || $this->hasRole(['bhw', 'bhv'])) {
+            return [
+                'purok_kalusugan' => HealthServiceRecord::SERVICES['purok_kalusugan'] ?? 'Purok Kalusugan',
+            ];
+        }
+
+        return [];
+    }
+
+    public function canConductService(string $serviceType): bool
+    {
+        return array_key_exists($serviceType, $this->allowedHealthServices());
     }
 
     public function getRoleDisplayNameAttribute(): string

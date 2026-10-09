@@ -280,8 +280,10 @@
                         PHI Confidential
                     </span>
                 </div>
-                @if (! Auth::user()->isAdmin())
+                @if (Auth::user()->isClinicalStaff())
                     <a href="{{ route('services.create', ['patient_id' => $patient->id]) }}" class="text-xs text-blue-600 hover:underline font-semibold">+ Add Service Record</a>
+                @elseif (Auth::user()->isBhw())
+                    <a href="{{ route('services.create', ['patient_id' => $patient->id, 'type' => 'purok_kalusugan']) }}" class="text-xs text-blue-600 hover:underline font-semibold">+ Log Outreach (Purok Kalusugan)</a>
                 @else
                     <span class="text-xs text-slate-400 italic">Consultations restricted to healthcare personnel</span>
                 @endif
@@ -345,7 +347,9 @@
         <div x-show="activeTab === 'dispensed'" class="space-y-4" style="display: none;">
             <div class="flex items-center justify-between">
                 <h2 class="font-bold text-slate-800 text-base">Medicines & Vaccines Dispensed</h2>
-                <a href="{{ route('inventory.dispense', ['patient_id' => $patient->id]) }}" class="text-xs text-amber-600 hover:underline font-semibold">+ Dispense Item</a>
+                @if (Auth::user()->canDispenseMedicine())
+                    <a href="{{ route('inventory.dispense', ['patient_id' => $patient->id]) }}" class="text-xs text-amber-600 hover:underline font-semibold">+ Dispense Item</a>
+                @endif
             </div>
 
             <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">

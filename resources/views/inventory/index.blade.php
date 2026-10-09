@@ -7,15 +7,19 @@
                 <p class="text-sm text-slate-500 mt-1">Manage health center supplies, lot tracking, FIFO dispensation, and cold-chain storage.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                <a href="{{ route('inventory.items.create') }}" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 rounded-lg text-xs font-semibold shadow-2xs transition">
-                    + New Item
-                </a>
-                <a href="{{ route('inventory.batches.receive') }}" class="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-xs transition">
-                    + Receive Stock
-                </a>
-                <a href="{{ route('inventory.dispense') }}" class="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition">
-                    Dispense Item (FIFO)
-                </a>
+                @if (! Auth::user()->isBhw())
+                    <a href="{{ route('inventory.items.create') }}" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 rounded-lg text-xs font-semibold shadow-2xs transition">
+                        + New Item
+                    </a>
+                    <a href="{{ route('inventory.batches.receive') }}" class="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-xs transition">
+                        + Receive Stock
+                    </a>
+                @endif
+                @if (Auth::user()->canDispenseMedicine())
+                    <a href="{{ route('inventory.dispense') }}" class="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition">
+                        Dispense Item (FIFO)
+                    </a>
+                @endif
             </div>
         </div>
 
@@ -232,15 +236,21 @@
                                     <a href="{{ route('inventory.items.show', $item) }}" class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition" title="View Batches &amp; Expiration Queue">
                                         Batches
                                     </a>
-                                    <a href="{{ route('inventory.batches.receive', ['item_id' => $item->id]) }}" class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">
-                                        + Receive
-                                    </a>
-                                    <a href="{{ route('inventory.dispense', ['item_id' => $item->id]) }}" class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition">
-                                        Dispense
-                                    </a>
-                                    <a href="{{ route('inventory.items.edit', $item) }}" class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
-                                        Edit
-                                    </a>
+                                    @if (! Auth::user()->isBhw())
+                                        <a href="{{ route('inventory.batches.receive', ['item_id' => $item->id]) }}" class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">
+                                            + Receive
+                                        </a>
+                                    @endif
+                                    @if (Auth::user()->canDispenseMedicine())
+                                        <a href="{{ route('inventory.dispense', ['item_id' => $item->id]) }}" class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition">
+                                            Dispense
+                                        </a>
+                                    @endif
+                                    @if (! Auth::user()->isBhw())
+                                        <a href="{{ route('inventory.items.edit', $item) }}" class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                                            Edit
+                                        </a>
+                                    @endif
                                 </td>
                             </tr>
                             @if ($item->batches->count() > 1)

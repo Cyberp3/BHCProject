@@ -184,7 +184,7 @@ test('inventory dispensing adheres strictly to FIFO allocation', function () {
         'remarks' => 'Dispensed for outreach clinic',
     ];
 
-    $response = $this->actingAs($this->admin)->post(route('inventory.dispense.process'), $dispenseData);
+    $response = $this->actingAs($this->nurse)->post(route('inventory.dispense.process'), $dispenseData);
 
     $response->assertRedirect(route('inventory.index'));
 
@@ -261,6 +261,9 @@ test('all application view screens render successfully without errors', function
         route('assessments.create', $patient),
         route('services.create'),
         route('services.create', ['patient_id' => $patient->id]),
+        route('inventory.dispense'),
+        route('inventory.dispense', ['item_id' => $item->id]),
+        route('inventory.dispense', ['patient_id' => $patient->id]),
     ];
 
     foreach ($clinicalUrls as $url) {
@@ -279,9 +282,6 @@ test('all application view screens render successfully without errors', function
         route('inventory.items.edit', $item),
         route('inventory.batches.receive'),
         route('inventory.batches.receive', ['item_id' => $item->id]),
-        route('inventory.dispense'),
-        route('inventory.dispense', ['item_id' => $item->id]),
-        route('inventory.dispense', ['patient_id' => $patient->id]),
         route('reports.index'),
         route('reports.patients'),
         route('reports.services'),

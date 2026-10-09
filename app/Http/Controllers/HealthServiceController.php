@@ -53,17 +53,20 @@ class HealthServiceController extends Controller
         $user = Auth::user();
         abort_if($user->isAdmin(), 403, 'Unauthorized: Health program consultations and clinical care must be conducted and recorded by authorized healthcare personnel.');
 
+        $allowedServices = $user->allowedHealthServices();
+        abort_if(empty($allowedServices), 403, 'Unauthorized: You are not authorized to record health service consultations.');
+
         $patient = null;
         if ($request->filled('patient_id')) {
             $patient = Patient::findOrFail($request->input('patient_id'));
         }
 
         $selectedType = $request->input('type');
-        if (! array_key_exists((string) $selectedType, HealthServiceRecord::SERVICES)) {
-            $selectedType = 'family_planning';
+        if (! array_key_exists((string) $selectedType, $allowedServices)) {
+            $selectedType = array_key_first($allowedServices);
         }
 
-        $services = HealthServiceRecord::SERVICES;
+        $services = $allowedServices;
         $today = Carbon::today()->format('Y-m-d');
         $patients = Patient::with('purok')->orderBy('last_name')->get();
 
@@ -76,9 +79,19 @@ class HealthServiceController extends Controller
         $user = Auth::user();
         abort_if($user->isAdmin(), 403, 'Unauthorized: Health program consultations and clinical care must be conducted and recorded by authorized healthcare personnel.');
 
+        $allowedServices = $user->allowedHealthServices();
+        $requestedType = (string) $request->input('service_type');
+
+        if (! array_key_exists($requestedType, $allowedServices)) {
+            if ($user->isBhw()) {
+                abort(403, 'Unauthorized: Barangay Health Workers (BHW) are only authorized to record Purok Kalusugan (Community Outreach) activities. Clinical programs require a Registered Nurse or Midwife.');
+            }
+            abort(403, 'Unauthorized: You are not authorized to record consultations for this health program.');
+        }
+
         $validated = $request->validate([
             'patient_id' => ['required', Rule::exists('patients', 'id')->whereNull('deleted_at')],
-            'service_type' => ['required', Rule::in(array_keys(HealthServiceRecord::SERVICES))],
+            'service_type' => ['required', Rule::in(array_keys($allowedServices))],
             'service_date' => ['required', 'date', 'before_or_equal:today', 'after:2000-01-01'],
             'complaint_or_reason' => ['nullable', 'string', 'max:1000'],
             'findings_and_notes' => ['nullable', 'string'],

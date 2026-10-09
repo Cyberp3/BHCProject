@@ -7,6 +7,7 @@ use App\Models\InventoryBatch;
 use App\Models\InventoryItem;
 use App\Models\InventoryTransaction;
 use App\Models\Patient;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -81,11 +82,18 @@ class InventoryController extends Controller
 
     public function createItem(): View
     {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_if($user->isBhw(), 403, 'Unauthorized: Catalog item management must be conducted by registered clinical personnel or administrators.');
+
         return view('inventory.items.create');
     }
 
     public function storeItem(Request $request): RedirectResponse
     {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_if($user->isBhw(), 403, 'Unauthorized: Catalog item management must be conducted by registered clinical personnel or administrators.');
         $validated = $request->validate([
             'item_code' => ['required', 'string', 'max:50', 'unique:inventory_items,item_code'],
             'name' => ['required', 'string', 'max:150'],
@@ -116,11 +124,18 @@ class InventoryController extends Controller
 
     public function editItem(InventoryItem $item): View
     {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_if($user->isBhw(), 403, 'Unauthorized: Catalog item management must be conducted by registered clinical personnel or administrators.');
+
         return view('inventory.items.edit', compact('item'));
     }
 
     public function updateItem(Request $request, InventoryItem $item): RedirectResponse
     {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_if($user->isBhw(), 403, 'Unauthorized: Catalog item management must be conducted by registered clinical personnel or administrators.');
         $validated = $request->validate([
             'item_code' => ['required', 'string', 'max:50', 'unique:inventory_items,item_code,'.$item->id],
             'name' => ['required', 'string', 'max:150'],
@@ -185,6 +200,10 @@ class InventoryController extends Controller
 
     public function receiveBatchForm(Request $request): View
     {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_if($user->isBhw(), 403, 'Unauthorized: Stock batch receiving must be conducted by registered clinical personnel or administrators.');
+
         $items = InventoryItem::orderBy('name')->get();
         $selectedItemId = $request->input('item_id');
         $today = Carbon::today()->format('Y-m-d');
@@ -194,6 +213,9 @@ class InventoryController extends Controller
 
     public function storeBatch(Request $request): RedirectResponse
     {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_if($user->isBhw(), 403, 'Unauthorized: Stock batch receiving must be conducted by registered clinical personnel or administrators.');
         $validated = $request->validate([
             'inventory_item_id' => ['required', 'exists:inventory_items,id'],
             'batch_number' => [
@@ -252,6 +274,10 @@ class InventoryController extends Controller
 
     public function dispenseForm(Request $request): View
     {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_unless($user->canDispenseMedicine(), 403, 'Unauthorized: Only registered clinical personnel (Nurses and Midwives) are authorized to dispense medications and vaccines.');
+
         $today = Carbon::today();
 
         // Auto-quarantine expired active batches across inventory
@@ -275,6 +301,9 @@ class InventoryController extends Controller
 
     public function processDispense(Request $request): RedirectResponse
     {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_unless($user->canDispenseMedicine(), 403, 'Unauthorized: Only registered clinical personnel (Nurses and Midwives) are authorized to dispense medications and vaccines.');
         $validated = $request->validate([
             'inventory_item_id' => ['required', 'exists:inventory_items,id'],
             'patient_id' => ['nullable', Rule::exists('patients', 'id')->whereNull('deleted_at')],

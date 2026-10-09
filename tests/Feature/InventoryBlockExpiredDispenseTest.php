@@ -16,6 +16,16 @@ beforeEach(function () {
             'is_active' => true,
         ]
     );
+
+    $this->nurse = User::firstOrCreate(
+        ['email' => 'nurse@tacunan.gov.ph'],
+        [
+            'name' => 'Nurse Maria Santos',
+            'password' => bcrypt('password123'),
+            'role' => 'nurse',
+            'is_active' => true,
+        ]
+    );
 });
 
 test('dispensing strictly rejects items when all available stock is expired', function () {
@@ -44,7 +54,7 @@ test('dispensing strictly rejects items when all available stock is expired', fu
         'status' => 'active',
     ]);
 
-    $response = $this->actingAs($this->admin)->post(route('inventory.dispense.process'), [
+    $response = $this->actingAs($this->nurse)->post(route('inventory.dispense.process'), [
         'inventory_item_id' => $item->id,
         'quantity' => 10,
         'remarks' => 'Attempt to dispense expired medication',
@@ -102,7 +112,7 @@ test('fefo dispensing bypasses expired batches and strictly deducts from unexpir
     ]);
 
     // Dispense 25 tablets
-    $response = $this->actingAs($this->admin)->post(route('inventory.dispense.process'), [
+    $response = $this->actingAs($this->nurse)->post(route('inventory.dispense.process'), [
         'inventory_item_id' => $item->id,
         'quantity' => 25,
         'remarks' => 'Dispensed to outreach client',
@@ -167,7 +177,7 @@ test('dispensing fails if requested quantity exceeds unexpired stock even if exp
     ]);
 
     // Request 25 tablets (total stock is 70, but unexpired is only 20)
-    $response = $this->actingAs($this->admin)->post(route('inventory.dispense.process'), [
+    $response = $this->actingAs($this->nurse)->post(route('inventory.dispense.process'), [
         'inventory_item_id' => $item->id,
         'quantity' => 25,
         'remarks' => 'Request exceeding unexpired stock',
@@ -203,7 +213,7 @@ test('dispense form marks items with only expired batches as quarantined and dis
         'status' => 'active',
     ]);
 
-    $response = $this->actingAs($this->admin)->get(route('inventory.dispense'));
+    $response = $this->actingAs($this->nurse)->get(route('inventory.dispense'));
     $response->assertStatus(200);
     $response->assertSee('[EXPIRED / QUARANTINED - CANNOT DISPENSE]');
 });
