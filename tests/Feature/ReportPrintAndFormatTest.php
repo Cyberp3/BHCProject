@@ -31,13 +31,13 @@ beforeEach(function () {
     );
 });
 
-test('reports hub page renders all 4 report generation cards', function () {
+test('reports hub page renders report generation cards', function () {
     $response = $this->actingAs($this->admin)->get(route('reports.index'));
     $response->assertStatus(200);
     $response->assertSee('Health Center Reports');
     $response->assertSee('Patient Profiling');
     $response->assertSee('Health Services Monthly Summary');
-    $response->assertSee('Appointments');
+    $response->assertDontSee('Appointments & Follow-up Summary');
     $response->assertSee('Inventory');
 });
 
@@ -60,17 +60,6 @@ test('health services report renders official header and service utilization', f
     $response->assertSee('Health Services');
     $response->assertSee('Programs Utilization Report');
     $response->assertSee('Service Utilization by Program');
-    $response->assertSee('Certified Correct By:');
-});
-
-test('appointments report renders compliance tallies and official certification footer', function () {
-    $response = $this->actingAs($this->admin)->get(route('reports.appointments'));
-    $response->assertStatus(200);
-    $response->assertSee('Barangay Tacunan Health Center');
-    $response->assertSee('Follow-up');
-    $response->assertSee('Appointment Compliance Report');
-    $response->assertSee('Scheduled');
-    $response->assertSee('Attended');
     $response->assertSee('Certified Correct By:');
 });
 

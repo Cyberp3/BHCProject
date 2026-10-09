@@ -240,7 +240,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Recommended Next Follow-up Date <span class="text-slate-400 font-normal">(Optional clinical advisory note)</span></label>
                         <input type="date" name="next_follow_up_date" min="{{ date('Y-m-d', strtotime('+1 day')) }}" value="{{ old('next_follow_up_date') }}" class="w-full sm:w-64 text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                        <span class="text-[11px] text-slate-400 block mt-1">Stores an advisory return note on the patient's record. Official clinic appointments are managed in the <a href="{{ route('appointments.index') }}" class="text-emerald-600 underline font-medium">Appointments</a> module.</span>
+                        <span class="text-[11px] text-slate-400 block mt-1">Stores an advisory return date on the patient's consultation history for clinical continuity.</span>
                     </div>
                 </div>
 

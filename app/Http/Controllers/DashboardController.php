@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Appointment;
 use App\Models\AuditLog;
+use App\Models\HealthServiceRecord;
 use App\Models\InventoryBatch;
 use App\Models\InventoryItem;
 use App\Models\Patient;
@@ -20,9 +20,7 @@ class DashboardController extends Controller
 
         $totalPatients = Patient::count();
 
-        $todayAppointmentsCount = Appointment::whereDate('appointment_date', $today)
-            ->where('status', 'scheduled')
-            ->count();
+        $totalServicesCount = HealthServiceRecord::count();
 
         // Auto-quarantine expired active batches
         InventoryBatch::where('status', 'active')
@@ -40,9 +38,8 @@ class DashboardController extends Controller
 
         $nearExpiryCount = InventoryBatch::nearExpiry(90)->count();
 
-        $todayAppointments = Appointment::with('patient')
-            ->whereDate('appointment_date', $today)
-            ->orderBy('appointment_time', 'asc')
+        $recentServices = HealthServiceRecord::with(['patient', 'user'])
+            ->latest('service_date')
             ->take(5)
             ->get();
 
@@ -63,10 +60,10 @@ class DashboardController extends Controller
 
         return view('dashboard.index', compact(
             'totalPatients',
-            'todayAppointmentsCount',
+            'totalServicesCount',
             'lowStockCount',
             'nearExpiryCount',
-            'todayAppointments',
+            'recentServices',
             'recentPatients',
             'purokBreakdown',
             'recentActivities'

@@ -140,7 +140,6 @@ class PatientController extends Controller
             'creator',
             'healthAssessments.user',
             'healthServiceRecords.user',
-            'appointments.scheduledBy',
             'inventoryTransactions.item',
             'inventoryTransactions.batch',
         ]);

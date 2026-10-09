@@ -457,18 +457,8 @@ test('patients directory status filter isolates active and archived records', fu
     $responseAll->assertSee($archivedPatient->patient_control_number);
 });
 
-test('appointment creation and inventory dispense reject archived patients', function () {
+test('inventory dispense rejects archived patients', function () {
     $this->patient->delete();
-
-    $nextWednesday = Carbon::now()->next(Carbon::WEDNESDAY)->format('Y-m-d');
-    $apptResponse = $this->actingAs($this->admin)->post(route('appointments.store'), [
-        'patient_id' => $this->patient->id,
-        'service_type' => 'immunization',
-        'appointment_date' => $nextWednesday,
-        'appointment_time' => '09:00',
-        'purpose' => 'Post-archive checkup',
-    ]);
-    $apptResponse->assertSessionHasErrors(['patient_id']);
 
     $item = InventoryItem::create([
         'item_code' => 'TEST-MED-'.uniqid(),

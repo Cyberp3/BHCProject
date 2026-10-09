@@ -40,18 +40,18 @@
                 </div>
             </div>
 
-            <!-- Card 2: Today's Appointments -->
+            <!-- Card 2: Total Consultations -->
             <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs flex items-center justify-between min-w-0">
                 <div class="min-w-0 flex-1 mr-3">
-                    <div class="text-xs font-semibold uppercase text-slate-400 tracking-wider truncate">Today's Appointments</div>
-                    <div class="text-3xl font-extrabold text-slate-900 mt-1 truncate">{{ number_format($todayAppointmentsCount) }}</div>
-                    <a href="{{ route('appointments.index', ['filter' => 'today']) }}" class="text-xs text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-1 mt-2 truncate">
-                        View schedule &rarr;
+                    <div class="text-xs font-semibold uppercase text-slate-400 tracking-wider truncate">Total Consultations</div>
+                    <div class="text-3xl font-extrabold text-slate-900 mt-1 truncate">{{ number_format($totalServicesCount) }}</div>
+                    <a href="{{ route('services.index') }}" class="text-xs text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-1 mt-2 truncate">
+                        View services &rarr;
                     </a>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 flex-shrink-0">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                     </svg>
                 </div>
             </div>
@@ -93,36 +93,36 @@
             </div>
         </div>
 
-        <!-- 2 Column Section: Today's Appointments & Recent Patients -->
+        <!-- 2 Column Section: Recent Health Services & Recent Patients -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Today's Scheduled Appointments -->
+            <!-- Recent Consultations & Health Services -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
                 <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50 shrink-0 flex-shrink-0">
                     <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2 min-w-0 truncate">
                         <span class="w-2 h-2 rounded-full bg-blue-500 shrink-0 flex-shrink-0"></span>
-                        <span class="truncate">Today's Scheduled Appointments</span>
+                        <span class="truncate">Recent Consultations & Services</span>
                     </h2>
-                    <a href="{{ route('appointments.index', ['filter' => 'today']) }}" class="text-xs text-blue-600 hover:underline font-medium shrink-0 flex-shrink-0 ml-2">View All</a>
+                    <a href="{{ route('services.index') }}" class="text-xs text-blue-600 hover:underline font-medium shrink-0 flex-shrink-0 ml-2">View All</a>
                 </div>
 
                 <div class="divide-y divide-slate-100 flex-1">
-                    @forelse ($todayAppointments as $appt)
+                    @forelse ($recentServices as $srv)
                         <div class="p-4 flex items-center justify-between hover:bg-slate-50/80 transition min-w-0">
                             <div class="min-w-0 flex-1 mr-3">
-                                <a href="{{ route('patients.show', $appt->patient) }}" class="font-semibold text-sm text-slate-900 hover:text-emerald-600 truncate block">
-                                    {{ $appt->patient->full_name }}
+                                <a href="{{ route('services.show', $srv) }}" class="font-semibold text-sm text-slate-900 hover:text-emerald-600 truncate block">
+                                    {{ $srv->patient->full_name }}
                                 </a>
                                 <div class="text-xs text-slate-500 mt-0.5 truncate">
-                                    {{ $appt->purpose }} &bull; <span class="font-medium text-slate-700">{{ $appt->appointment_time ? \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A') : 'All Day' }}</span>
+                                    {{ $srv->service_title }} &bull; <span class="font-medium text-slate-700">{{ $srv->service_date ? $srv->service_date->format('M d, Y') : 'N/A' }}</span>
                                 </div>
                             </div>
                             <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 shrink-0 flex-shrink-0">
-                                {{ ucfirst($appt->status) }}
+                                {{ $srv->user ? $srv->user->name : 'Staff' }}
                             </span>
                         </div>
                     @empty
                         <div class="p-8 text-center text-slate-400 text-sm">
-                            No appointments scheduled for today.
+                            No consultations recorded yet.
                         </div>
                     @endforelse
                 </div>

@@ -209,7 +209,6 @@ test('operational reports endpoints render valid data', function () {
         route('reports.index'),
         route('reports.patients'),
         route('reports.services'),
-        route('reports.appointments'),
         route('reports.inventory'),
     ];
 
@@ -289,10 +288,6 @@ test('all application view screens render successfully without errors', function
         route('patients.create'),
         route('patients.show', $patient),
         route('services.index'),
-        route('appointments.index'),
-        route('appointments.create'),
-        route('appointments.create', ['patient_id' => $patient->id]),
-        route('appointments.edit', $appointment),
         route('inventory.index'),
         route('inventory.items.create'),
         route('inventory.items.edit', $item),
@@ -304,7 +299,6 @@ test('all application view screens render successfully without errors', function
         route('reports.index'),
         route('reports.patients'),
         route('reports.services'),
-        route('reports.appointments'),
         route('reports.inventory'),
         route('users.index'),
         route('users.create'),

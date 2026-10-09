@@ -6,8 +6,8 @@
             <p class="text-sm text-slate-500 mt-1">Operational summaries, demographics, service counts, and inventory monitoring for Barangay Tacunan.</p>
         </div>
 
-        <!-- 4 Reports Hub Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Reports Hub Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- 1. Patient Demographics Report -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-6 flex flex-col justify-between hover:border-emerald-300 transition">
                 <div>
@@ -48,27 +48,7 @@
                 </div>
             </div>
 
-            <!-- 3. Appointments & Follow-ups -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-6 flex flex-col justify-between hover:border-emerald-300 transition">
-                <div>
-                    <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                    </div>
-                    <h2 class="text-lg font-bold text-slate-900">Appointments & Follow-up Summary</h2>
-                    <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                        Follow-up compliance metrics, tally of scheduled vs attended vs missed checkups across specific date ranges.
-                    </p>
-                </div>
-                <div class="mt-6 pt-4 border-t border-slate-100">
-                    <a href="{{ route('reports.appointments') }}" class="inline-flex items-center text-xs font-bold text-indigo-700 hover:text-indigo-800">
-                        Generate Follow-up Report &rarr;
-                    </a>
-                </div>
-            </div>
-
-            <!-- 4. Medicine & Vaccine Inventory Summary -->
+            <!-- 3. Medicine & Vaccine Inventory Summary -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-6 flex flex-col justify-between hover:border-emerald-300 transition">
                 <div>
                     <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center mb-4">

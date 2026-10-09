@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HealthAssessmentController;
@@ -37,10 +36,6 @@ Route::middleware(['auth', 'active_user'])->group(function () {
     Route::post('services', [HealthServiceController::class, 'store'])->name('services.store');
     Route::get('services/{serviceRecord}', [HealthServiceController::class, 'show'])->name('services.show');
 
-    // Module 3: Appointments & Follow-up Scheduling
-    Route::resource('appointments', AppointmentController::class)->except(['show', 'destroy']);
-    Route::patch('appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.updateStatus');
-
     // Module 4: Medicine & Vaccine Inventory with FIFO
     Route::prefix('inventory')->name('inventory.')->group(function () {
         Route::get('/', [InventoryController::class, 'index'])->name('index');
@@ -62,7 +57,6 @@ Route::middleware(['auth', 'active_user'])->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
         Route::get('/patients', [ReportController::class, 'patients'])->name('patients');
         Route::get('/services', [ReportController::class, 'services'])->name('services');
-        Route::get('/appointments', [ReportController::class, 'appointments'])->name('appointments');
         Route::get('/inventory', [ReportController::class, 'inventory'])->name('inventory');
     });
 

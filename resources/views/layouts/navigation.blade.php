@@ -41,14 +41,6 @@
             <span class="text-[10px] bg-emerald-800 text-emerald-200 px-1.5 py-0.5 rounded font-bold shrink-0 flex-shrink-0">8</span>
         </a>
 
-        <!-- Appointments / Follow-ups -->
-        <a href="{{ route('appointments.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition {{ request()->routeIs('appointments.*') ? 'bg-emerald-600 text-white shadow' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-            <svg class="w-5 h-5 shrink-0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span class="truncate">Appointments</span>
-        </a>
-
         <!-- Inventory (Medicines & Vaccines) -->
         <a href="{{ route('inventory.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition {{ request()->routeIs('inventory.*') ? 'bg-emerald-600 text-white shadow' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
             <svg class="w-5 h-5 shrink-0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

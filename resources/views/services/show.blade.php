@@ -119,9 +119,6 @@
                                 <div class="text-sm font-semibold text-blue-700">{{ $serviceRecord->next_follow_up_date->format('l, F d, Y') }}</div>
                             </div>
                         </div>
-                        <a href="{{ route('appointments.index') }}" class="text-xs text-blue-800 hover:underline font-semibold">
-                            View in Appointments &rarr;
-                        </a>
                     </div>
                 @endif
             </div>
