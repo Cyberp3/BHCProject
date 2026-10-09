@@ -208,12 +208,8 @@ class Patient extends Model
             return $query;
         }
 
-        return $query->where(function (Builder $q) use ($serviceType) {
-            $q->whereHas('healthServiceRecords', function (Builder $sq) use ($serviceType) {
-                $sq->where('service_type', $serviceType);
-            })->orWhereHas('appointments', function (Builder $sq) use ($serviceType) {
-                $sq->where('service_type', $serviceType);
-            });
+        return $query->whereHas('healthServiceRecords', function (Builder $sq) use ($serviceType) {
+            $sq->where('service_type', $serviceType);
         });
     }
 }

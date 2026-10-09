@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Appointment;
 use App\Models\AuditLog;
 use App\Models\HealthServiceRecord;
 use App\Models\InventoryItem;
@@ -80,28 +79,26 @@ test('non-admin personnel cannot archive patient records and receive 403', funct
 });
 
 test('historical clinical records remain intact after patient is soft deleted', function () {
-    // Create an appointment for this patient
-    $nextWednesday = Carbon::now()->next(Carbon::WEDNESDAY)->format('Y-m-d');
-    $appointment = Appointment::create([
+    // Create a clinical health service record for this patient
+    $record = HealthServiceRecord::create([
         'patient_id' => $this->patient->id,
+        'user_id' => $this->admin->id,
         'service_type' => 'immunization',
-        'appointment_date' => $nextWednesday,
-        'appointment_time' => '09:00',
-        'purpose' => 'Routine Booster',
-        'scheduled_by' => $this->admin->id,
-        'status' => 'scheduled',
+        'service_title' => 'Routine Booster Dose',
+        'service_date' => Carbon::now()->format('Y-m-d'),
+        'clinical_findings' => 'Booster dose administered normally.',
     ]);
 
     // Admin archives patient
     $this->actingAs($this->admin)->delete(route('patients.destroy', $this->patient));
 
-    // The appointment record is preserved in the database
-    $preservedAppt = Appointment::find($appointment->id);
-    expect($preservedAppt)->not->toBeNull();
-    expect($preservedAppt->patient_id)->toBe($this->patient->id);
+    // The clinical record is preserved in the database
+    $preservedRecord = HealthServiceRecord::find($record->id);
+    expect($preservedRecord)->not->toBeNull();
+    expect($preservedRecord->patient_id)->toBe($this->patient->id);
 
     // The soft-deleted patient can still be accessed via withTrashed relationship
-    expect(Patient::withTrashed()->find($preservedAppt->patient_id)->full_name)->toBe('Gomez, Roberto');
+    expect(Patient::withTrashed()->find($preservedRecord->patient_id)->full_name)->toBe('Gomez, Roberto');
 });
 
 test('suggested control number accounts for soft-deleted patients and never collides', function () {

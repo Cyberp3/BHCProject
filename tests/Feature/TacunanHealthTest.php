@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Appointment;
 use App\Models\AuditLog;
 use App\Models\HealthAssessment;
 use App\Models\HealthServiceRecord;
@@ -141,10 +140,6 @@ test('can log health service consultation visit record', function () {
     expect($record)->not->toBeNull();
     expect($record->service_title)->toBe('Immunization');
     expect($record->next_follow_up_date->format('Y-m-d'))->toBe($followUpDate);
-
-    // Verify appointment was NOT automatically scheduled (appointments module handles calendar bookings)
-    $appointment = Appointment::where('patient_id', $patient->id)->first();
-    expect($appointment)->toBeNull();
 });
 
 test('inventory dispensing adheres strictly to FIFO allocation', function () {
@@ -259,15 +254,6 @@ test('all application view screens render successfully without errors', function
         'category' => 'medicine',
         'unit_of_measure' => 'Tablet',
         'minimum_stock_alert' => 10,
-    ]);
-
-    $appointment = Appointment::create([
-        'patient_id' => $patient->id,
-        'scheduled_by' => $this->admin->id,
-        'appointment_date' => Carbon::tomorrow(),
-        'service_type' => 'immunization',
-        'purpose' => 'Checkup',
-        'status' => 'scheduled',
     ]);
 
     $clinicalUrls = [

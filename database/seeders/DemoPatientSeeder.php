@@ -10,6 +10,7 @@ use App\Models\Purok;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class DemoPatientSeeder extends Seeder
 {
@@ -77,16 +78,18 @@ class DemoPatientSeeder extends Seeder
             'next_follow_up_date' => Carbon::today()->format('Y-m-d'),
         ]);
 
-        Appointment::create([
-            'patient_id' => $p1->id,
-            'scheduled_by' => $nurse->id,
-            'service_type' => 'cvd_screening',
-            'appointment_date' => Carbon::today()->format('Y-m-d'),
-            'appointment_time' => '09:00',
-            'purpose' => '2-week BP re-check and maintenance medication refill',
-            'status' => 'scheduled',
-            'status_notes' => 'Bring empty medicine blister pack and PhilHealth ID.',
-        ]);
+        if (Schema::hasTable('appointments')) {
+            Appointment::create([
+                'patient_id' => $p1->id,
+                'scheduled_by' => $nurse->id,
+                'service_type' => 'cvd_screening',
+                'appointment_date' => Carbon::today()->format('Y-m-d'),
+                'appointment_time' => '09:00',
+                'purpose' => '2-week BP re-check and maintenance medication refill',
+                'status' => 'scheduled',
+                'status_notes' => 'Bring empty medicine blister pack and PhilHealth ID.',
+            ]);
+        }
 
         // 2. Maria Clara Santos - Pregnant Mother (Prenatal Care)
         $p2 = Patient::create([
@@ -141,16 +144,18 @@ class DemoPatientSeeder extends Seeder
             'next_follow_up_date' => Carbon::today()->addDays(10)->format('Y-m-d'),
         ]);
 
-        Appointment::create([
-            'patient_id' => $p2->id,
-            'scheduled_by' => $midwife->id,
-            'service_type' => 'prenatal_care',
-            'appointment_date' => Carbon::today()->addDays(10)->format('Y-m-d'),
-            'appointment_time' => '10:00',
-            'purpose' => '3rd Prenatal Checkup and Gestational Diabetes Screen',
-            'status' => 'scheduled',
-            'status_notes' => 'Bring maternal health record booklet (Pink book).',
-        ]);
+        if (Schema::hasTable('appointments')) {
+            Appointment::create([
+                'patient_id' => $p2->id,
+                'scheduled_by' => $midwife->id,
+                'service_type' => 'prenatal_care',
+                'appointment_date' => Carbon::today()->addDays(10)->format('Y-m-d'),
+                'appointment_time' => '10:00',
+                'purpose' => '3rd Prenatal Checkup and Gestational Diabetes Screen',
+                'status' => 'scheduled',
+                'status_notes' => 'Bring maternal health record booklet (Pink book).',
+            ]);
+        }
 
         // 3. Baby Ethan Gabriel Reyes - 6-month-old Infant (Immunization)
         $p3 = Patient::create([
@@ -201,16 +206,18 @@ class DemoPatientSeeder extends Seeder
             'next_follow_up_date' => Carbon::today()->format('Y-m-d'),
         ]);
 
-        Appointment::create([
-            'patient_id' => $p3->id,
-            'scheduled_by' => $nurse->id,
-            'service_type' => 'immunization',
-            'appointment_date' => Carbon::today()->format('Y-m-d'),
-            'appointment_time' => '08:30',
-            'purpose' => 'Pentavalent Dose 3 and OPV Dose 3 + IPV injection',
-            'status' => 'scheduled',
-            'status_notes' => 'Bring Child Immunization Record (Yellow Card).',
-        ]);
+        if (Schema::hasTable('appointments')) {
+            Appointment::create([
+                'patient_id' => $p3->id,
+                'scheduled_by' => $nurse->id,
+                'service_type' => 'immunization',
+                'appointment_date' => Carbon::today()->format('Y-m-d'),
+                'appointment_time' => '08:30',
+                'purpose' => 'Pentavalent Dose 3 and OPV Dose 3 + IPV injection',
+                'status' => 'scheduled',
+                'status_notes' => 'Bring Child Immunization Record (Yellow Card).',
+            ]);
+        }
 
         // 4. Teresa Bautista - Senior Citizen (PhilPEN NCD Assessment)
         $p4 = Patient::create([
@@ -262,16 +269,18 @@ class DemoPatientSeeder extends Seeder
             'next_follow_up_date' => Carbon::today()->addDays(23)->format('Y-m-d'),
         ]);
 
-        Appointment::create([
-            'patient_id' => $p4->id,
-            'scheduled_by' => $nurse->id,
-            'service_type' => 'philpen',
-            'appointment_date' => Carbon::today()->addDays(23)->format('Y-m-d'),
-            'appointment_time' => '09:00',
-            'purpose' => 'Monthly FBS test and maintenance medication refill',
-            'status' => 'scheduled',
-            'status_notes' => 'Fasting 8-10 hours prior to morning blood extraction.',
-        ]);
+        if (Schema::hasTable('appointments')) {
+            Appointment::create([
+                'patient_id' => $p4->id,
+                'scheduled_by' => $nurse->id,
+                'service_type' => 'philpen',
+                'appointment_date' => Carbon::today()->addDays(23)->format('Y-m-d'),
+                'appointment_time' => '09:00',
+                'purpose' => 'Monthly FBS test and maintenance medication refill',
+                'status' => 'scheduled',
+                'status_notes' => 'Fasting 8-10 hours prior to morning blood extraction.',
+            ]);
+        }
 
         // 5. Rosa Batungbakal - Family Planning (DMPA Injectable)
         $p5 = Patient::create([
@@ -322,16 +331,18 @@ class DemoPatientSeeder extends Seeder
             'next_follow_up_date' => Carbon::today()->addDays(30)->format('Y-m-d'),
         ]);
 
-        Appointment::create([
-            'patient_id' => $p5->id,
-            'scheduled_by' => $midwife->id,
-            'service_type' => 'family_planning',
-            'appointment_date' => Carbon::today()->addDays(30)->format('Y-m-d'),
-            'appointment_time' => '11:00',
-            'purpose' => 'Quarterly DMPA Injectable Re-injection',
-            'status' => 'scheduled',
-            'status_notes' => 'Bring Family Planning Card.',
-        ]);
+        if (Schema::hasTable('appointments')) {
+            Appointment::create([
+                'patient_id' => $p5->id,
+                'scheduled_by' => $midwife->id,
+                'service_type' => 'family_planning',
+                'appointment_date' => Carbon::today()->addDays(30)->format('Y-m-d'),
+                'appointment_time' => '11:00',
+                'purpose' => 'Quarterly DMPA Injectable Re-injection',
+                'status' => 'scheduled',
+                'status_notes' => 'Bring Family Planning Card.',
+            ]);
+        }
 
         // 6. Totoy Magtanggol - 3-year-old child (BNS Growth Monitoring)
         $p6 = Patient::create([
