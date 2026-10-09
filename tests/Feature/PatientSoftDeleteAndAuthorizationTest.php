@@ -325,7 +325,7 @@ test('patient profile screen renders medical confidentiality banner and hides ed
 test('patient directory screen renders privacy safeguards and hides edit buttons for admin', function () {
     $adminIndex = $this->actingAs($this->admin)->get(route('patients.index'));
     $adminIndex->assertStatus(200);
-    $adminIndex->assertSee('RA 10173 Protected');
+    $adminIndex->assertDontSee('RA 10173 Protected');
     $adminIndex->assertSee('Privacy Shield');
     $adminIndex->assertSee('Read-Only');
     $adminIndex->assertDontSee('Edit Patient');

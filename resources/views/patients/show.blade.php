@@ -99,7 +99,6 @@
                     </svg>
                     <span class="font-semibold">Authorized Healthcare Personnel Access &bull; Confidential Medical Record</span>
                 </div>
-                <span class="text-[10px] uppercase tracking-wider font-bold text-emerald-700">DOH & RA 10173 Protected</span>
             </div>
         @endif
 
