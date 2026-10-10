@@ -104,14 +104,14 @@ class HealthServiceController extends Controller
         ]);
 
         $allowedKeys = match ($validated['service_type']) {
-            'family_planning' => ['method', 'client_type'],
-            'prenatal_care' => ['lmp', 'edc', 'trimester', 'gravida', 'para', 'fundic_height_cm', 'fetal_heart_tone', 'tetanus_toxoid_status'],
-            'immunization' => ['vaccine_name', 'dose_sequence', 'admin_site', 'batch_lot_number', 'adverse_events'],
+            'family_planning' => ['method', 'client_type', 'source', 'drop_out_reason', 'method_accepted'],
+            'prenatal_care' => ['gravida', 'para', 'lmp', 'edc', 'trimester', 'fundic_height_cm', 'fetal_heart_tone', 'tetanus_toxoid_status'],
+            'immunization' => ['vaccine_name', 'dose_sequence', 'admin_site', 'batch_lot_number', 'adverse_events', 'vaccine_administered', 'site_of_injection'],
             'cvd_screening' => ['cvd_risk', 'organ_damage', 'systolic_bp', 'diastolic_bp', 'smoker_status', 'cvd_risk_level', 'has_hypertension_history', 'has_diabetes_history'],
             'philpen' => ['tobacco_use', 'alcohol_use', 'fbs', 'total_cholesterol', 'risk_stratification', 'alcohol_consumption', 'fasting_blood_sugar'],
-            'ntp' => ['cough_duration', 'tb_testing'],
-            'purok_kalusugan' => ['outreach_activity'],
-            'bns_program' => ['bns_intervention', 'bns_category'],
+            'ntp' => ['tb_presumptive', 'cough_duration', 'sputum_genexpert_result', 'chest_xray_findings', 'treatment_regimen', 'tb_testing'],
+            'purok_kalusugan' => ['activity_type', 'household_members_screened', 'sanitation_status', 'health_education_topic', 'outreach_activity'],
+            'bns_program' => ['target_group', 'bns_intervention', 'bns_category', 'weight_for_age', 'height_for_age', 'weight_for_length', 'vitamin_a_given', 'deworming_given'],
             default => [],
         };
 

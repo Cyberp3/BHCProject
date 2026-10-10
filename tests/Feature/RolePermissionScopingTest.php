@@ -224,3 +224,47 @@ test('admin is blocked from clinical consultations and medicine dispensing', fun
         'quantity' => 1,
     ])->assertForbidden();
 });
+
+test('health services record all program-specific parameters and show permanent clinical record notice', function () {
+    $prenatalData = [
+        'patient_id' => $this->patient->id,
+        'service_type' => 'prenatal_care',
+        'service_date' => Carbon::today()->format('Y-m-d'),
+        'complaint_or_reason' => '2nd trimester evaluation',
+        'service_specific_data' => [
+            'gravida' => '2',
+            'para' => '1',
+            'lmp' => '2026-04-01',
+            'edc' => '2027-01-06',
+            'trimester' => '2nd Trimester (Visit 2)',
+            'fundic_height_cm' => '24',
+            'fetal_heart_tone' => '144 bpm',
+            'tetanus_toxoid_status' => 'Td 2 Given',
+        ],
+    ];
+
+    $response = $this->actingAs($this->midwife)->post(route('services.store'), $prenatalData);
+    $response->assertRedirect(route('patients.show', $this->patient));
+
+    $record = HealthServiceRecord::where('patient_id', $this->patient->id)
+        ->where('service_type', 'prenatal_care')
+        ->latest('id')
+        ->first();
+
+    expect($record)->not->toBeNull();
+    expect($record->service_specific_data['gravida'])->toBe('2');
+    expect($record->service_specific_data['fundic_height_cm'])->toBe('24');
+    expect($record->service_specific_data['fetal_heart_tone'])->toBe('144 bpm');
+
+    // Show view should display parameters and permanent record notice
+    $showResponse = $this->actingAs($this->midwife)->get(route('services.show', $record));
+    $showResponse->assertOk();
+    $showResponse->assertSee('Permanent Clinical Record');
+    $showResponse->assertSee('Program-Specific Parameters');
+    $showResponse->assertSee('144 bpm');
+    $showResponse->assertSee('fundic height cm');
+
+    // Consultations remain immutable with no edit route
+    expect(Route::has('services.edit'))->toBeFalse();
+    expect(Route::has('services.update'))->toBeFalse();
+});
