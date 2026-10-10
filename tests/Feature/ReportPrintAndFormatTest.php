@@ -73,6 +73,33 @@ test('inventory report renders stock balance, near-expiry table, and official ce
     $response->assertSee('Approved By:');
 });
 
+test('inventory report provides specification buttons for critical, near-expiry, and overall inventory views', function () {
+    $response = $this->actingAs($this->admin)->get(route('reports.inventory'));
+    $response->assertStatus(200);
+    $response->assertSee('Report Specification:');
+    $response->assertSee('All Sections');
+    $response->assertSee('Critical Stock');
+    $response->assertSee('Near-Expiry');
+    $response->assertSee('Overall Inventory');
+});
+
+test('inventory report accepts section parameter for direct URL filtering', function () {
+    $responseCritical = $this->actingAs($this->admin)->get(route('reports.inventory', ['section' => 'critical']));
+    $responseCritical->assertStatus(200);
+    $responseCritical->assertSee("section: 'critical'", false);
+    $responseCritical->assertSee('Critical / Low Stock Items Only');
+
+    $responseNear = $this->actingAs($this->admin)->get(route('reports.inventory', ['section' => 'near_expiry']));
+    $responseNear->assertStatus(200);
+    $responseNear->assertSee("section: 'near_expiry'", false);
+    $responseNear->assertSee('Near-Expiry Batches Only');
+
+    $responseOverall = $this->actingAs($this->admin)->get(route('reports.inventory', ['section' => 'overall']));
+    $responseOverall->assertStatus(200);
+    $responseOverall->assertSee("section: 'overall'", false);
+    $responseOverall->assertSee('Overall Inventory Summary Only');
+});
+
 test('reports support pagination and customizable page sizes', function () {
     // Generate extra patients to create multiple pages
     for ($i = 2; $i <= 30; $i++) {
