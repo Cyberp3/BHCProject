@@ -268,3 +268,52 @@ test('health services record all program-specific parameters and show permanent 
     expect(Route::has('services.edit'))->toBeFalse();
     expect(Route::has('services.update'))->toBeFalse();
 });
+
+test('bhw users are strictly blocked from reports endpoints and reports links are hidden in UI', function () {
+    $reportRoutes = [
+        route('reports.index'),
+        route('reports.patients'),
+        route('reports.services'),
+        route('reports.inventory'),
+    ];
+
+    // BHW is blocked with 403 Forbidden on all report endpoints
+    foreach ($reportRoutes as $url) {
+        $response = $this->actingAs($this->bhw)->get($url);
+        $response->assertForbidden();
+    }
+
+    // BHW dashboard view does not render Reports navigation or reports shortcuts
+    $dashboardResponse = $this->actingAs($this->bhw)->get(route('dashboard'));
+    $dashboardResponse->assertOk();
+    $dashboardResponse->assertDontSee('href="'.route('reports.index').'"', false);
+    $dashboardResponse->assertDontSee('href="'.route('reports.patients').'"', false);
+    $dashboardResponse->assertDontSee('href="'.route('reports.inventory').'"', false);
+    $dashboardResponse->assertDontSee('Full Purok Report');
+
+    // BHW inventory view does not render Full Inventory Report link
+    $inventoryResponse = $this->actingAs($this->bhw)->get(route('inventory.index'));
+    $inventoryResponse->assertOk();
+    $inventoryResponse->assertDontSee('Full Inventory Report');
+});
+
+test('authorized clinical staff and administrators can access reports and view navigation links', function () {
+    $reportRoutes = [
+        route('reports.index'),
+        route('reports.patients'),
+        route('reports.services'),
+        route('reports.inventory'),
+    ];
+
+    foreach ([$this->admin, $this->nurse, $this->midwife] as $user) {
+        foreach ($reportRoutes as $url) {
+            $response = $this->actingAs($user)->get($url);
+            $response->assertOk();
+        }
+
+        // Navigation renders reports link
+        $dashboardResponse = $this->actingAs($user)->get(route('dashboard'));
+        $dashboardResponse->assertOk();
+        $dashboardResponse->assertSee('href="'.route('reports.index').'"', false);
+    }
+});

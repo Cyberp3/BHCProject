@@ -333,7 +333,9 @@
         <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-200 bg-slate-50/50 flex items-center justify-between">
                 <h2 class="font-bold text-slate-800 text-sm">Recent Stock Movements (Audit Trail)</h2>
-                <a href="{{ route('reports.inventory') }}" class="text-xs text-slate-500 hover:underline font-medium">Full Inventory Report</a>
+                @if(Auth::user()->canAccessReports())
+                    <a href="{{ route('reports.inventory') }}" class="text-xs text-slate-500 hover:underline font-medium">Full Inventory Report</a>
+                @endif
             </div>
 
             <div class="overflow-x-auto">

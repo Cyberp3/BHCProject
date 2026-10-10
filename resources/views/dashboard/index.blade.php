@@ -81,9 +81,15 @@
                     <div class="text-3xl font-extrabold {{ $nearExpiryCount > 0 ? 'text-rose-600' : 'text-slate-900' }} mt-1 truncate">
                         {{ number_format($nearExpiryCount) }}
                     </div>
-                    <a href="{{ route('reports.inventory') }}" class="text-xs text-rose-600 hover:text-rose-700 font-medium inline-flex items-center gap-1 mt-2 truncate">
-                        View batches &rarr;
-                    </a>
+                    @if(Auth::user()->canAccessReports())
+                        <a href="{{ route('reports.inventory') }}" class="text-xs text-rose-600 hover:text-rose-700 font-medium inline-flex items-center gap-1 mt-2 truncate">
+                            View batches &rarr;
+                        </a>
+                    @else
+                        <span class="text-xs text-slate-400 font-medium inline-flex items-center gap-1 mt-2 truncate">
+                            Stock monitored
+                        </span>
+                    @endif
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 flex-shrink-0">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,7 +174,9 @@
             <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-col">
                 <div class="flex items-center justify-between mb-4 shrink-0 flex-shrink-0">
                     <h2 class="font-bold text-slate-800 text-sm truncate mr-2">Patient Distribution by Purok</h2>
-                    <a href="{{ route('reports.patients') }}" class="text-xs text-emerald-600 hover:underline font-medium shrink-0 flex-shrink-0">Full Purok Report</a>
+                    @if(Auth::user()->canAccessReports())
+                        <a href="{{ route('reports.patients') }}" class="text-xs text-emerald-600 hover:underline font-medium shrink-0 flex-shrink-0">Full Purok Report</a>
+                    @endif
                 </div>
 
                 <div class="space-y-3 flex-1">

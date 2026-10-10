@@ -19,8 +19,13 @@ class CheckRole
             return redirect()->route('login');
         }
 
-        if (! empty($roles) && ! in_array($request->user()->role, $roles, true)) {
-            abort(403, 'Access denied: You do not have permission to access this module.');
+        if (! empty($roles)) {
+            $userRole = strtolower(trim((string) $request->user()->role));
+            $normalizedRoles = array_map(fn ($r) => strtolower(trim((string) $r)), $roles);
+
+            if (! in_array($userRole, $normalizedRoles, true)) {
+                abort(403, 'Access denied: You do not have permission to access this module.');
+            }
         }
 
         return $next($request);

@@ -52,8 +52,8 @@ Route::middleware(['auth', 'active_user'])->group(function () {
         Route::post('/dispense', [InventoryController::class, 'processDispense'])->name('dispense.process');
     });
 
-    // Module 5: Basic Reports
-    Route::prefix('reports')->name('reports.')->group(function () {
+    // Module 5: Basic Reports (Restricted to non-BHW staff: Admin, Nurse, Midwife)
+    Route::prefix('reports')->name('reports.')->middleware('role:admin,nurse,midwife,bns')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
         Route::get('/patients', [ReportController::class, 'patients'])->name('patients');
         Route::get('/services', [ReportController::class, 'services'])->name('services');

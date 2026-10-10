@@ -9,21 +9,33 @@ use App\Models\InventoryItem;
 use App\Models\InventoryTransaction;
 use App\Models\Patient;
 use App\Models\Purok;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
-    //
+    protected function authorizeReportsAccess(): void
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+        abort_if(! $user || ! $user->canAccessReports(), 403, 'Unauthorized: Barangay Health Workers (BHW) are not authorized to view or print health center administrative reports.');
+    }
+
     public function index(): View
     {
+        $this->authorizeReportsAccess();
+
         return view('reports.index');
     }
 
     public function patients(Request $request): View
     {
+        $this->authorizeReportsAccess();
+
         $totalPatients = Patient::count();
         $maleCount = Patient::where('sex', 'Male')->count();
         $femaleCount = Patient::where('sex', 'Female')->count();
@@ -53,6 +65,8 @@ class ReportController extends Controller
 
     public function services(Request $request): View
     {
+        $this->authorizeReportsAccess();
+
         $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->format('Y-m-d'));
 
@@ -80,6 +94,8 @@ class ReportController extends Controller
 
     public function appointments(Request $request): View
     {
+        $this->authorizeReportsAccess();
+
         $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->input('end_date', Carbon::now()->addMonth()->format('Y-m-d'));
 
@@ -104,6 +120,8 @@ class ReportController extends Controller
 
     public function inventory(Request $request): View
     {
+        $this->authorizeReportsAccess();
+
         $items = InventoryItem::with(['batches' => function ($q) {
             $q->where('status', 'active');
         }])->orderBy('name')->get();

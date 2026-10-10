@@ -109,6 +109,11 @@ class User extends Authenticatable
         return $this->isClinicalStaff();
     }
 
+    public function canAccessReports(): bool
+    {
+        return ! $this->isBhw() && ! $this->hasRole(['bhw', 'bhv']);
+    }
+
     /**
      * Get the health service programs this user is authorized to conduct.
      *
