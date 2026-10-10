@@ -80,6 +80,7 @@ test('inventory report provides specification buttons for critical, near-expiry,
     $response->assertSee('All Sections');
     $response->assertSee('Critical Stock');
     $response->assertSee('Near-Expiry');
+    $response->assertSee('Stock Movement Tracker');
     $response->assertSee('Overall Inventory');
 });
 
@@ -94,10 +95,32 @@ test('inventory report accepts section parameter for direct URL filtering', func
     $responseNear->assertSee("section: 'near_expiry'", false);
     $responseNear->assertSee('Near-Expiry Batches Only');
 
+    $responseMovements = $this->actingAs($this->admin)->get(route('reports.inventory', ['section' => 'movements']));
+    $responseMovements->assertStatus(200);
+    $responseMovements->assertSee("section: 'movements'", false);
+    $responseMovements->assertSee('Stock Movement &amp; Balance Tracker', false);
+    $responseMovements->assertSee('Beginning Balance');
+    $responseMovements->assertSee('Stock In (+)');
+    $responseMovements->assertSee('Stock Out (&minus;)', false);
+    $responseMovements->assertSee('Remaining Balance (=)');
+
     $responseOverall = $this->actingAs($this->admin)->get(route('reports.inventory', ['section' => 'overall']));
     $responseOverall->assertStatus(200);
     $responseOverall->assertSee("section: 'overall'", false);
     $responseOverall->assertSee('Overall Inventory Summary Only');
+});
+
+test('inventory report stock movement tracker supports custom date range filtering', function () {
+    $response = $this->actingAs($this->admin)->get(route('reports.inventory', [
+        'section' => 'movements',
+        'start_date' => '2026-10-06',
+        'end_date' => '2026-10-07',
+    ]));
+
+    $response->assertStatus(200);
+    $response->assertSee('value="2026-10-06"', false);
+    $response->assertSee('value="2026-10-07"', false);
+    $response->assertSee('Stock Movement &amp; Balance Tracker', false);
 });
 
 test('reports support pagination and customizable page sizes', function () {

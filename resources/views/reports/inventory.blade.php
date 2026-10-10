@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="space-y-6" x-data="{
-        section: '{{ in_array(request('section'), ['critical', 'near_expiry', 'overall']) ? request('section') : 'all' }}',
+        section: '{{ in_array(request('section'), ['critical', 'near_expiry', 'overall', 'movements']) ? request('section') : 'all' }}',
         setSection(val) {
             this.section = val;
             const url = new URL(window.location);
@@ -15,7 +15,7 @@
             window.addEventListener('popstate', () => {
                 const params = new URLSearchParams(window.location.search);
                 const s = params.get('section');
-                this.section = ['critical', 'near_expiry', 'overall'].includes(s) ? s : 'all';
+                this.section = ['critical', 'near_expiry', 'overall', 'movements'].includes(s) ? s : 'all';
             });
         }
     }">
@@ -93,6 +93,24 @@
                         </span>
                     </a>
 
+                    <!-- Stock Movement Tracker Button (Whiteboard Ledger) -->
+                    <a href="{{ request()->fullUrlWithQuery(['section' => 'movements']) }}" 
+                       @click.prevent="setSection('movements')"
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition border cursor-pointer"
+                       :class="section === 'movements' 
+                           ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs ring-2 ring-indigo-600/20' 
+                           : 'bg-white text-indigo-900 border-slate-300 hover:bg-indigo-50/50 hover:border-indigo-300'">
+                        <span class="w-2 h-2 rounded-full" :class="section === 'movements' ? 'bg-white ring-2 ring-indigo-300' : 'bg-indigo-500'"></span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                        </svg>
+                        <span>Stock Movement Tracker</span>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-bold"
+                              :class="section === 'movements' ? 'bg-indigo-700 text-white' : 'bg-indigo-100 text-indigo-800'">
+                            Ledger
+                        </span>
+                    </a>
+
                     <!-- Overall Inventory Button -->
                     <a href="{{ request()->fullUrlWithQuery(['section' => 'overall']) }}" 
                        @click.prevent="setSection('overall')"
@@ -132,14 +150,18 @@
                     <span x-show="section === 'near_expiry'" x-cloak class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-900 border border-rose-300 print:border-black print:text-black print:bg-transparent">
                         Near-Expiry Batches Only (&le; 90 Days Monitoring)
                     </span>
+                    <span x-show="section === 'movements'" x-cloak class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-900 border border-indigo-300 print:border-black print:text-black print:bg-transparent">
+                        Stock Movement &amp; Balance Tracker (Beginning + Stock In &minus; Stock Out = Remaining Balance)
+                    </span>
                     <span x-show="section === 'overall'" x-cloak class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-900 border border-blue-300 print:border-black print:text-black print:bg-transparent">
                         Overall Inventory Summary Only (Complete Stock Balance)
                     </span>
                 </div>
                 <div class="text-[11px] text-slate-500 font-medium print:text-black">
-                    <span x-show="section === 'all'">Showing 3 Sections</span>
+                    <span x-show="section === 'all'">Showing 4 Sections</span>
                     <span x-show="section === 'critical'" x-cloak>{{ $lowStockItems->count() }} Alert Record(s)</span>
                     <span x-show="section === 'near_expiry'" x-cloak>{{ $nearExpiryBatches->count() }} Near-Expiry Batch(es)</span>
+                    <span x-show="section === 'movements'" x-cloak>{{ $stockMovements->count() }} Stock Movement Items ({{ \Carbon\Carbon::parse($startDate)->format('M d') }} &ndash; {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }})</span>
                     <span x-show="section === 'overall'" x-cloak>{{ number_format($items->total()) }} Catalog Item(s)</span>
                 </div>
             </div>
@@ -232,6 +254,161 @@
                                 </tr>
                             @endforelse
                         </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SECTION: STOCK MOVEMENT & BALANCE TRACKER (Beginning + Stock In - Stock Out = Remaining Balance) -->
+            <div x-show="section === 'all' || section === 'movements'" x-transition.opacity>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+                        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">
+                            Stock Movement &amp; Balance Tracker ({{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }} &ndash; {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }})
+                        </h3>
+                    </div>
+                    <span class="text-[11px] text-slate-500 font-mono print:text-black">
+                        Formula: Beginning + Stock In &minus; Stock Out = Remaining Balance
+                    </span>
+                </div>
+
+                <!-- Date Range Filter Form (no-print) -->
+                <div class="mb-4 p-3 bg-slate-50 rounded-xl border border-slate-200 no-print flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Tracking Period:
+                        </span>
+                        <span class="text-[11px] text-slate-500 hidden sm:inline">Specify start and end dates to track inventory flow:</span>
+                    </div>
+
+                    <form method="GET" action="{{ route('reports.inventory') }}" class="flex flex-wrap items-center gap-2.5">
+                        <input type="hidden" name="section" :value="section">
+                        <div class="flex items-center gap-1 text-xs text-slate-600">
+                            <label class="font-semibold">From:</label>
+                            <input type="date" name="start_date" value="{{ $startDate }}" class="text-xs rounded-lg border-slate-300 py-1 px-2.5">
+                        </div>
+                        <div class="flex items-center gap-1 text-xs text-slate-600">
+                            <label class="font-semibold">To:</label>
+                            <input type="date" name="end_date" value="{{ $endDate }}" class="text-xs rounded-lg border-slate-300 py-1 px-2.5">
+                        </div>
+                        <button type="submit" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition">
+                            Filter Ledger
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Stock Movement KPI Summary Cards (Print and Screen) -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-center">
+                        <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Beginning Balance</span>
+                        <div class="text-lg font-black text-slate-800 mt-0.5">{{ number_format($movementTotals['beginning']) }}</div>
+                        <span class="text-[10px] text-slate-400">As of {{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }}</span>
+                    </div>
+                    <div class="p-3 bg-emerald-50/70 rounded-lg border border-emerald-200 text-center">
+                        <span class="text-[10px] uppercase font-bold text-emerald-700 tracking-wider">Total Stock In (+)</span>
+                        <div class="text-lg font-black text-emerald-800 mt-0.5">+{{ number_format($movementTotals['stock_in']) }}</div>
+                        <span class="text-[10px] text-emerald-600">Received Batches</span>
+                    </div>
+                    <div class="p-3 bg-rose-50/70 rounded-lg border border-rose-200 text-center">
+                        <span class="text-[10px] uppercase font-bold text-rose-700 tracking-wider">Total Stock Out (&minus;)</span>
+                        <div class="text-lg font-black text-rose-800 mt-0.5">&minus;{{ number_format($movementTotals['stock_out']) }}</div>
+                        <span class="text-[10px] text-rose-600">Dispensed Prescriptions</span>
+                    </div>
+                    <div class="p-3 bg-indigo-50/70 rounded-lg border border-indigo-200 text-center">
+                        <span class="text-[10px] uppercase font-bold text-indigo-700 tracking-wider">Remaining Balance (=)</span>
+                        <div class="text-lg font-black text-indigo-900 mt-0.5">{{ number_format($movementTotals['remaining']) }}</div>
+                        <span class="text-[10px] text-indigo-600">As of {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}</span>
+                    </div>
+                </div>
+
+                <!-- Stock Movement Ledger Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-700 border border-slate-200">
+                        <thead class="bg-indigo-50 font-bold uppercase text-indigo-950">
+                            <tr>
+                                <th class="p-2.5 border">Item Code</th>
+                                <th class="p-2.5 border">Medicine / Vaccine Name</th>
+                                <th class="p-2.5 border">Category</th>
+                                <th class="p-2.5 border text-center">Unit</th>
+                                <th class="p-2.5 border text-center bg-slate-100/90 text-slate-900 font-bold">Beginning Balance</th>
+                                <th class="p-2.5 border text-center bg-emerald-100/70 text-emerald-950 font-bold">Stock In (+)</th>
+                                <th class="p-2.5 border text-center bg-rose-100/70 text-rose-950 font-bold">Stock Out (&minus;)</th>
+                                <th class="p-2.5 border text-center bg-indigo-100/90 text-indigo-950 font-black">Remaining Balance (=)</th>
+                                <th class="p-2.5 border text-center">Net Period Change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($stockMovements as $row)
+                                <tr class="hover:bg-indigo-50/30">
+                                    <td class="p-2.5 border font-mono font-bold">{{ $row->item->item_code }}</td>
+                                    <td class="p-2.5 border font-semibold">
+                                        {{ $row->item->name }}
+                                        @if ($row->item->dosage_form)
+                                            <span class="text-[11px] text-slate-400 font-normal">({{ $row->item->dosage_form }})</span>
+                                        @endif
+                                    </td>
+                                    <td class="p-2.5 border uppercase text-[11px]">{{ $row->item->category }}</td>
+                                    <td class="p-2.5 border text-center text-slate-500">{{ $row->item->unit_of_measure }}</td>
+                                    <td class="p-2.5 border text-center font-bold text-slate-800 bg-slate-50/50">
+                                        {{ number_format($row->beginning_balance) }}
+                                    </td>
+                                    <td class="p-2.5 border text-center font-bold {{ $row->stock_in > 0 ? 'text-emerald-700 bg-emerald-50/40' : 'text-slate-400' }}">
+                                        {{ $row->stock_in > 0 ? '+' . number_format($row->stock_in) : '0' }}
+                                    </td>
+                                    <td class="p-2.5 border text-center font-bold {{ $row->stock_out > 0 ? 'text-rose-700 bg-rose-50/40' : 'text-slate-400' }}">
+                                        {{ $row->stock_out > 0 ? '-' . number_format($row->stock_out) : '0' }}
+                                    </td>
+                                    <td class="p-2.5 border text-center font-black text-sm text-indigo-900 bg-indigo-50/50">
+                                        {{ number_format($row->remaining_balance) }}
+                                    </td>
+                                    <td class="p-2.5 border text-center font-bold">
+                                        @if ($row->net_change > 0)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] bg-emerald-100 text-emerald-800">
+                                                +{{ number_format($row->net_change) }}
+                                            </span>
+                                        @elseif ($row->net_change < 0)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] bg-rose-100 text-rose-800">
+                                                {{ number_format($row->net_change) }}
+                                            </span>
+                                        @else
+                                            <span class="text-slate-400 font-normal text-[11px]">No Change</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="9" class="p-4 text-center text-slate-400">No inventory items found.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                        <tfoot class="bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-300">
+                            <tr>
+                                <td colspan="4" class="p-2.5 border text-right uppercase tracking-wider text-[11px]">
+                                    Total Aggregate Stock Units:
+                                </td>
+                                <td class="p-2.5 border text-center">
+                                    {{ number_format($movementTotals['beginning']) }}
+                                </td>
+                                <td class="p-2.5 border text-center text-emerald-700">
+                                    +{{ number_format($movementTotals['stock_in']) }}
+                                </td>
+                                <td class="p-2.5 border text-center text-rose-700">
+                                    &minus;{{ number_format($movementTotals['stock_out']) }}
+                                </td>
+                                <td class="p-2.5 border text-center text-indigo-950 text-sm">
+                                    {{ number_format($movementTotals['remaining']) }}
+                                </td>
+                                <td class="p-2.5 border text-center">
+                                    @php $totalNet = $movementTotals['stock_in'] - $movementTotals['stock_out']; @endphp
+                                    <span class="{{ $totalNet > 0 ? 'text-emerald-700' : ($totalNet < 0 ? 'text-rose-700' : 'text-slate-500') }}">
+                                        {{ $totalNet > 0 ? '+' : '' }}{{ number_format($totalNet) }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>

@@ -131,6 +131,9 @@ class ReportController extends Controller
     {
         $this->authorizeReportsAccess();
 
+        $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
+
         $itemsQuery = InventoryItem::with(['batches' => function ($q) {
             $q->where('status', 'active');
         }])->orderBy('name');
@@ -154,11 +157,59 @@ class ReportController extends Controller
             ->take(50)
             ->get();
 
+        // Calculate Stock Movement Tracker (Beginning Balance + Stock In - Stock Out = Remaining Balance)
+        $allItems = (clone $itemsQuery)->get();
+        $transactions = InventoryTransaction::whereDate('transaction_date', '<=', $endDate)->get();
+
+        $startCarbon = Carbon::parse($startDate)->startOfDay();
+        $endCarbon = Carbon::parse($endDate)->endOfDay();
+
+        $priorTxsByItem = $transactions->where('transaction_date', '<', $startCarbon)->groupBy('inventory_item_id');
+        $periodTxsByItem = $transactions->whereBetween('transaction_date', [$startCarbon, $endCarbon])->groupBy('inventory_item_id');
+
+        $stockMovements = $allItems->map(function ($item) use ($priorTxsByItem, $periodTxsByItem) {
+            $priorTxs = $priorTxsByItem->get($item->id, collect());
+            $priorIn = $priorTxs->where('transaction_type', 'received')->sum('quantity');
+            $priorOut = $priorTxs->where('transaction_type', 'dispensed')->sum('quantity');
+            $beginningBalance = max(0, $priorIn - $priorOut);
+
+            $periodTxs = $periodTxsByItem->get($item->id, collect());
+            $stockIn = $periodTxs->where('transaction_type', 'received')->sum('quantity');
+            $stockOut = $periodTxs->where('transaction_type', 'dispensed')->sum('quantity');
+
+            if ($priorTxs->isEmpty() && $periodTxs->isEmpty()) {
+                $beginningBalance = (int) $item->total_stock;
+                $remainingBalance = $beginningBalance;
+            } else {
+                $remainingBalance = max(0, $beginningBalance + $stockIn - $stockOut);
+            }
+
+            return (object) [
+                'item' => $item,
+                'beginning_balance' => $beginningBalance,
+                'stock_in' => $stockIn,
+                'stock_out' => $stockOut,
+                'remaining_balance' => $remainingBalance,
+                'net_change' => $stockIn - $stockOut,
+            ];
+        });
+
+        $movementTotals = [
+            'beginning' => $stockMovements->sum('beginning_balance'),
+            'stock_in' => $stockMovements->sum('stock_in'),
+            'stock_out' => $stockMovements->sum('stock_out'),
+            'remaining' => $stockMovements->sum('remaining_balance'),
+        ];
+
         return view('reports.inventory', compact(
             'items',
             'lowStockItems',
             'nearExpiryBatches',
-            'recentTransactions'
+            'recentTransactions',
+            'stockMovements',
+            'movementTotals',
+            'startDate',
+            'endDate'
         ));
     }
 }
