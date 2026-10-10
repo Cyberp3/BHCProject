@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\HealthAssessment;
 use App\Models\Patient;
 use App\Models\Purok;
 use App\Models\User;
@@ -258,4 +259,159 @@ test('patient update enforces the same demographic validation rules', function (
     ]);
 
     $response->assertSessionHasErrors(['first_name', 'civil_status', 'blood_type', 'contact_number']);
+});
+
+test('authorized clinical staff can update health assessment and vital signs with auto BMI recalculation and audit trail', function () {
+    $patient = Patient::create([
+        'patient_control_number' => 'TAC-VAL-UPDATE-02',
+        'first_name' => 'Clarissa',
+        'last_name' => 'Ocampo',
+        'sex' => 'Female',
+        'date_of_birth' => '1995-05-12',
+        'purok_id' => $this->purok->id,
+        'street_address' => 'Purok 2, Tacunan',
+        'contact_number' => '09191234567',
+        'created_by' => $this->nurse->id,
+    ]);
+
+    $assessment = HealthAssessment::create([
+        'patient_id' => $patient->id,
+        'user_id' => $this->nurse->id,
+        'assessment_date' => Carbon::yesterday()->format('Y-m-d'),
+        'weight_kg' => 60.0,
+        'height_cm' => 160.0,
+        'systolic_bp' => 120,
+        'diastolic_bp' => 80,
+        'pulse_rate' => 72,
+        'respiratory_rate' => 16,
+        'temperature_celsius' => 36.5,
+        'notes' => 'Original baseline checkup',
+    ]);
+
+    expect((float) $assessment->bmi)->toEqual(23.4);
+
+    $response = $this->actingAs($this->nurse)->put(route('assessments.update', $assessment), [
+        'assessment_date' => Carbon::today()->format('Y-m-d'),
+        'weight_kg' => 70.0,
+        'height_cm' => 160.0,
+        'systolic_bp' => 130,
+        'diastolic_bp' => 85,
+        'pulse_rate' => 78,
+        'respiratory_rate' => 18,
+        'temperature_celsius' => 36.8,
+        'notes' => 'Updated after re-calibration',
+    ]);
+
+    $response->assertRedirect(route('patients.show', $patient));
+    $response->assertSessionHas('success');
+
+    $assessment->refresh();
+    expect((float) $assessment->weight_kg)->toEqual(70.0);
+    expect($assessment->systolic_bp)->toEqual(130);
+    expect((float) $assessment->bmi)->toEqual(27.3);
+    expect($assessment->notes)->toEqual('Updated after re-calibration');
+
+    $this->assertDatabaseHas('audit_logs', [
+        'action' => 'EDIT_ASSESSMENT',
+        'module' => 'Assessments',
+        'user_id' => $this->nurse->id,
+    ]);
+});
+
+test('admin cannot update clinical health assessment and receives 403', function () {
+    $patient = Patient::create([
+        'patient_control_number' => 'TAC-VAL-UPDATE-03',
+        'first_name' => 'Felipe',
+        'last_name' => 'Cruz',
+        'sex' => 'Male',
+        'date_of_birth' => '1990-07-20',
+        'purok_id' => $this->purok->id,
+        'street_address' => 'Purok 3, Tacunan',
+        'contact_number' => '09201234567',
+        'created_by' => $this->admin->id,
+    ]);
+
+    $assessment = HealthAssessment::create([
+        'patient_id' => $patient->id,
+        'user_id' => $this->nurse->id,
+        'assessment_date' => Carbon::today()->format('Y-m-d'),
+        'weight_kg' => 65.0,
+        'height_cm' => 170.0,
+        'systolic_bp' => 120,
+        'diastolic_bp' => 80,
+    ]);
+
+    $response = $this->actingAs($this->admin)->put(route('assessments.update', $assessment), [
+        'assessment_date' => Carbon::today()->format('Y-m-d'),
+        'weight_kg' => 75.0,
+    ]);
+
+    $response->assertStatus(403);
+});
+
+test('cannot update health assessment for an archived patient record', function () {
+    $patient = Patient::create([
+        'patient_control_number' => 'TAC-VAL-UPDATE-04',
+        'first_name' => 'Carmela',
+        'last_name' => 'Reyes',
+        'sex' => 'Female',
+        'date_of_birth' => '1992-03-15',
+        'purok_id' => $this->purok->id,
+        'street_address' => 'Purok 4, Tacunan',
+        'contact_number' => '09211234567',
+        'created_by' => $this->nurse->id,
+    ]);
+
+    $assessment = HealthAssessment::create([
+        'patient_id' => $patient->id,
+        'user_id' => $this->nurse->id,
+        'assessment_date' => Carbon::today()->format('Y-m-d'),
+        'weight_kg' => 52.0,
+    ]);
+
+    $patient->delete();
+
+    $response = $this->actingAs($this->nurse)->put(route('assessments.update', $assessment), [
+        'assessment_date' => Carbon::today()->format('Y-m-d'),
+        'weight_kg' => 54.0,
+    ]);
+
+    $response->assertStatus(422);
+});
+
+test('patient show profile renders view and edit modal triggers for recorded vitals', function () {
+    $patient = Patient::create([
+        'patient_control_number' => 'TAC-VAL-UPDATE-05',
+        'first_name' => 'Tristan',
+        'last_name' => 'Aquino',
+        'sex' => 'Male',
+        'date_of_birth' => '2001-09-09',
+        'purok_id' => $this->purok->id,
+        'street_address' => 'Purok 5, Tacunan',
+        'contact_number' => '09221234567',
+        'created_by' => $this->nurse->id,
+    ]);
+
+    HealthAssessment::create([
+        'patient_id' => $patient->id,
+        'user_id' => $this->nurse->id,
+        'assessment_date' => Carbon::today()->format('Y-m-d'),
+        'weight_kg' => 68.5,
+        'height_cm' => 172.0,
+        'systolic_bp' => 118,
+        'diastolic_bp' => 76,
+        'pulse_rate' => 70,
+        'respiratory_rate' => 16,
+        'temperature_celsius' => 36.6,
+        'notes' => 'Patient in optimal health condition',
+    ]);
+
+    $response = $this->actingAs($this->nurse)->get(route('patients.show', $patient));
+
+    $response->assertOk();
+    $response->assertSee('Actions');
+    $response->assertSee('openViewModal');
+    $response->assertSee('openEditModal');
+    $response->assertSee('Vital Signs & BNS Assessment Details', false);
+    $response->assertSee('Edit Vital Signs & Assessment', false);
 });

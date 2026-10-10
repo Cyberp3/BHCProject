@@ -1,5 +1,48 @@
 <x-app-layout>
-    <div class="space-y-6" x-data="{ activeTab: 'assessments', privacyMask: {{ Auth::user()->isAdmin() ? 'true' : 'false' }} }">
+    <div class="space-y-6" x-data="{
+        activeTab: '{{ request('tab', 'assessments') }}',
+        privacyMask: {{ Auth::user()->isAdmin() ? 'true' : 'false' }},
+        viewModalOpen: false,
+        editModalOpen: false,
+        selectedVitals: null,
+        editForm: {
+            id: null,
+            assessment_date: '',
+            weight_kg: '',
+            height_cm: '',
+            systolic_bp: '',
+            diastolic_bp: '',
+            pulse_rate: '',
+            respiratory_rate: '',
+            temperature_celsius: '',
+            nutritional_status: '',
+            notes: '',
+            updateUrl: ''
+        },
+        openViewModal(item) {
+            this.selectedVitals = item;
+            this.viewModalOpen = true;
+        },
+        openEditModal(item) {
+            this.selectedVitals = item;
+            this.editForm = {
+                id: item.id,
+                assessment_date: item.assessment_date_raw || '',
+                weight_kg: item.weight_kg ?? '',
+                height_cm: item.height_cm ?? '',
+                systolic_bp: item.systolic_bp ?? '',
+                diastolic_bp: item.diastolic_bp ?? '',
+                pulse_rate: item.pulse_rate ?? '',
+                respiratory_rate: item.respiratory_rate ?? '',
+                temperature_celsius: item.temperature_celsius ?? '',
+                nutritional_status: item.nutritional_status ?? '',
+                notes: item.notes ?? '',
+                updateUrl: item.update_url
+            };
+            this.viewModalOpen = false;
+            this.editModalOpen = true;
+        }
+    }">
         <!-- Breadcrumb & Privacy Controls -->
         <div class="flex items-center justify-between">
             <a href="{{ route('patients.index') }}" class="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1">
@@ -219,10 +262,34 @@
                                 <th class="px-4 py-3">Nutritional Status</th>
                                 <th class="px-4 py-3">Staff</th>
                                 <th class="px-4 py-3">Notes</th>
+                                <th class="px-4 py-3 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
                             @forelse ($healthAssessments as $vitals)
+                                @php
+                                    $vitalsData = [
+                                        'id' => $vitals->id,
+                                        'assessment_date' => $vitals->assessment_date->format('M d, Y'),
+                                        'assessment_date_raw' => $vitals->assessment_date->format('Y-m-d'),
+                                        'weight_kg' => $vitals->weight_kg,
+                                        'height_cm' => $vitals->height_cm,
+                                        'bmi' => $vitals->bmi,
+                                        'blood_pressure' => $vitals->blood_pressure,
+                                        'systolic_bp' => $vitals->systolic_bp,
+                                        'diastolic_bp' => $vitals->diastolic_bp,
+                                        'pulse_rate' => $vitals->pulse_rate,
+                                        'respiratory_rate' => $vitals->respiratory_rate,
+                                        'temperature_celsius' => $vitals->temperature_celsius,
+                                        'nutritional_status' => $vitals->nutritional_status,
+                                        'notes' => $vitals->notes,
+                                        'staff_name' => $vitals->user ? $vitals->user->name : 'N/A',
+                                        'staff_role' => $vitals->user ? ucfirst($vitals->user->role) : '',
+                                        'created_at' => $vitals->created_at ? $vitals->created_at->format('M d, Y h:i A') : '',
+                                        'updated_at' => $vitals->updated_at && $vitals->updated_at != $vitals->created_at ? $vitals->updated_at->format('M d, Y h:i A') : null,
+                                        'update_url' => route('assessments.update', $vitals),
+                                    ];
+                                @endphp
                                 <tr class="hover:bg-slate-50/80">
                                     <td class="px-4 py-3 font-medium text-slate-900">
                                         {{ $vitals->assessment_date->format('M d, Y') }}
@@ -256,10 +323,24 @@
                                     <td class="px-4 py-3 text-slate-500 max-w-xs truncate">
                                         {{ $vitals->notes ?? '-' }}
                                     </td>
+                                    <td class="px-4 py-3 text-right whitespace-nowrap">
+                                        <div class="flex items-center justify-end gap-1.5">
+                                            <button type="button" @click="openViewModal({{ json_encode($vitalsData) }})" class="px-2.5 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition inline-flex items-center gap-1 shadow-2xs">
+                                                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                View
+                                            </button>
+                                            @if (! Auth::user()->isAdmin() && ! $patient->trashed())
+                                                <button type="button" @click="openEditModal({{ json_encode($vitalsData) }})" class="px-2.5 py-1 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-lg transition inline-flex items-center gap-1 shadow-2xs">
+                                                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                    Edit
+                                                </button>
+                                            @endif
+                                        </div>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="px-4 py-8 text-center text-slate-400">
+                                    <td colspan="9" class="px-4 py-8 text-center text-slate-400">
                                         No health assessments or vital signs recorded yet.
                                     </td>
                                 </tr>
@@ -479,6 +560,265 @@
                 </div>
             </div>
         </div>
+
+        <!-- MODAL 1: VIEW FULL VITALS & ASSESSMENT DETAILS -->
+        <div x-show="viewModalOpen" 
+             x-cloak 
+             class="fixed inset-0 z-50 overflow-y-auto" 
+             style="display: none;"
+             @keydown.escape.window="viewModalOpen = false">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="viewModalOpen = false"></div>
+
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all text-slate-800"
+                     @click.away="viewModalOpen = false">
+                    
+                    <!-- Modal Header -->
+                    <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+                                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-slate-900">Vital Signs & BNS Assessment Details</h3>
+                                <p class="text-xs text-slate-500">
+                                    Patient: <span class="font-semibold text-slate-700">{{ $patient->full_name }}</span> ({{ $patient->patient_control_number }})
+                                </p>
+                            </div>
+                        </div>
+                        <button type="button" @click="viewModalOpen = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">&times;</button>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="p-6 space-y-6 max-h-[75vh] overflow-y-auto text-sm">
+                        <!-- Date & Staff Info Banner -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">Assessment Date</span>
+                                <span class="font-semibold text-slate-800 text-sm" x-text="selectedVitals?.assessment_date || 'N/A'"></span>
+                            </div>
+                            <div>
+                                <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">Recorded By</span>
+                                <span class="font-semibold text-slate-800 text-sm" x-text="selectedVitals?.staff_name || 'Healthcare Staff'"></span>
+                                <template x-if="selectedVitals?.staff_role">
+                                    <span class="text-[11px] text-slate-500 block" x-text="'(' + selectedVitals.staff_role + ')'"></span>
+                                </template>
+                            </div>
+                            <div>
+                                <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">Timestamp</span>
+                                <span class="text-xs text-slate-600" x-text="selectedVitals?.created_at || 'N/A'"></span>
+                                <template x-if="selectedVitals?.updated_at">
+                                    <span class="text-[10px] text-amber-700 block mt-0.5" x-text="'Edited: ' + selectedVitals.updated_at"></span>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Anthropometric Panel (BNS Growth Monitoring) -->
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                Anthropometric Measurements (Growth Monitoring)
+                            </h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div class="p-3 bg-white border border-slate-200 rounded-xl">
+                                    <div class="text-[11px] text-slate-500 font-medium">Weight</div>
+                                    <div class="text-base font-bold text-slate-900 mt-0.5" x-text="selectedVitals?.weight_kg ? selectedVitals.weight_kg + ' kg' : 'Not recorded'"></div>
+                                </div>
+                                <div class="p-3 bg-white border border-slate-200 rounded-xl">
+                                    <div class="text-[11px] text-slate-500 font-medium">Height</div>
+                                    <div class="text-base font-bold text-slate-900 mt-0.5" x-text="selectedVitals?.height_cm ? selectedVitals.height_cm + ' cm' : 'Not recorded'"></div>
+                                </div>
+                                <div class="p-3 bg-white border border-slate-200 rounded-xl">
+                                    <div class="text-[11px] text-slate-500 font-medium">BMI</div>
+                                    <div class="text-base font-bold text-slate-900 mt-0.5" x-text="selectedVitals?.bmi ? selectedVitals.bmi + ' kg/m²' : 'N/A'"></div>
+                                </div>
+                                <div class="p-3 bg-white border border-slate-200 rounded-xl">
+                                    <div class="text-[11px] text-slate-500 font-medium">Nutritional Status</div>
+                                    <div class="mt-1">
+                                        <span class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block" 
+                                              x-text="selectedVitals?.nutritional_status || 'Unspecified'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Clinical Vital Signs Panel -->
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                Clinical Vital Signs
+                            </h4>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div class="p-3 bg-white border border-slate-200 rounded-xl">
+                                    <div class="text-[11px] text-slate-500 font-medium">Blood Pressure</div>
+                                    <div class="text-base font-bold text-slate-900 mt-0.5" x-text="selectedVitals?.blood_pressure || (selectedVitals?.systolic_bp && selectedVitals?.diastolic_bp ? selectedVitals.systolic_bp + '/' + selectedVitals.diastolic_bp + ' mmHg' : 'Not recorded')"></div>
+                                </div>
+                                <div class="p-3 bg-white border border-slate-200 rounded-xl">
+                                    <div class="text-[11px] text-slate-500 font-medium">Pulse / Heart Rate</div>
+                                    <div class="text-base font-bold text-slate-900 mt-0.5" x-text="selectedVitals?.pulse_rate ? selectedVitals.pulse_rate + ' bpm' : 'Not recorded'"></div>
+                                </div>
+                                <div class="p-3 bg-white border border-slate-200 rounded-xl">
+                                    <div class="text-[11px] text-slate-500 font-medium">Respiratory Rate</div>
+                                    <div class="text-base font-bold text-slate-900 mt-0.5" x-text="selectedVitals?.respiratory_rate ? selectedVitals.respiratory_rate + ' breaths/min' : 'Not recorded'"></div>
+                                </div>
+                                <div class="p-3 bg-white border border-slate-200 rounded-xl">
+                                    <div class="text-[11px] text-slate-500 font-medium">Body Temperature</div>
+                                    <div class="text-base font-bold text-slate-900 mt-0.5" x-text="selectedVitals?.temperature_celsius ? selectedVitals.temperature_celsius + ' °C' : 'Not recorded'"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Observation Notes & Remarks Panel -->
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Observations & Clinical Notes</h4>
+                            <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                                <p class="text-xs text-slate-700 whitespace-pre-wrap leading-relaxed" x-text="selectedVitals?.notes || 'No observation notes or remarks entered for this assessment.'"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                        <button type="button" @click="viewModalOpen = false" class="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg text-xs font-semibold transition">
+                            Close
+                        </button>
+                        @if (! Auth::user()->isAdmin() && ! $patient->trashed())
+                            <button type="button" @click="openEditModal(selectedVitals)" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition inline-flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                Edit Record
+                            </button>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL 2: EDIT VITALS & ASSESSMENT -->
+        @if (! Auth::user()->isAdmin() && ! $patient->trashed())
+            <div x-show="editModalOpen" 
+                 x-cloak 
+                 class="fixed inset-0 z-50 overflow-y-auto" 
+                 style="display: none;"
+                 @keydown.escape.window="editModalOpen = false">
+                <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="editModalOpen = false"></div>
+
+                <div class="flex min-h-full items-center justify-center p-4">
+                    <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all text-slate-800"
+                         @click.away="editModalOpen = false">
+                        
+                        <form method="POST" :action="editForm.updateUrl" autocomplete="off" class="space-y-0">
+                            @csrf
+                            @method('PUT')
+
+                            <!-- Modal Header -->
+                            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+                                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-base font-bold text-slate-900">Edit Vital Signs & Assessment</h3>
+                                        <p class="text-xs text-slate-500">
+                                            Updating record for <span class="font-semibold text-slate-700">{{ $patient->full_name }}</span> ({{ $patient->patient_control_number }})
+                                        </p>
+                                    </div>
+                                </div>
+                                <button type="button" @click="editModalOpen = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">&times;</button>
+                            </div>
+
+                            <!-- Modal Form Fields -->
+                            <div class="p-6 space-y-5 max-h-[75vh] overflow-y-auto text-xs">
+                                <!-- Assessment Date -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Assessment Date <span class="text-rose-500">*</span></label>
+                                    <input type="date" name="assessment_date" x-model="editForm.assessment_date" max="{{ date('Y-m-d') }}" required autocomplete="off" class="w-full sm:w-64 text-xs rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                </div>
+
+                                <hr class="border-slate-100">
+
+                                <!-- Anthropometrics (Growth Monitoring) -->
+                                <div>
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Anthropometric Measurements (BNS)</h4>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-slate-700 mb-1">Weight (kg)</label>
+                                            <input type="number" step="0.1" min="0.5" max="300" name="weight_kg" x-model="editForm.weight_kg" placeholder="e.g. 55.4" autocomplete="off" class="w-full text-xs rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-slate-700 mb-1">Height (cm)</label>
+                                            <input type="number" step="0.1" min="30" max="250" name="height_cm" x-model="editForm.height_cm" placeholder="e.g. 162.5" autocomplete="off" class="w-full text-xs rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="border-slate-100">
+
+                                <!-- Clinical Vitals -->
+                                <div>
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Vital Signs</h4>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-slate-700 mb-1">Blood Pressure - Systolic (mmHg)</label>
+                                            <input type="number" min="50" max="260" name="systolic_bp" x-model="editForm.systolic_bp" placeholder="e.g. 120" autocomplete="off" class="w-full text-xs rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-slate-700 mb-1">Blood Pressure - Diastolic (mmHg)</label>
+                                            <input type="number" min="30" max="160" name="diastolic_bp" x-model="editForm.diastolic_bp" placeholder="e.g. 80" autocomplete="off" class="w-full text-xs rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-slate-700 mb-1">Pulse / Heart Rate (bpm)</label>
+                                            <input type="number" min="30" max="220" name="pulse_rate" x-model="editForm.pulse_rate" placeholder="e.g. 75" autocomplete="off" class="w-full text-xs rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-slate-700 mb-1">Respiratory Rate (breaths/min)</label>
+                                            <input type="number" min="10" max="80" name="respiratory_rate" x-model="editForm.respiratory_rate" placeholder="e.g. 18" autocomplete="off" class="w-full text-xs rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-slate-700 mb-1">Body Temperature (°C)</label>
+                                            <input type="number" step="0.1" min="30" max="45" name="temperature_celsius" x-model="editForm.temperature_celsius" placeholder="e.g. 36.6" autocomplete="off" class="w-full text-xs rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nutritional Status Assessment</label>
+                                            <select name="nutritional_status" x-model="editForm.nutritional_status" class="w-full text-xs rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                                <option value="">Auto-assign based on BMI</option>
+                                                <option value="Normal">Normal</option>
+                                                <option value="Underweight">Underweight</option>
+                                                <option value="Overweight">Overweight</option>
+                                                <option value="Obese">Obese</option>
+                                                <option value="Wasted">Wasted (Acute Malnutrition)</option>
+                                                <option value="Stunted">Stunted (Chronic Malnutrition)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="border-slate-100">
+
+                                <!-- Remarks -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Observations / Remarks</label>
+                                    <textarea name="notes" x-model="editForm.notes" rows="3" placeholder="Enter clinical observations or nutritional notes..." class="w-full text-xs rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Modal Footer -->
+                            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
+                                <button type="button" @click="editModalOpen = false" class="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg text-xs font-semibold transition">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 </x-app-layout>
 

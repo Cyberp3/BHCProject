@@ -36,6 +36,55 @@ class HealthAssessmentController extends Controller
         abort_if($user->isAdmin(), 403, 'Unauthorized: Health assessments and vital signs must be conducted and recorded by authorized healthcare personnel.');
         abort_if($patient->trashed(), 422, 'Cannot record health assessment for an archived patient record. Please restore the patient first.');
 
+        $validated = $this->validateAssessmentData($request);
+
+        $validated['patient_id'] = $patient->id;
+        $validated['user_id'] = Auth::id();
+
+        $assessment = HealthAssessment::create($validated);
+
+        AuditLog::log(
+            'RECORD_ASSESSMENT',
+            'Assessments',
+            "Recorded health/vitals assessment for {$patient->full_name}",
+            $assessment->id
+        );
+
+        return redirect()->route('patients.show', $patient)
+            ->with('success', 'Health assessment and vitals recorded successfully.');
+    }
+
+    public function update(Request $request, HealthAssessment $assessment): RedirectResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_if($user->isAdmin(), 403, 'Unauthorized: Health assessments and vital signs must be conducted and updated by authorized healthcare personnel.');
+
+        $patient = $assessment->patient;
+        abort_if($patient->trashed(), 422, 'Cannot update health assessment for an archived patient record. Please restore the patient first.');
+
+        $validated = $this->validateAssessmentData($request);
+
+        $assessment->update($validated);
+
+        AuditLog::log(
+            'EDIT_ASSESSMENT',
+            'Assessments',
+            "Updated health/vitals assessment for {$patient->full_name}",
+            $assessment->id
+        );
+
+        return redirect()->route('patients.show', $patient)
+            ->with('success', 'Health assessment and vitals updated successfully.');
+    }
+
+    /**
+     * Validate assessment data for store and update requests.
+     *
+     * @return array<string, mixed>
+     */
+    private function validateAssessmentData(Request $request): array
+    {
         $validator = Validator::make($request->all(), [
             'assessment_date' => ['required', 'date', 'before_or_equal:today', 'after:1900-01-01'],
             'weight_kg' => ['nullable', 'numeric', 'min:0.5', 'max:300'],
@@ -84,21 +133,6 @@ class HealthAssessmentController extends Controller
             }
         });
 
-        $validated = $validator->validate();
-
-        $validated['patient_id'] = $patient->id;
-        $validated['user_id'] = Auth::id();
-
-        $assessment = HealthAssessment::create($validated);
-
-        AuditLog::log(
-            'RECORD_ASSESSMENT',
-            'Assessments',
-            "Recorded health/vitals assessment for {$patient->full_name}",
-            $assessment->id
-        );
-
-        return redirect()->route('patients.show', $patient)
-            ->with('success', 'Health assessment and vitals recorded successfully.');
+        return $validator->validate();
     }
 }

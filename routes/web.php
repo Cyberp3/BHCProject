@@ -29,6 +29,7 @@ Route::middleware(['auth', 'active_user'])->group(function () {
     Route::resource('patients', PatientController::class)->withTrashed(['show']);
     Route::get('patients/{patient}/assessments/create', [HealthAssessmentController::class, 'create'])->name('assessments.create');
     Route::post('patients/{patient}/assessments', [HealthAssessmentController::class, 'store'])->name('assessments.store');
+    Route::put('assessments/{assessment}', [HealthAssessmentController::class, 'update'])->name('assessments.update');
 
     // Module 1: The 8 Health Center Services
     Route::get('services', [HealthServiceController::class, 'index'])->name('services.index');
