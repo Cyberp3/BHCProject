@@ -13,7 +13,7 @@
                 <p class="text-xs text-slate-500 mt-1">Modify follow-up details or change appointment status for {{ $appointment->patient->full_name }}.</p>
             </div>
 
-            <form method="POST" action="{{ route('appointments.update', $appointment) }}" 
+            <form method="POST" action="{{ route('appointments.update', $appointment) }}" autocomplete="off"
                 x-data="{
                     serviceType: '{{ old('service_type', $appointment->service_type) }}',
                     appointmentDate: '{{ old('appointment_date', $appointment->appointment_date ? $appointment->appointment_date->format('Y-m-d') : '') }}',

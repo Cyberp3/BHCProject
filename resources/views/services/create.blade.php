@@ -30,7 +30,7 @@
                 </p>
             </div>
 
-            <form method="POST" action="{{ route('services.store') }}" class="p-6 space-y-6">
+            <form method="POST" action="{{ route('services.store') }}" class="p-6 space-y-6" autocomplete="off">
                 @csrf
 
                 <!-- Patient Selection -->

@@ -24,7 +24,7 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ route('inventory.dispense.process') }}" class="p-6 space-y-6">
+            <form method="POST" action="{{ route('inventory.dispense.process') }}" class="p-6 space-y-6" autocomplete="off">
                 @csrf
 
                 <!-- Select Item -->

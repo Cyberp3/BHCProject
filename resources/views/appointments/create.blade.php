@@ -58,7 +58,7 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ route('appointments.store') }}" 
+            <form method="POST" action="{{ route('appointments.store') }}" autocomplete="off"
                 x-data="{
                     serviceType: '{{ old('service_type', 'General Consultation') }}',
                     appointmentDate: '{{ old('appointment_date', $tomorrow) }}',

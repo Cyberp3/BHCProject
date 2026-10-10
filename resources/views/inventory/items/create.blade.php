@@ -12,7 +12,7 @@
                 <p class="text-xs text-slate-500 mt-1">Register a new medicine or vaccine formula in the health center catalog.</p>
             </div>
 
-            <form method="POST" action="{{ route('inventory.items.store') }}" class="p-6 space-y-6">
+            <form method="POST" action="{{ route('inventory.items.store') }}" class="p-6 space-y-6" autocomplete="off">
                 @csrf
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

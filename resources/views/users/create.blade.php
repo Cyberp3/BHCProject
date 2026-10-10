@@ -12,23 +12,23 @@
                 <p class="text-xs text-slate-500 mt-1">Add a new personnel account with specific role-based permissions.</p>
             </div>
 
-            <form method="POST" action="{{ route('users.store') }}" class="p-6 space-y-6">
+            <form method="POST" action="{{ route('users.store') }}" class="p-6 space-y-6" autocomplete="off">
                 @csrf
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name <span class="text-rose-500">*</span></label>
-                    <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g. Maria Santos, RN" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g. Maria Santos, RN" required autocomplete="off" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address <span class="text-rose-500">*</span></label>
-                        <input type="email" name="email" value="{{ old('email') }}" placeholder="e.g. msantos@tacunan.gov.ph" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <input type="email" name="email" value="{{ old('email') }}" placeholder="e.g. msantos@tacunan.gov.ph" required autocomplete="off" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Contact Phone Number</label>
-                        <input type="text" name="contact_number" value="{{ old('contact_number') }}" placeholder="09xxxxxxxxx" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <input type="text" name="contact_number" value="{{ old('contact_number') }}" placeholder="09xxxxxxxxx" autocomplete="off" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                     </div>
                 </div>
 
@@ -44,12 +44,12 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Password <span class="text-rose-500">*</span></label>
-                        <input type="password" name="password" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <input type="password" name="password" required autocomplete="new-password" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Confirm Password <span class="text-rose-500">*</span></label>
-                        <input type="password" name="password_confirmation" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <input type="password" name="password_confirmation" required autocomplete="new-password" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                     </div>
                 </div>
 

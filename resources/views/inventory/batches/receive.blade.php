@@ -27,7 +27,7 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ route('inventory.batches.store') }}" class="p-6 space-y-6">
+            <form method="POST" action="{{ route('inventory.batches.store') }}" class="p-6 space-y-6" autocomplete="off">
                 @csrf
 
                 <!-- Select Item -->
@@ -50,7 +50,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Batch / Lot Number <span class="text-rose-500">*</span></label>
-                        <input type="text" name="batch_number" value="{{ old('batch_number') }}" placeholder="e.g. LOT-2026-X99" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono">
+                        <input type="text" name="batch_number" value="{{ old('batch_number') }}" placeholder="e.g. LOT-2026-X99" required autocomplete="off" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono">
                         @error('batch_number')
                             <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p>
                         @enderror

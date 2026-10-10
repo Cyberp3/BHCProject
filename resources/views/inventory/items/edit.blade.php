@@ -12,7 +12,7 @@
                 <p class="text-xs text-slate-500 mt-1">Update specifications for {{ $item->name }} ({{ $item->item_code }}).</p>
             </div>
 
-            <form method="POST" action="{{ route('inventory.items.update', $item) }}" class="p-6 space-y-6">
+            <form method="POST" action="{{ route('inventory.items.update', $item) }}" class="p-6 space-y-6" autocomplete="off">
                 @csrf
                 @method('PUT')
 

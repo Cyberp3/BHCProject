@@ -16,13 +16,13 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('login') }}" class="space-y-4" x-data="{ showPassword: false }">
+    <form method="POST" action="{{ route('login') }}" class="space-y-4" x-data="{ showPassword: false }" autocomplete="off">
         @csrf
 
         <!-- Email Address -->
         <div>
             <label for="email" class="block text-xs font-semibold text-slate-700 mb-1">Health Center Email</label>
-            <input id="email" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" type="email" name="email" value="{{ old('email') }}" placeholder="name@tacunan.gov.ph" required autofocus autocomplete="username" />
+            <input id="email" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" type="email" name="email" value="{{ old('email') }}" placeholder="name@tacunan.gov.ph" required autofocus autocomplete="off" />
             <x-input-error :messages="$errors->get('email')" class="mt-1" />
         </div>
 

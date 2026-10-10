@@ -13,7 +13,7 @@
                 <p class="text-xs text-slate-500 mt-1">Update demographic details for {{ $patient->full_name }} ({{ $patient->patient_control_number }}).</p>
             </div>
 
-            <form method="POST" action="{{ route('patients.update', $patient) }}" class="p-6 space-y-6">
+            <form method="POST" action="{{ route('patients.update', $patient) }}" class="p-6 space-y-6" autocomplete="off">
                 @csrf
                 @method('PUT')
 
@@ -23,7 +23,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Patient Control Number <span class="text-rose-500">*</span></label>
-                            <input type="text" name="patient_control_number" value="{{ old('patient_control_number', $patient->patient_control_number) }}" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono">
+                            <input type="text" name="patient_control_number" value="{{ old('patient_control_number', $patient->patient_control_number) }}" required autocomplete="off" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono">
                             <x-input-error :messages="$errors->get('patient_control_number')" class="mt-1" />
                         </div>
 
@@ -49,25 +49,25 @@
                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <div class="sm:col-span-1">
                             <label class="block text-xs font-semibold text-slate-700 mb-1">First Name <span class="text-rose-500">*</span></label>
-                            <input type="text" name="first_name" value="{{ old('first_name', $patient->first_name) }}" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <input type="text" name="first_name" value="{{ old('first_name', $patient->first_name) }}" required autocomplete="off" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                             <x-input-error :messages="$errors->get('first_name')" class="mt-1" />
                         </div>
 
                         <div class="sm:col-span-1">
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Middle Name</label>
-                            <input type="text" name="middle_name" value="{{ old('middle_name', $patient->middle_name) }}" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <input type="text" name="middle_name" value="{{ old('middle_name', $patient->middle_name) }}" autocomplete="off" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                             <x-input-error :messages="$errors->get('middle_name')" class="mt-1" />
                         </div>
 
                         <div class="sm:col-span-1">
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Last Name <span class="text-rose-500">*</span></label>
-                            <input type="text" name="last_name" value="{{ old('last_name', $patient->last_name) }}" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <input type="text" name="last_name" value="{{ old('last_name', $patient->last_name) }}" required autocomplete="off" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                             <x-input-error :messages="$errors->get('last_name')" class="mt-1" />
                         </div>
 
                         <div class="sm:col-span-1">
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Suffix</label>
-                            <input type="text" name="suffix" value="{{ old('suffix', $patient->suffix) }}" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <input type="text" name="suffix" value="{{ old('suffix', $patient->suffix) }}" autocomplete="off" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                             <x-input-error :messages="$errors->get('suffix')" class="mt-1" />
                         </div>
                     </div>
@@ -109,19 +109,19 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Street Address <span class="text-rose-500">*</span></label>
-                            <input type="text" name="street_address" value="{{ old('street_address', $patient->street_address) }}" required placeholder="e.g. Block 4 Lot 12, Tacunan Village" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <input type="text" name="street_address" value="{{ old('street_address', $patient->street_address) }}" required autocomplete="off" placeholder="e.g. Block 4 Lot 12, Tacunan Village" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                             <x-input-error :messages="$errors->get('street_address')" class="mt-1" />
                         </div>
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Contact Phone <span class="text-rose-500">*</span></label>
-                            <input type="text" name="contact_number" value="{{ old('contact_number', $patient->contact_number) }}" required placeholder="09xxxxxxxxx" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <input type="text" name="contact_number" value="{{ old('contact_number', $patient->contact_number) }}" required autocomplete="off" placeholder="09xxxxxxxxx" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                             <x-input-error :messages="$errors->get('contact_number')" class="mt-1" />
                         </div>
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">PhilHealth Number <span class="text-[11px] font-normal text-slate-400">(Format: XX-XXXXXXXXX-X)</span></label>
-                            <input type="text" name="philhealth_number" value="{{ old('philhealth_number', $patient->philhealth_number) }}" placeholder="12-345678901-2" pattern="[0-9]{2}-[0-9]{9}-[0-9]{1}" title="Format: XX-XXXXXXXXX-X (12 digits, e.g. 12-345678901-2)" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono">
+                            <input type="text" name="philhealth_number" value="{{ old('philhealth_number', $patient->philhealth_number) }}" autocomplete="off" placeholder="12-345678901-2" pattern="[0-9]{2}-[0-9]{9}-[0-9]{1}" title="Format: XX-XXXXXXXXX-X (12 digits, e.g. 12-345678901-2)" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono">
                             <x-input-error :messages="$errors->get('philhealth_number')" class="mt-1" />
                         </div>
 
@@ -146,13 +146,13 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Emergency Contact Name</label>
-                            <input type="text" name="emergency_contact_name" value="{{ old('emergency_contact_name', $patient->emergency_contact_name) }}" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <input type="text" name="emergency_contact_name" value="{{ old('emergency_contact_name', $patient->emergency_contact_name) }}" autocomplete="off" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                             <x-input-error :messages="$errors->get('emergency_contact_name')" class="mt-1" />
                         </div>
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Emergency Contact Number</label>
-                            <input type="text" name="emergency_contact_number" value="{{ old('emergency_contact_number', $patient->emergency_contact_number) }}" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <input type="text" name="emergency_contact_number" value="{{ old('emergency_contact_number', $patient->emergency_contact_number) }}" autocomplete="off" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                             <x-input-error :messages="$errors->get('emergency_contact_number')" class="mt-1" />
                         </div>
                     </div>

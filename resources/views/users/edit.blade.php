@@ -12,24 +12,24 @@
                 <p class="text-xs text-slate-500 mt-1">Update profile, role permissions, or active access for {{ $user->name }}.</p>
             </div>
 
-            <form method="POST" action="{{ route('users.update', $user) }}" class="p-6 space-y-6">
+            <form method="POST" action="{{ route('users.update', $user) }}" class="p-6 space-y-6" autocomplete="off">
                 @csrf
                 @method('PUT')
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name <span class="text-rose-500">*</span></label>
-                    <input type="text" name="name" value="{{ old('name', $user->name) }}" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <input type="text" name="name" value="{{ old('name', $user->name) }}" required autocomplete="off" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address <span class="text-rose-500">*</span></label>
-                        <input type="email" name="email" value="{{ old('email', $user->email) }}" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <input type="email" name="email" value="{{ old('email', $user->email) }}" required autocomplete="off" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Contact Phone Number</label>
-                        <input type="text" name="contact_number" value="{{ old('contact_number', $user->contact_number) }}" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <input type="text" name="contact_number" value="{{ old('contact_number', $user->contact_number) }}" autocomplete="off" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                     </div>
                 </div>
 
@@ -50,12 +50,12 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">New Password</label>
-                            <input type="password" name="password" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <input type="password" name="password" autocomplete="new-password" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                         </div>
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Confirm New Password</label>
-                            <input type="password" name="password_confirmation" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <input type="password" name="password_confirmation" autocomplete="new-password" class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                         </div>
                     </div>
                 </div>
