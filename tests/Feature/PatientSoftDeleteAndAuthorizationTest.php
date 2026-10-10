@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\AuditLog;
+use App\Models\HealthAssessment;
 use App\Models\HealthServiceRecord;
 use App\Models\InventoryItem;
 use App\Models\Patient;
@@ -471,4 +472,32 @@ test('inventory dispense rejects archived patients', function () {
         'quantity' => 10,
     ]);
     $dispenseResponse->assertSessionHasErrors(['patient_id']);
+});
+
+test('patient profile paginates clinical assessments and service records across pages', function () {
+    // Create 15 health assessments
+    for ($i = 1; $i <= 15; $i++) {
+        HealthAssessment::create([
+            'patient_id' => $this->patient->id,
+            'user_id' => $this->nurse->id,
+            'assessment_date' => Carbon::today()->subDays($i)->format('Y-m-d'),
+            'weight_kg' => 60.0 + $i,
+            'height_cm' => 165.0,
+            'notes' => "Assessment visit #{$i}",
+        ]);
+    }
+
+    $response = $this->actingAs($this->nurse)->get(route('patients.show', $this->patient));
+    $response->assertOk();
+    $response->assertSee('Vitals & BNS Assessments (15)', false);
+    $response->assertSee('Showing 1 to 10 of 15 assessments');
+    $response->assertSee('assessments_page=2');
+
+    // Page 2 shows remaining 5 assessments
+    $page2Response = $this->actingAs($this->nurse)->get(route('patients.show', [
+        'patient' => $this->patient,
+        'assessments_page' => 2,
+    ]));
+    $page2Response->assertOk();
+    $page2Response->assertSee('Showing 11 to 15 of 15 assessments');
 });

@@ -68,8 +68,11 @@
             <!-- Patient Listing Filter -->
             <div class="mt-8 pt-6 border-t border-slate-200">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 no-print">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Patient Registry Roster</h3>
-                    <form method="GET" action="{{ route('reports.patients') }}" class="flex items-center gap-2">
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Patient Registry Roster</h3>
+                        <span class="text-xs text-slate-500 font-medium">({{ number_format($patientList->total()) }} Registered)</span>
+                    </div>
+                    <form method="GET" action="{{ route('reports.patients') }}" class="flex flex-wrap items-center gap-2">
                         <select name="purok_id" class="py-1.5 px-3 text-xs rounded-lg border-slate-300">
                             <option value="">-- All Puroks --</option>
                             @foreach ($purokStats as $purok)
@@ -77,6 +80,12 @@
                                     {{ $purok->name }}
                                 </option>
                             @endforeach
+                        </select>
+                        <select name="per_page" class="py-1.5 px-3 text-xs rounded-lg border-slate-300">
+                            <option value="25" {{ request('per_page') == '25' ? 'selected' : '' }}>25 / page</option>
+                            <option value="50" {{ request('per_page') == '50' ? 'selected' : '' }}>50 / page</option>
+                            <option value="100" {{ request('per_page') == '100' ? 'selected' : '' }}>100 / page</option>
+                            <option value="all" {{ request('per_page') == 'all' ? 'selected' : '' }}>Show All</option>
                         </select>
                         <button type="submit" class="px-3 py-1.5 bg-slate-800 text-white rounded-lg text-xs font-semibold">Filter</button>
                     </form>
@@ -99,7 +108,7 @@
                         <tbody>
                             @forelse ($patientList as $index => $patient)
                                 <tr class="hover:bg-slate-50">
-                                    <td class="p-2.5 border text-slate-400">{{ $index + 1 }}</td>
+                                    <td class="p-2.5 border text-slate-400">{{ $patientList->firstItem() ? ($patientList->firstItem() + $index) : ($index + 1) }}</td>
                                     <td class="p-2.5 border font-mono font-bold">{{ $patient->patient_control_number }}</td>
                                     <td class="p-2.5 border font-semibold">{{ $patient->full_name }}</td>
                                     <td class="p-2.5 border">{{ $patient->sex }}</td>
@@ -116,6 +125,15 @@
                         </tbody>
                     </table>
                 </div>
+
+                @if ($patientList->hasPages())
+                    <div class="p-4 border-t border-slate-200 no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div class="text-xs text-slate-500">
+                            Showing {{ $patientList->firstItem() }} to {{ $patientList->lastItem() }} of {{ number_format($patientList->total()) }} patients
+                        </div>
+                        {{ $patientList->links() }}
+                    </div>
+                @endif
             </div>
 
             <!-- Official Certification & Signatory Section -->

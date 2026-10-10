@@ -115,7 +115,7 @@
 
             <!-- SECTION 3: COMPLETE CURRENT CATALOG -->
             <div>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Overall Inventory Summary</h3>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Overall Inventory Summary ({{ number_format($items->total()) }} Items)</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs text-slate-700 border border-slate-200">
                         <thead class="bg-slate-100 font-bold uppercase text-slate-600">
@@ -144,6 +144,15 @@
                         </tbody>
                     </table>
                 </div>
+
+                @if ($items->hasPages())
+                    <div class="p-4 border-t border-slate-200 no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div class="text-xs text-slate-500">
+                            Showing {{ $items->firstItem() }} to {{ $items->lastItem() }} of {{ number_format($items->total()) }} catalog items
+                        </div>
+                        {{ $items->links() }}
+                    </div>
+                @endif
             </div>
 
             <!-- Official Certification & Signatory Section -->

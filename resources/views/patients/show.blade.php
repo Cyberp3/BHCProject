@@ -175,13 +175,13 @@
         <div class="border-b border-slate-200">
             <nav class="flex space-x-6">
                 <button @click="activeTab = 'assessments'" :class="activeTab === 'assessments' ? 'border-emerald-600 text-emerald-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 font-medium'" class="py-3 px-1 border-b-2 text-sm transition">
-                    Vitals & BNS Assessments ({{ $patient->healthAssessments->count() }})
+                    Vitals & BNS Assessments ({{ $healthAssessments->total() }})
                 </button>
                 <button @click="activeTab = 'services'" :class="activeTab === 'services' ? 'border-emerald-600 text-emerald-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 font-medium'" class="py-3 px-1 border-b-2 text-sm transition">
-                    Health Services History ({{ $patient->healthServiceRecords->count() }})
+                    Health Services History ({{ $healthServiceRecords->total() }})
                 </button>
                 <button @click="activeTab = 'dispensed'" :class="activeTab === 'dispensed' ? 'border-emerald-600 text-emerald-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 font-medium'" class="py-3 px-1 border-b-2 text-sm transition">
-                    Dispensed Items ({{ $patient->inventoryTransactions->count() }})
+                    Dispensed Items ({{ $inventoryTransactions->total() }})
                 </button>
                 <button @click="activeTab = 'info'" :class="activeTab === 'info' ? 'border-emerald-600 text-emerald-600 font-bold' : 'border-transparent text-slate-500 hover:text-slate-700 font-medium'" class="py-3 px-1 border-b-2 text-sm transition">
                     Full Demographics & Contacts
@@ -222,7 +222,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
-                            @forelse ($patient->healthAssessments as $vitals)
+                            @forelse ($healthAssessments as $vitals)
                                 <tr class="hover:bg-slate-50/80">
                                     <td class="px-4 py-3 font-medium text-slate-900">
                                         {{ $vitals->assessment_date->format('M d, Y') }}
@@ -267,6 +267,15 @@
                         </tbody>
                     </table>
                 </div>
+
+                @if ($healthAssessments->hasPages())
+                    <div class="p-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div class="text-xs text-slate-500">
+                            Showing {{ $healthAssessments->firstItem() }} to {{ $healthAssessments->lastItem() }} of {{ number_format($healthAssessments->total()) }} assessments
+                        </div>
+                        {{ $healthAssessments->links() }}
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -304,7 +313,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
-                            @forelse ($patient->healthServiceRecords as $service)
+                            @forelse ($healthServiceRecords as $service)
                                 <tr class="hover:bg-slate-50/80">
                                     <td class="px-4 py-3 font-medium text-slate-900">
                                         {{ $service->service_date->format('M d, Y') }}
@@ -340,6 +349,15 @@
                         </tbody>
                     </table>
                 </div>
+
+                @if ($healthServiceRecords->hasPages())
+                    <div class="p-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div class="text-xs text-slate-500">
+                            Showing {{ $healthServiceRecords->firstItem() }} to {{ $healthServiceRecords->lastItem() }} of {{ number_format($healthServiceRecords->total()) }} consultations
+                        </div>
+                        {{ $healthServiceRecords->links() }}
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -365,7 +383,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
-                            @forelse ($patient->inventoryTransactions as $tx)
+                            @forelse ($inventoryTransactions as $tx)
                                 <tr class="hover:bg-slate-50/80">
                                     <td class="px-4 py-3 font-medium text-slate-900">
                                         {{ $tx->transaction_date->format('M d, Y') }}
@@ -393,6 +411,15 @@
                         </tbody>
                     </table>
                 </div>
+
+                @if ($inventoryTransactions->hasPages())
+                    <div class="p-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div class="text-xs text-slate-500">
+                            Showing {{ $inventoryTransactions->firstItem() }} to {{ $inventoryTransactions->lastItem() }} of {{ number_format($inventoryTransactions->total()) }} dispensed records
+                        </div>
+                        {{ $inventoryTransactions->links() }}
+                    </div>
+                @endif
             </div>
         </div>
 

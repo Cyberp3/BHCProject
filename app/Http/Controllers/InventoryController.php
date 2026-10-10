@@ -67,8 +67,8 @@ class InventoryController extends Controller
         $recentTransactions = InventoryTransaction::with(['item', 'batch', 'user', 'patient'])
             ->latest('transaction_date')
             ->latest('id')
-            ->take(8)
-            ->get();
+            ->paginate(10, ['*'], 'tx_page')
+            ->withQueryString();
 
         return view('inventory.index', compact(
             'items',

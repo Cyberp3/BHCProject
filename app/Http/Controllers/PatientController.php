@@ -138,13 +138,33 @@ class PatientController extends Controller
         $patient->load([
             'purok',
             'creator',
-            'healthAssessments.user',
-            'healthServiceRecords.user',
-            'inventoryTransactions.item',
-            'inventoryTransactions.batch',
         ]);
 
-        return view('patients.show', compact('patient'));
+        $healthAssessments = $patient->healthAssessments()
+            ->with('user')
+            ->orderBy('assessment_date', 'desc')
+            ->orderBy('id', 'desc')
+            ->paginate(10, ['*'], 'assessments_page')
+            ->appends(request()->except('assessments_page'))
+            ->appends(['tab' => 'assessments']);
+
+        $healthServiceRecords = $patient->healthServiceRecords()
+            ->with('user')
+            ->orderBy('service_date', 'desc')
+            ->orderBy('id', 'desc')
+            ->paginate(10, ['*'], 'services_page')
+            ->appends(request()->except('services_page'))
+            ->appends(['tab' => 'services']);
+
+        $inventoryTransactions = $patient->inventoryTransactions()
+            ->with(['item', 'batch', 'user'])
+            ->latest('transaction_date')
+            ->latest('id')
+            ->paginate(10, ['*'], 'dispensed_page')
+            ->appends(request()->except('dispensed_page'))
+            ->appends(['tab' => 'dispensed']);
+
+        return view('patients.show', compact('patient', 'healthAssessments', 'healthServiceRecords', 'inventoryTransactions'));
     }
 
     public function edit(Patient $patient): View

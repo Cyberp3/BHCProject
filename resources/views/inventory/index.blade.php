@@ -394,6 +394,15 @@
                     </tbody>
                 </table>
             </div>
+
+            @if ($recentTransactions->hasPages())
+                <div class="p-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div class="text-xs text-slate-500">
+                        Showing {{ $recentTransactions->firstItem() }} to {{ $recentTransactions->lastItem() }} of {{ number_format($recentTransactions->total()) }} stock movements
+                    </div>
+                    {{ $recentTransactions->links() }}
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

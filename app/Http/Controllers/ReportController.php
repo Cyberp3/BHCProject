@@ -51,7 +51,11 @@ class ReportController extends Controller
             $patientsQuery->where('purok_id', $selectedPurokId);
         }
 
-        $patientList = $patientsQuery->orderBy('last_name')->get();
+        $totalPatientsCount = (clone $patientsQuery)->count();
+        $perPage = $request->input('per_page', 25);
+        $patientList = ($perPage === 'all' || $request->boolean('all'))
+            ? $patientsQuery->orderBy('last_name')->paginate($totalPatientsCount ?: 25)->withQueryString()
+            : $patientsQuery->orderBy('last_name')->paginate((int) $perPage)->withQueryString();
 
         return view('reports.patients', compact(
             'totalPatients',
@@ -76,10 +80,15 @@ class ReportController extends Controller
             ->pluck('count', 'service_type')
             ->toArray();
 
-        $records = HealthServiceRecord::with(['patient.purok', 'user'])
+        $recordsQuery = HealthServiceRecord::with(['patient.purok', 'user'])
             ->whereBetween('service_date', [$startDate, $endDate])
-            ->orderBy('service_date', 'desc')
-            ->get();
+            ->orderBy('service_date', 'desc');
+
+        $totalRecordsCount = (clone $recordsQuery)->count();
+        $perPage = $request->input('per_page', 25);
+        $records = ($perPage === 'all' || $request->boolean('all'))
+            ? $recordsQuery->paginate($totalRecordsCount ?: 25)->withQueryString()
+            : $recordsQuery->paginate((int) $perPage)->withQueryString();
 
         $allServices = HealthServiceRecord::SERVICES;
 
@@ -122,11 +131,17 @@ class ReportController extends Controller
     {
         $this->authorizeReportsAccess();
 
-        $items = InventoryItem::with(['batches' => function ($q) {
+        $itemsQuery = InventoryItem::with(['batches' => function ($q) {
             $q->where('status', 'active');
-        }])->orderBy('name')->get();
+        }])->orderBy('name');
 
-        $lowStockItems = $items->filter(function ($item) {
+        $totalItemsCount = (clone $itemsQuery)->count();
+        $perPage = $request->input('per_page', 25);
+        $items = ($perPage === 'all' || $request->boolean('all'))
+            ? $itemsQuery->paginate($totalItemsCount ?: 25)->withQueryString()
+            : $itemsQuery->paginate((int) $perPage)->withQueryString();
+
+        $lowStockItems = (clone $itemsQuery)->get()->filter(function ($item) {
             return $item->total_stock <= $item->minimum_stock_alert;
         });
 
