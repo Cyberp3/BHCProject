@@ -1,5 +1,78 @@
 <x-app-layout>
-    <div class="max-w-4xl mx-auto space-y-6" x-data="{ programType: '{{ old('service_type', $selectedType) }}' }">
+    <div class="max-w-4xl mx-auto space-y-6" x-data="{
+        programType: '{{ old('service_type', $selectedType) }}',
+        serviceDate: '{{ old('service_date', $today) }}',
+        scheduleInfo: {
+            'ntp': {
+                days: [1, 2],
+                dayNames: 'Monday & Tuesday (Morning)',
+                hours: '8:00 AM - 12:00 PM',
+                badgeColor: 'amber'
+            },
+            'family_planning': {
+                days: [1, 2],
+                dayNames: 'Monday & Tuesday (Afternoon)',
+                hours: '1:00 PM - 5:00 PM',
+                badgeColor: 'purple'
+            },
+            'prenatal_care': {
+                days: [2],
+                dayNames: 'Tuesday',
+                hours: '8:00 AM - 5:00 PM',
+                badgeColor: 'pink'
+            },
+            'immunization': {
+                days: [3],
+                dayNames: 'Wednesday (Bakuna Day)',
+                hours: '8:00 AM - 5:00 PM',
+                badgeColor: 'emerald'
+            },
+            'purok_kalusugan': {
+                days: [4],
+                dayNames: 'Thursday (Community Outreach)',
+                hours: '8:00 AM - 5:00 PM',
+                badgeColor: 'teal'
+            },
+            'bns_program': {
+                days: [4],
+                dayNames: 'Thursday (Growth Monitoring)',
+                hours: '8:00 AM - 5:00 PM',
+                badgeColor: 'teal'
+            },
+            'cvd_screening': {
+                days: [5],
+                dayNames: 'Friday (Hypertension / Diabetes)',
+                hours: '8:00 AM - 5:00 PM',
+                badgeColor: 'rose'
+            },
+            'philpen': {
+                days: [5],
+                dayNames: 'Friday (PhilPEN Assessment)',
+                hours: '8:00 AM - 5:00 PM',
+                badgeColor: 'rose'
+            }
+        },
+        getCurrentSchedule() {
+            return this.scheduleInfo[this.programType] || null;
+        },
+        isDateMatchingSchedule() {
+            if (!this.serviceDate) return true;
+            let schedule = this.getCurrentSchedule();
+            if (!schedule) return true;
+            let parts = this.serviceDate.split('-');
+            if (parts.length !== 3) return true;
+            let dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+            return schedule.days.includes(dateObj.getDay());
+        },
+        getSelectedDayName() {
+            if (!this.serviceDate) return '';
+            let parts = this.serviceDate.split('-');
+            if (parts.length !== 3) return '';
+            let dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+            let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            return days[dateObj.getDay()];
+        }
+    }">
         <!-- Breadcrumb -->
         <div class="flex items-center justify-between">
             <a href="{{ $patient ? route('patients.show', $patient) : route('services.index') }}" class="text-xs font-semibold text-slate-500 hover:text-slate-800">
@@ -71,9 +144,53 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Service / Consultation Date <span class="text-rose-500">*</span></label>
-                        <input type="date" name="service_date" value="{{ old('service_date', $today) }}" max="{{ date('Y-m-d') }}" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <input type="date" name="service_date" x-model="serviceDate" max="{{ date('Y-m-d') }}" required class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    </div>
+
+                    <!-- Helpful Clinic Schedule Reference -->
+                    <div class="flex flex-col justify-end">
+                        <template x-if="getCurrentSchedule()">
+                            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-1">
+                                <div class="flex items-center gap-1.5 font-semibold text-slate-700">
+                                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span>Regular Program Day: <span class="text-slate-900" x-text="getCurrentSchedule()?.dayNames"></span></span>
+                                </div>
+                                <div class="text-[11px] text-slate-500" x-text="'Hours: ' + getCurrentSchedule()?.hours"></div>
+                            </div>
+                        </template>
                     </div>
                 </div>
+
+                <!-- Advisory notice based on selected consultation date -->
+                <template x-if="getCurrentSchedule() && serviceDate">
+                    <div>
+                        <!-- Matching date (green positive feedback) -->
+                        <div x-show="isDateMatchingSchedule()" class="px-3.5 py-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>
+                                Consultation date (<strong x-text="getSelectedDayName()"></strong>) aligns with the official clinic day for this health program.
+                            </span>
+                        </div>
+
+                        <!-- Off-schedule date (gentle amber advisory notice) -->
+                        <div x-show="!isDateMatchingSchedule()" class="px-3.5 py-2.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900 flex items-start gap-2 shadow-2xs">
+                            <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <div>
+                                <span class="font-bold">Schedule Advisory:</span>
+                                <span>The selected date is a <strong x-text="getSelectedDayName()"></strong>. This program is scheduled on <strong x-text="getCurrentSchedule()?.dayNames"></strong>.</span>
+                                <span class="text-amber-700 block text-[11px] mt-0.5">
+                                    Walk-ins, catch-up sessions, and back-encoded visits are permitted and will still be saved.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
 
                 <hr class="border-slate-100">
 
@@ -481,6 +598,11 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Recommended Next Follow-up Date <span class="text-slate-400 font-normal">(Optional clinical advisory note)</span></label>
                         <input type="date" name="next_follow_up_date" min="{{ date('Y-m-d', strtotime('+1 day')) }}" value="{{ old('next_follow_up_date') }}" class="w-full sm:w-64 text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <template x-if="getCurrentSchedule()">
+                            <span class="text-[11px] text-slate-500 block mt-1">
+                                Tip: For regular program follow-ups, consider scheduling on a <strong class="text-slate-700" x-text="getCurrentSchedule()?.dayNames"></strong>.
+                            </span>
+                        </template>
                         <span class="text-[11px] text-slate-400 block mt-1">Stores an advisory return date on the patient's consultation history for clinical continuity.</span>
                     </div>
                 </div>
