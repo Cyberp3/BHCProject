@@ -95,5 +95,15 @@
                 </main>
             </div>
         </div>
+
+        <!-- Back-Button & BfCache Security Guard -->
+        <script>
+            // Invalidate browser Back-Forward cache to enforce live session verification on back navigation
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted || (window.performance && window.performance.getEntriesByType && window.performance.getEntriesByType('navigation')[0] && window.performance.getEntriesByType('navigation')[0].type === 'back_forward')) {
+                    window.location.reload();
+                }
+            });
+        </script>
     </body>
 </html>

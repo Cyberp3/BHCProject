@@ -181,35 +181,125 @@
                 </div>
             </div>
 
-            <!-- Recent System Activities -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
-                <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50 shrink-0 flex-shrink-0">
-                    <h2 class="font-bold text-slate-800 text-sm truncate mr-2">Recent System Activities</h2>
-                    @if(Auth::user()->isAdmin())
+            @if(Auth::user()->isAdmin())
+                <!-- Recent System Activities (Admin Only) -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+                    <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50 shrink-0 flex-shrink-0">
+                        <h2 class="font-bold text-slate-800 text-sm truncate mr-2">Recent System Activities</h2>
                         <a href="{{ route('audit-logs.index') }}" class="text-xs text-slate-500 hover:underline font-medium shrink-0 flex-shrink-0">View All Logs</a>
-                    @endif
-                </div>
+                    </div>
 
-                <div class="divide-y divide-slate-100 flex-1">
-                    @forelse ($recentActivities as $log)
-                        <div class="p-3.5 flex items-start gap-3 hover:bg-slate-50 transition text-xs min-w-0">
-                            <span class="px-2 py-0.5 rounded font-bold text-[10px] bg-slate-100 text-slate-700 border border-slate-200 shrink-0 flex-shrink-0 mt-0.5">
-                                {{ $log->module }}
-                            </span>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-slate-800 font-medium truncate">{{ $log->description }}</p>
-                                <span class="text-slate-400 text-[11px] truncate block">
-                                    by {{ $log->user ? $log->user->name : 'System' }} &bull; {{ $log->created_at->diffForHumans() }}
+                    <div class="divide-y divide-slate-100 flex-1">
+                        @forelse ($recentActivities as $log)
+                            <div class="p-3.5 flex items-start gap-3 hover:bg-slate-50 transition text-xs min-w-0">
+                                <span class="px-2 py-0.5 rounded font-bold text-[10px] bg-slate-100 text-slate-700 border border-slate-200 shrink-0 flex-shrink-0 mt-0.5">
+                                    {{ $log->module }}
                                 </span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-slate-800 font-medium truncate">{{ $log->description }}</p>
+                                    <span class="text-slate-400 text-[11px] truncate block">
+                                        by {{ $log->user ? $log->user->name : 'System' }} &bull; {{ $log->created_at->diffForHumans() }}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                    @empty
-                        <div class="p-6 text-center text-slate-400 text-sm">
-                            No recent system activity recorded.
-                        </div>
-                    @endforelse
+                        @empty
+                            <div class="p-6 text-center text-slate-400 text-sm">
+                                No recent system activity recorded.
+                            </div>
+                        @endforelse
+                    </div>
                 </div>
-            </div>
+            @else
+                <!-- Healthcare Fieldwork & Quick Actions (BHW & Clinical Staff) -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3 shrink-0 flex-shrink-0">
+                            <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2 truncate">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                                Healthcare Fieldwork & Quick Actions
+                            </h2>
+                            <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                                {{ Auth::user()->role_display_name }}
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4">
+                            Direct shortcuts for community health operations, resident enrollment, and consultations.
+                        </p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <a href="{{ route('patients.create') }}" class="p-3 rounded-lg border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                    </svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-xs font-semibold text-slate-800 group-hover:text-emerald-700 truncate">Register Patient</div>
+                                    <div class="text-[11px] text-slate-400 truncate">New resident profile</div>
+                                </div>
+                            </a>
+
+                            <a href="{{ route('services.create') }}" class="p-3 rounded-lg border border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 transition group flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-xs font-semibold text-slate-800 group-hover:text-blue-700 truncate">Record Service</div>
+                                    <div class="text-[11px] text-slate-400 truncate">Consultation / Care</div>
+                                </div>
+                            </a>
+
+                            <a href="{{ route('patients.index') }}" class="p-3 rounded-lg border border-slate-200 hover:border-teal-500 hover:bg-teal-50/50 transition group flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-xs font-semibold text-slate-800 group-hover:text-teal-700 truncate">Patient Directory</div>
+                                    <div class="text-[11px] text-slate-400 truncate">Search resident records</div>
+                                </div>
+                            </a>
+
+                            @if(Auth::user()->canDispenseMedicine())
+                                <a href="{{ route('inventory.dispense') }}" class="p-3 rounded-lg border border-slate-200 hover:border-amber-500 hover:bg-amber-50/50 transition group flex items-start gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                                        </svg>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="text-xs font-semibold text-slate-800 group-hover:text-amber-700 truncate">Dispense Medicine</div>
+                                        <div class="text-[11px] text-slate-400 truncate">FEFO inventory issue</div>
+                                    </div>
+                                </a>
+                            @else
+                                <a href="{{ route('inventory.index') }}" class="p-3 rounded-lg border border-slate-200 hover:border-purple-500 hover:bg-purple-50/50 transition group flex items-start gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                        </svg>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="text-xs font-semibold text-slate-800 group-hover:text-purple-700 truncate">View Inventory</div>
+                                        <div class="text-[11px] text-slate-400 truncate">Check item availability</div>
+                                    </div>
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                        <span>Station: Barangay Tacunan Health Center</span>
+                        <span class="inline-flex items-center gap-1.5 text-emerald-600 font-medium">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            System Active
+                        </span>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

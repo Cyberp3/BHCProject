@@ -317,3 +317,19 @@ test('authorized clinical staff and administrators can access reports and view n
         $dashboardResponse->assertSee('href="'.route('reports.index').'"', false);
     }
 });
+
+test('dashboard restricts recent system activity audit logs to admin only and presents quick actions to bhw', function () {
+    // Admin sees Recent System Activities and View All Logs
+    $adminResponse = $this->actingAs($this->admin)->get(route('dashboard'));
+    $adminResponse->assertOk();
+    $adminResponse->assertSee('Recent System Activities');
+    $adminResponse->assertSee('View All Logs');
+
+    // BHW does not see Recent System Activities, but sees Fieldwork & Quick Actions
+    $bhwResponse = $this->actingAs($this->bhw)->get(route('dashboard'));
+    $bhwResponse->assertOk();
+    $bhwResponse->assertDontSee('Recent System Activities');
+    $bhwResponse->assertDontSee('View All Logs');
+    $bhwResponse->assertSee('Healthcare Fieldwork');
+    $bhwResponse->assertSee('Register Patient');
+});

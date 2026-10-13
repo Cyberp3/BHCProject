@@ -16,7 +16,28 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('login') }}" class="space-y-4" x-data="{ showPassword: false }" autocomplete="off">
+    <form method="POST" action="{{ route('login') }}" class="space-y-4" x-data="{ showPassword: false, isSubmitting: false }" autocomplete="off" @submit.prevent="
+        if (isSubmitting) return;
+        const pwd = document.getElementById('password');
+        const raw = pwd ? pwd.value : '';
+        if (raw && window.crypto && crypto.subtle && (raw.length !== 64 || !/^[0-9a-f]{64}$/i.test(raw))) {
+            isSubmitting = true;
+            const enc = new TextEncoder();
+            crypto.subtle.digest('SHA-256', enc.encode(raw)).then(buf => {
+                const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+                pwd.value = hex;
+                try { window.history.replaceState(null, null, window.location.href); } catch (e) {}
+                $el.submit();
+            }).catch(() => {
+                try { window.history.replaceState(null, null, window.location.href); } catch (e) {}
+                $el.submit();
+            });
+        } else {
+            isSubmitting = true;
+            try { window.history.replaceState(null, null, window.location.href); } catch (e) {}
+            $el.submit();
+        }
+    ">
         @csrf
 
         <!-- Email Address -->
@@ -31,7 +52,7 @@
             <label for="password" class="block text-xs font-semibold text-slate-700 mb-1">Password</label>
             <div class="relative">
                 <input id="password"
-                    class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 pr-10"
+                    class="w-full text-sm rounded-lg border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 pr-10 font-mono"
                     :type="showPassword ? 'text' : 'password'"
                     type="password"
                     name="password"
@@ -70,8 +91,15 @@
         </div>
 
         <div>
-            <button type="submit" class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold shadow-md shadow-emerald-900/10 transition">
-                Sign In to Health Center
+            <button type="submit" :disabled="isSubmitting" class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-75 text-white rounded-lg text-sm font-bold shadow-md shadow-emerald-900/10 transition flex items-center justify-center gap-2">
+                <span x-show="!isSubmitting">Sign In to Health Center</span>
+                <span x-show="isSubmitting" style="display: none;" class="inline-flex items-center gap-2">
+                    <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    Authenticating Securely...
+                </span>
             </button>
         </div>
     </form>

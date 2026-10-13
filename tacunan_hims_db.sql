@@ -1,169 +1,189 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
+-- MariaDB dump 10.19  Distrib 10.4.32-MariaDB, for Win64 (AMD64)
 --
--- Host: 127.0.0.1
--- Generation Time: Sep 25, 2026 at 03:24 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.5.10
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
+-- Host: localhost    Database: tacunan_hims_db
+-- ------------------------------------------------------
+-- Server version	10.4.32-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
-
---
--- Database: `tacunan_hims_db`
---
-
--- --------------------------------------------------------
-
---
--- Table structure for table `appointments`
---
-
-CREATE TABLE `appointments` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `patient_id` bigint(20) UNSIGNED NOT NULL,
-  `scheduled_by` bigint(20) UNSIGNED NOT NULL,
-  `appointment_date` date NOT NULL,
-  `appointment_time` time DEFAULT NULL,
-  `service_type` varchar(50) NOT NULL,
-  `purpose` varchar(255) NOT NULL,
-  `status` enum('scheduled','attended','cancelled','missed') NOT NULL DEFAULT 'scheduled',
-  `status_notes` text DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `appointments`
---
-
-INSERT INTO `appointments` (`id`, `patient_id`, `scheduled_by`, `appointment_date`, `appointment_time`, `service_type`, `purpose`, `status`, `status_notes`, `created_at`, `updated_at`) VALUES
-(1, 1, 2, '2026-09-20', '09:00:00', 'cvd_screening', '2-week BP re-check and maintenance medication refill', 'scheduled', 'Bring empty medicine blister pack and PhilHealth ID.', '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(2, 2, 3, '2026-09-30', '10:00:00', 'prenatal_care', '3rd Prenatal Checkup and Gestational Diabetes Screen', 'scheduled', 'Bring maternal health record booklet (Pink book).', '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(3, 3, 2, '2026-09-20', '08:30:00', 'immunization', 'Pentavalent Dose 3 and OPV Dose 3 + IPV injection', 'scheduled', 'Bring Child Immunization Record (Yellow Card).', '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(4, 4, 2, '2026-10-13', '09:00:00', 'philpen', 'Monthly FBS test and maintenance medication refill', 'scheduled', 'Fasting 8-10 hours prior to morning blood extraction.', '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(5, 5, 3, '2026-10-20', '11:00:00', 'family_planning', 'Quarterly DMPA Injectable Re-injection', 'scheduled', 'Bring Family Planning Card.', '2026-09-20 04:02:58', '2026-09-20 04:02:58');
-
--- --------------------------------------------------------
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
 -- Table structure for table `audit_logs`
 --
 
+DROP TABLE IF EXISTS `audit_logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `audit_logs` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
   `action` varchar(100) NOT NULL,
   `module` varchar(100) NOT NULL,
-  `record_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `record_id` bigint(20) unsigned DEFAULT NULL,
   `description` text NOT NULL,
   `ip_address` varchar(45) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `audit_logs_user_id_foreign` (`user_id`),
+  KEY `audit_logs_action_index` (`action`),
+  KEY `audit_logs_module_index` (`module`),
+  KEY `audit_logs_record_id_index` (`record_id`),
+  CONSTRAINT `audit_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `audit_logs`
 --
 
-INSERT INTO `audit_logs` (`id`, `user_id`, `action`, `module`, `record_id`, `description`, `ip_address`, `created_at`) VALUES
-(1, 1, 'LOGIN', 'Auth', NULL, 'User logged in to the system', '127.0.0.1', '2026-09-21 03:34:27'),
-(2, 1, 'LOGIN', 'Auth', NULL, 'User logged in to the system', '127.0.0.1', '2026-09-21 19:32:12');
-
--- --------------------------------------------------------
+LOCK TABLES `audit_logs` WRITE;
+/*!40000 ALTER TABLE `audit_logs` DISABLE KEYS */;
+INSERT INTO `audit_logs` VALUES (1,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-21 03:34:27'),(2,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-21 19:32:12'),(3,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-25 22:13:05'),(4,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-26 00:58:54'),(5,1,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-09-26 01:14:15'),(6,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-26 01:14:48'),(7,1,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-09-26 01:16:46'),(8,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-26 01:43:12'),(9,1,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-09-26 01:44:53'),(10,3,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-26 01:45:34'),(11,3,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-26 06:46:03'),(12,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-27 17:20:51'),(13,1,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-09-27 17:21:33'),(14,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-27 17:44:47'),(15,1,'CREATE_PATIENT','Patients',9,'Registered new patient Nacasabug, Jillian Grace C. (TAC-2026-0009)','127.0.0.1','2026-09-27 17:51:51'),(16,1,'RECORD_ASSESSMENT','Assessments',7,'Recorded health/vitals assessment for Nacasabug, Jillian Grace C.','127.0.0.1','2026-09-27 17:52:51'),(17,1,'RECORD_SERVICE','Services',9,'Recorded Purok Kalusugan for patient Nacasabug, Jillian Grace C.','127.0.0.1','2026-09-27 17:53:53'),(18,1,'SCHEDULE_APPOINTMENT','Appointments',7,'Scheduled appointment for Nacasabug, Jillian Grace C. on Sep 29, 2026','127.0.0.1','2026-09-27 17:54:25'),(19,1,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-09-27 17:55:28'),(20,3,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-27 17:55:47'),(21,3,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-09-27 17:58:30'),(22,2,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-27 17:59:45'),(23,2,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-09-27 18:02:54'),(24,5,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-27 18:03:36'),(25,5,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-09-27 18:15:01'),(26,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-27 18:28:51'),(27,1,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-09-27 18:36:33'),(28,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-27 18:38:15'),(29,1,'UPDATE_APPOINTMENT_STATUS','Appointments',7,'Changed appointment status to \'attended\' for Nacasabug, Jillian Grace C.','127.0.0.1','2026-09-27 18:42:01'),(30,1,'CREATE_PATIENT','Patients',10,'Registered new patient Neoda, JM (TAC-2026-0010)','127.0.0.1','2026-09-27 19:00:05'),(31,1,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-09-27 19:06:27'),(32,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-27 19:13:29'),(33,1,'SCHEDULE_APPOINTMENT','Appointments',8,'Scheduled appointment for Batungbakal, Rosa D. on Sep 29, 2026','127.0.0.1','2026-09-27 19:33:47'),(34,1,'RECEIVE_BATCH','Inventory',8,'Received batch AMX-2026-2 (150 Capsule) for Amoxicillin 500mg','127.0.0.1','2026-09-27 19:52:02'),(35,1,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-09-27 19:55:13'),(36,5,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-09-27 19:55:32'),(37,5,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-09-27 19:57:19'),(38,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-06 21:36:01'),(39,1,'UPDATE_PATIENT','Patients',9,'Updated demographics for patient Nacasabug, Jillian Grace C. (TAC-2026-0009)','127.0.0.1','2026-10-07 03:33:43'),(40,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-08 03:39:29'),(41,5,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-08 15:14:37'),(42,5,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-10-08 17:14:52'),(43,3,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-08 17:15:19'),(44,3,'CREATE_PATIENT','Patients',11,'Registered new patient Duzal, McCoy (TAC-2026-0011)','127.0.0.1','2026-10-08 17:29:04'),(45,3,'UPDATE_PATIENT','Patients',11,'Updated demographics for patient Duzal, McCoy (TAC-2026-0011)','127.0.0.1','2026-10-08 17:29:52'),(46,3,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-10-08 17:31:22'),(47,3,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-08 17:39:34'),(48,3,'RECORD_SERVICE','Services',10,'Recorded CVD Screening for patient Bautista, Teresa A.','127.0.0.1','2026-10-08 17:45:02'),(49,3,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-10-08 18:03:46'),(50,5,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-08 18:03:59'),(51,5,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-10-08 18:12:07'),(52,3,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-08 18:13:47'),(53,3,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-10-08 18:17:06'),(54,2,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-08 18:17:39'),(55,2,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-10-08 18:17:43'),(56,2,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-08 18:18:15'),(57,2,'RECORD_ASSESSMENT','Assessments',8,'Recorded health/vitals assessment for Santos, Maria Clara R.','127.0.0.1','2026-10-08 18:31:21'),(58,2,'DISPENSE_INVENTORY','Inventory',1,'Dispensed 21 Capsule of Amoxicillin 500mg (FEFO applied, expired batches blocked)','127.0.0.1','2026-10-08 18:51:35'),(59,2,'DISPENSE_INVENTORY','Inventory',1,'Dispensed 21 Capsule of Amoxicillin 500mg (FEFO applied, expired batches blocked)','127.0.0.1','2026-10-08 18:52:16'),(60,2,'RECEIVE_BATCH','Inventory',9,'Received batch lot 0120 (1000 Tablet) for Losartan Potassium 50mg','127.0.0.1','2026-10-08 18:54:41'),(61,2,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-10-08 19:05:19'),(62,5,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-08 19:05:59'),(63,5,'CREATE_PATIENT','Patients',12,'Registered new patient panilag, hazel a. (TAC-2026-0012)','127.0.0.1','2026-10-08 19:14:56'),(64,5,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-10-08 19:16:04'),(65,5,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-09 18:32:53'),(66,5,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-10-10 02:40:18'),(67,3,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-10 02:40:48'),(68,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-11 01:05:34'),(69,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-11 17:41:19'),(70,1,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-10-11 17:43:18'),(71,3,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-11 17:44:15'),(72,3,'RECORD_ASSESSMENT','Assessments',9,'Recorded health/vitals assessment for Batungbakal, Rosa D.','127.0.0.1','2026-10-11 17:46:34'),(73,3,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-10-11 18:37:53'),(74,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-11 18:38:43'),(75,1,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-10-11 18:39:51'),(76,1,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-11 18:41:30'),(77,1,'LOGOUT','Auth',NULL,'User logged out of the system','127.0.0.1','2026-10-11 19:15:05'),(78,3,'LOGIN','Auth',NULL,'User logged in to the system','127.0.0.1','2026-10-11 19:15:45'),(79,3,'CREATE_PATIENT','Patients',13,'Registered new patient Dingal, Jannelle D. (TAC-2026-0013)','127.0.0.1','2026-10-11 19:18:29');
+/*!40000 ALTER TABLE `audit_logs` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `cache`
 --
 
+DROP TABLE IF EXISTS `cache`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cache` (
   `key` varchar(255) NOT NULL,
   `value` mediumtext NOT NULL,
-  `expiration` bigint(20) NOT NULL
+  `expiration` bigint(20) NOT NULL,
+  PRIMARY KEY (`key`),
+  KEY `cache_expiration_index` (`expiration`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `cache`
+--
+
+LOCK TABLES `cache` WRITE;
+/*!40000 ALTER TABLE `cache` DISABLE KEYS */;
+INSERT INTO `cache` VALUES ('tacunan-integrated-health-system-cache-admin@tacunan.gov.pjlzasdbkjdh|127.0.0.1','i:1;',1790563134),('tacunan-integrated-health-system-cache-admin@tacunan.gov.pjlzasdbkjdh|127.0.0.1:timer','i:1790563134;',1790563134),('tacunan-integrated-health-system-cache-boost:mcp:database-schema:mysql::0:0:0:0','a:2:{s:6:\"engine\";s:5:\"mysql\";s:6:\"tables\";a:18:{s:12:\"appointments\";a:5:{s:7:\"columns\";a:11:{s:2:\"id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:10:\"patient_id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:12:\"scheduled_by\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:16:\"appointment_date\";a:1:{s:4:\"type\";s:4:\"date\";}s:16:\"appointment_time\";a:1:{s:4:\"type\";s:4:\"time\";}s:12:\"service_type\";a:1:{s:4:\"type\";s:11:\"varchar(50)\";}s:7:\"purpose\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:6:\"status\";a:1:{s:4:\"type\";s:49:\"enum(\'scheduled\',\'attended\',\'cancelled\',\'missed\')\";}s:12:\"status_notes\";a:1:{s:4:\"type\";s:4:\"text\";}s:10:\"created_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}s:10:\"updated_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}}s:7:\"indexes\";a:4:{s:35:\"appointments_appointment_date_index\";a:4:{s:7:\"columns\";a:1:{i:0;s:16:\"appointment_date\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:31:\"appointments_patient_id_foreign\";a:4:{s:7:\"columns\";a:1:{i:0;s:10:\"patient_id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:33:\"appointments_scheduled_by_foreign\";a:4:{s:7:\"columns\";a:1:{i:0;s:12:\"scheduled_by\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:2:\"id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}}s:12:\"foreign_keys\";a:2:{i:0;a:7:{s:4:\"name\";s:31:\"appointments_patient_id_foreign\";s:7:\"columns\";a:1:{i:0;s:10:\"patient_id\";}s:14:\"foreign_schema\";s:15:\"tacunan_hims_db\";s:13:\"foreign_table\";s:8:\"patients\";s:15:\"foreign_columns\";a:1:{i:0;s:2:\"id\";}s:9:\"on_update\";s:8:\"restrict\";s:9:\"on_delete\";s:7:\"cascade\";}i:1;a:7:{s:4:\"name\";s:33:\"appointments_scheduled_by_foreign\";s:7:\"columns\";a:1:{i:0;s:12:\"scheduled_by\";}s:14:\"foreign_schema\";s:15:\"tacunan_hims_db\";s:13:\"foreign_table\";s:5:\"users\";s:15:\"foreign_columns\";a:1:{i:0;s:2:\"id\";}s:9:\"on_update\";s:8:\"restrict\";s:9:\"on_delete\";s:8:\"restrict\";}}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:10:\"audit_logs\";a:5:{s:7:\"columns\";a:8:{s:2:\"id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:7:\"user_id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:6:\"action\";a:1:{s:4:\"type\";s:12:\"varchar(100)\";}s:6:\"module\";a:1:{s:4:\"type\";s:12:\"varchar(100)\";}s:9:\"record_id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:11:\"description\";a:1:{s:4:\"type\";s:4:\"text\";}s:10:\"ip_address\";a:1:{s:4:\"type\";s:11:\"varchar(45)\";}s:10:\"created_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}}s:7:\"indexes\";a:5:{s:23:\"audit_logs_action_index\";a:4:{s:7:\"columns\";a:1:{i:0;s:6:\"action\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:23:\"audit_logs_module_index\";a:4:{s:7:\"columns\";a:1:{i:0;s:6:\"module\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:26:\"audit_logs_record_id_index\";a:4:{s:7:\"columns\";a:1:{i:0;s:9:\"record_id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:26:\"audit_logs_user_id_foreign\";a:4:{s:7:\"columns\";a:1:{i:0;s:7:\"user_id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:2:\"id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}}s:12:\"foreign_keys\";a:1:{i:0;a:7:{s:4:\"name\";s:26:\"audit_logs_user_id_foreign\";s:7:\"columns\";a:1:{i:0;s:7:\"user_id\";}s:14:\"foreign_schema\";s:15:\"tacunan_hims_db\";s:13:\"foreign_table\";s:5:\"users\";s:15:\"foreign_columns\";a:1:{i:0;s:2:\"id\";}s:9:\"on_update\";s:8:\"restrict\";s:9:\"on_delete\";s:8:\"set null\";}}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:5:\"cache\";a:5:{s:7:\"columns\";a:3:{s:3:\"key\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:5:\"value\";a:1:{s:4:\"type\";s:10:\"mediumtext\";}s:10:\"expiration\";a:1:{s:4:\"type\";s:10:\"bigint(20)\";}}s:7:\"indexes\";a:2:{s:22:\"cache_expiration_index\";a:4:{s:7:\"columns\";a:1:{i:0;s:10:\"expiration\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:3:\"key\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}}s:12:\"foreign_keys\";a:0:{}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:11:\"cache_locks\";a:5:{s:7:\"columns\";a:3:{s:3:\"key\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:5:\"owner\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:10:\"expiration\";a:1:{s:4:\"type\";s:10:\"bigint(20)\";}}s:7:\"indexes\";a:2:{s:28:\"cache_locks_expiration_index\";a:4:{s:7:\"columns\";a:1:{i:0;s:10:\"expiration\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:3:\"key\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}}s:12:\"foreign_keys\";a:0:{}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:11:\"failed_jobs\";a:5:{s:7:\"columns\";a:7:{s:2:\"id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:4:\"uuid\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:10:\"connection\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:5:\"queue\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:7:\"payload\";a:1:{s:4:\"type\";s:8:\"longtext\";}s:9:\"exception\";a:1:{s:4:\"type\";s:8:\"longtext\";}s:9:\"failed_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}}s:7:\"indexes\";a:3:{s:44:\"failed_jobs_connection_queue_failed_at_index\";a:4:{s:7:\"columns\";a:3:{i:0;s:10:\"connection\";i:1;s:5:\"queue\";i:2;s:9:\"failed_at\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:23:\"failed_jobs_uuid_unique\";a:4:{s:7:\"columns\";a:1:{i:0;s:4:\"uuid\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:0;}s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:2:\"id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}}s:12:\"foreign_keys\";a:0:{}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:18:\"health_assessments\";a:5:{s:7:\"columns\";a:16:{s:2:\"id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:10:\"patient_id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:7:\"user_id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:15:\"assessment_date\";a:1:{s:4:\"type\";s:4:\"date\";}s:9:\"weight_kg\";a:1:{s:4:\"type\";s:12:\"decimal(5,2)\";}s:9:\"height_cm\";a:1:{s:4:\"type\";s:12:\"decimal(5,2)\";}s:3:\"bmi\";a:1:{s:4:\"type\";s:12:\"decimal(4,1)\";}s:11:\"systolic_bp\";a:1:{s:4:\"type\";s:20:\"smallint(5) unsigned\";}s:12:\"diastolic_bp\";a:1:{s:4:\"type\";s:20:\"smallint(5) unsigned\";}s:10:\"pulse_rate\";a:1:{s:4:\"type\";s:20:\"smallint(5) unsigned\";}s:16:\"respiratory_rate\";a:1:{s:4:\"type\";s:20:\"smallint(5) unsigned\";}s:19:\"temperature_celsius\";a:1:{s:4:\"type\";s:12:\"decimal(4,2)\";}s:18:\"nutritional_status\";a:1:{s:4:\"type\";s:11:\"varchar(50)\";}s:5:\"notes\";a:1:{s:4:\"type\";s:4:\"text\";}s:10:\"created_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}s:10:\"updated_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}}s:7:\"indexes\";a:3:{s:37:\"health_assessments_patient_id_foreign\";a:4:{s:7:\"columns\";a:1:{i:0;s:10:\"patient_id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:34:\"health_assessments_user_id_foreign\";a:4:{s:7:\"columns\";a:1:{i:0;s:7:\"user_id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:2:\"id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}}s:12:\"foreign_keys\";a:2:{i:0;a:7:{s:4:\"name\";s:37:\"health_assessments_patient_id_foreign\";s:7:\"columns\";a:1:{i:0;s:10:\"patient_id\";}s:14:\"foreign_schema\";s:15:\"tacunan_hims_db\";s:13:\"foreign_table\";s:8:\"patients\";s:15:\"foreign_columns\";a:1:{i:0;s:2:\"id\";}s:9:\"on_update\";s:8:\"restrict\";s:9:\"on_delete\";s:7:\"cascade\";}i:1;a:7:{s:4:\"name\";s:34:\"health_assessments_user_id_foreign\";s:7:\"columns\";a:1:{i:0;s:7:\"user_id\";}s:14:\"foreign_schema\";s:15:\"tacunan_hims_db\";s:13:\"foreign_table\";s:5:\"users\";s:15:\"foreign_columns\";a:1:{i:0;s:2:\"id\";}s:9:\"on_update\";s:8:\"restrict\";s:9:\"on_delete\";s:8:\"restrict\";}}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:22:\"health_service_records\";a:5:{s:7:\"columns\";a:11:{s:2:\"id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:10:\"patient_id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:7:\"user_id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:12:\"service_type\";a:1:{s:4:\"type\";s:11:\"varchar(50)\";}s:12:\"service_date\";a:1:{s:4:\"type\";s:4:\"date\";}s:19:\"complaint_or_reason\";a:1:{s:4:\"type\";s:4:\"text\";}s:18:\"findings_and_notes\";a:1:{s:4:\"type\";s:4:\"text\";}s:21:\"service_specific_data\";a:1:{s:4:\"type\";s:8:\"longtext\";}s:19:\"next_follow_up_date\";a:1:{s:4:\"type\";s:4:\"date\";}s:10:\"created_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}s:10:\"updated_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}}s:7:\"indexes\";a:4:{s:41:\"health_service_records_patient_id_foreign\";a:4:{s:7:\"columns\";a:1:{i:0;s:10:\"patient_id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:41:\"health_service_records_service_type_index\";a:4:{s:7:\"columns\";a:1:{i:0;s:12:\"service_type\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:38:\"health_service_records_user_id_foreign\";a:4:{s:7:\"columns\";a:1:{i:0;s:7:\"user_id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:2:\"id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}}s:12:\"foreign_keys\";a:2:{i:0;a:7:{s:4:\"name\";s:41:\"health_service_records_patient_id_foreign\";s:7:\"columns\";a:1:{i:0;s:10:\"patient_id\";}s:14:\"foreign_schema\";s:15:\"tacunan_hims_db\";s:13:\"foreign_table\";s:8:\"patients\";s:15:\"foreign_columns\";a:1:{i:0;s:2:\"id\";}s:9:\"on_update\";s:8:\"restrict\";s:9:\"on_delete\";s:7:\"cascade\";}i:1;a:7:{s:4:\"name\";s:38:\"health_service_records_user_id_foreign\";s:7:\"columns\";a:1:{i:0;s:7:\"user_id\";}s:14:\"foreign_schema\";s:15:\"tacunan_hims_db\";s:13:\"foreign_table\";s:5:\"users\";s:15:\"foreign_columns\";a:1:{i:0;s:2:\"id\";}s:9:\"on_update\";s:8:\"restrict\";s:9:\"on_delete\";s:8:\"restrict\";}}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:1:{i:0;O:8:\"stdClass\":2:{s:15:\"CONSTRAINT_NAME\";s:21:\"service_specific_data\";s:12:\"CHECK_CLAUSE\";s:35:\"json_valid(`service_specific_data`)\";}}}s:17:\"inventory_batches\";a:5:{s:7:\"columns\";a:12:{s:2:\"id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:17:\"inventory_item_id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:12:\"batch_number\";a:1:{s:4:\"type\";s:12:\"varchar(100)\";}s:13:\"date_received\";a:1:{s:4:\"type\";s:4:\"date\";}s:15:\"expiration_date\";a:1:{s:4:\"type\";s:4:\"date\";}s:17:\"quantity_received\";a:1:{s:4:\"type\";s:16:\"int(10) unsigned\";}s:16:\"current_quantity\";a:1:{s:4:\"type\";s:16:\"int(10) unsigned\";}s:18:\"supplier_or_source\";a:1:{s:4:\"type\";s:12:\"varchar(150)\";}s:6:\"status\";a:1:{s:4:\"type\";s:35:\"enum(\'active\',\'depleted\',\'expired\')\";}s:7:\"remarks\";a:1:{s:4:\"type\";s:4:\"text\";}s:10:\"created_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}s:10:\"updated_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}}s:7:\"indexes\";a:4:{s:36:\"inventory_batches_batch_number_index\";a:4:{s:7:\"columns\";a:1:{i:0;s:12:\"batch_number\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:39:\"inventory_batches_expiration_date_index\";a:4:{s:7:\"columns\";a:1:{i:0;s:15:\"expiration_date\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:43:\"inventory_batches_inventory_item_id_foreign\";a:4:{s:7:\"columns\";a:1:{i:0;s:17:\"inventory_item_id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:2:\"id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}}s:12:\"foreign_keys\";a:1:{i:0;a:7:{s:4:\"name\";s:43:\"inventory_batches_inventory_item_id_foreign\";s:7:\"columns\";a:1:{i:0;s:17:\"inventory_item_id\";}s:14:\"foreign_schema\";s:15:\"tacunan_hims_db\";s:13:\"foreign_table\";s:15:\"inventory_items\";s:15:\"foreign_columns\";a:1:{i:0;s:2:\"id\";}s:9:\"on_update\";s:8:\"restrict\";s:9:\"on_delete\";s:7:\"cascade\";}}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:15:\"inventory_items\";a:5:{s:7:\"columns\";a:13:{s:2:\"id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:9:\"item_code\";a:1:{s:4:\"type\";s:11:\"varchar(50)\";}s:4:\"name\";a:1:{s:4:\"type\";s:12:\"varchar(150)\";}s:12:\"generic_name\";a:1:{s:4:\"type\";s:12:\"varchar(150)\";}s:8:\"category\";a:1:{s:4:\"type\";s:26:\"enum(\'medicine\',\'vaccine\')\";}s:11:\"dosage_form\";a:1:{s:4:\"type\";s:12:\"varchar(100)\";}s:15:\"unit_of_measure\";a:1:{s:4:\"type\";s:11:\"varchar(50)\";}s:19:\"minimum_stock_alert\";a:1:{s:4:\"type\";s:16:\"int(10) unsigned\";}s:13:\"is_cold_chain\";a:1:{s:4:\"type\";s:10:\"tinyint(1)\";}s:24:\"storage_temperature_note\";a:1:{s:4:\"type\";s:12:\"varchar(100)\";}s:11:\"description\";a:1:{s:4:\"type\";s:4:\"text\";}s:10:\"created_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}s:10:\"updated_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}}s:7:\"indexes\";a:3:{s:30:\"inventory_items_category_index\";a:4:{s:7:\"columns\";a:1:{i:0;s:8:\"category\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:32:\"inventory_items_item_code_unique\";a:4:{s:7:\"columns\";a:1:{i:0;s:9:\"item_code\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:0;}s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:2:\"id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}}s:12:\"foreign_keys\";a:0:{}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:22:\"inventory_transactions\";a:5:{s:7:\"columns\";a:11:{s:2:\"id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:17:\"inventory_item_id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:18:\"inventory_batch_id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:7:\"user_id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:10:\"patient_id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:16:\"transaction_type\";a:1:{s:4:\"type\";s:60:\"enum(\'received\',\'dispensed\',\'disposed_expired\',\'adjustment\')\";}s:8:\"quantity\";a:1:{s:4:\"type\";s:16:\"int(10) unsigned\";}s:16:\"transaction_date\";a:1:{s:4:\"type\";s:4:\"date\";}s:7:\"remarks\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:10:\"created_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}s:10:\"updated_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}}s:7:\"indexes\";a:7:{s:49:\"inventory_transactions_inventory_batch_id_foreign\";a:4:{s:7:\"columns\";a:1:{i:0;s:18:\"inventory_batch_id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:48:\"inventory_transactions_inventory_item_id_foreign\";a:4:{s:7:\"columns\";a:1:{i:0;s:17:\"inventory_item_id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:41:\"inventory_transactions_patient_id_foreign\";a:4:{s:7:\"columns\";a:1:{i:0;s:10:\"patient_id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:45:\"inventory_transactions_transaction_date_index\";a:4:{s:7:\"columns\";a:1:{i:0;s:16:\"transaction_date\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:45:\"inventory_transactions_transaction_type_index\";a:4:{s:7:\"columns\";a:1:{i:0;s:16:\"transaction_type\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:38:\"inventory_transactions_user_id_foreign\";a:4:{s:7:\"columns\";a:1:{i:0;s:7:\"user_id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:2:\"id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}}s:12:\"foreign_keys\";a:4:{i:0;a:7:{s:4:\"name\";s:49:\"inventory_transactions_inventory_batch_id_foreign\";s:7:\"columns\";a:1:{i:0;s:18:\"inventory_batch_id\";}s:14:\"foreign_schema\";s:15:\"tacunan_hims_db\";s:13:\"foreign_table\";s:17:\"inventory_batches\";s:15:\"foreign_columns\";a:1:{i:0;s:2:\"id\";}s:9:\"on_update\";s:8:\"restrict\";s:9:\"on_delete\";s:8:\"restrict\";}i:1;a:7:{s:4:\"name\";s:48:\"inventory_transactions_inventory_item_id_foreign\";s:7:\"columns\";a:1:{i:0;s:17:\"inventory_item_id\";}s:14:\"foreign_schema\";s:15:\"tacunan_hims_db\";s:13:\"foreign_table\";s:15:\"inventory_items\";s:15:\"foreign_columns\";a:1:{i:0;s:2:\"id\";}s:9:\"on_update\";s:8:\"restrict\";s:9:\"on_delete\";s:8:\"restrict\";}i:2;a:7:{s:4:\"name\";s:41:\"inventory_transactions_patient_id_foreign\";s:7:\"columns\";a:1:{i:0;s:10:\"patient_id\";}s:14:\"foreign_schema\";s:15:\"tacunan_hims_db\";s:13:\"foreign_table\";s:8:\"patients\";s:15:\"foreign_columns\";a:1:{i:0;s:2:\"id\";}s:9:\"on_update\";s:8:\"restrict\";s:9:\"on_delete\";s:8:\"set null\";}i:3;a:7:{s:4:\"name\";s:38:\"inventory_transactions_user_id_foreign\";s:7:\"columns\";a:1:{i:0;s:7:\"user_id\";}s:14:\"foreign_schema\";s:15:\"tacunan_hims_db\";s:13:\"foreign_table\";s:5:\"users\";s:15:\"foreign_columns\";a:1:{i:0;s:2:\"id\";}s:9:\"on_update\";s:8:\"restrict\";s:9:\"on_delete\";s:8:\"restrict\";}}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:4:\"jobs\";a:5:{s:7:\"columns\";a:7:{s:2:\"id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:5:\"queue\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:7:\"payload\";a:1:{s:4:\"type\";s:8:\"longtext\";}s:8:\"attempts\";a:1:{s:4:\"type\";s:20:\"smallint(5) unsigned\";}s:11:\"reserved_at\";a:1:{s:4:\"type\";s:16:\"int(10) unsigned\";}s:12:\"available_at\";a:1:{s:4:\"type\";s:16:\"int(10) unsigned\";}s:10:\"created_at\";a:1:{s:4:\"type\";s:16:\"int(10) unsigned\";}}s:7:\"indexes\";a:2:{s:16:\"jobs_queue_index\";a:4:{s:7:\"columns\";a:1:{i:0;s:5:\"queue\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:2:\"id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}}s:12:\"foreign_keys\";a:0:{}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:11:\"job_batches\";a:5:{s:7:\"columns\";a:10:{s:2:\"id\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:4:\"name\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:10:\"total_jobs\";a:1:{s:4:\"type\";s:7:\"int(11)\";}s:12:\"pending_jobs\";a:1:{s:4:\"type\";s:7:\"int(11)\";}s:11:\"failed_jobs\";a:1:{s:4:\"type\";s:7:\"int(11)\";}s:14:\"failed_job_ids\";a:1:{s:4:\"type\";s:8:\"longtext\";}s:7:\"options\";a:1:{s:4:\"type\";s:10:\"mediumtext\";}s:12:\"cancelled_at\";a:1:{s:4:\"type\";s:7:\"int(11)\";}s:10:\"created_at\";a:1:{s:4:\"type\";s:7:\"int(11)\";}s:11:\"finished_at\";a:1:{s:4:\"type\";s:7:\"int(11)\";}}s:7:\"indexes\";a:1:{s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:2:\"id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}}s:12:\"foreign_keys\";a:0:{}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:10:\"migrations\";a:5:{s:7:\"columns\";a:3:{s:2:\"id\";a:1:{s:4:\"type\";s:16:\"int(10) unsigned\";}s:9:\"migration\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:5:\"batch\";a:1:{s:4:\"type\";s:7:\"int(11)\";}}s:7:\"indexes\";a:1:{s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:2:\"id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}}s:12:\"foreign_keys\";a:0:{}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:21:\"password_reset_tokens\";a:5:{s:7:\"columns\";a:3:{s:5:\"email\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:5:\"token\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:10:\"created_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}}s:7:\"indexes\";a:1:{s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:5:\"email\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}}s:12:\"foreign_keys\";a:0:{}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:8:\"patients\";a:5:{s:7:\"columns\";a:20:{s:2:\"id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:22:\"patient_control_number\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:10:\"first_name\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:11:\"middle_name\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:9:\"last_name\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:6:\"suffix\";a:1:{s:4:\"type\";s:11:\"varchar(20)\";}s:3:\"sex\";a:1:{s:4:\"type\";s:21:\"enum(\'Male\',\'Female\')\";}s:13:\"date_of_birth\";a:1:{s:4:\"type\";s:4:\"date\";}s:12:\"civil_status\";a:1:{s:4:\"type\";s:11:\"varchar(30)\";}s:8:\"purok_id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:14:\"street_address\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:14:\"contact_number\";a:1:{s:4:\"type\";s:11:\"varchar(30)\";}s:17:\"philhealth_number\";a:1:{s:4:\"type\";s:11:\"varchar(50)\";}s:10:\"blood_type\";a:1:{s:4:\"type\";s:11:\"varchar(10)\";}s:22:\"emergency_contact_name\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:24:\"emergency_contact_number\";a:1:{s:4:\"type\";s:11:\"varchar(30)\";}s:10:\"created_by\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:10:\"created_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}s:10:\"updated_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}s:10:\"deleted_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}}s:7:\"indexes\";a:4:{s:27:\"patients_created_by_foreign\";a:4:{s:7:\"columns\";a:1:{i:0;s:10:\"created_by\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:38:\"patients_patient_control_number_unique\";a:4:{s:7:\"columns\";a:1:{i:0;s:22:\"patient_control_number\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:0;}s:25:\"patients_purok_id_foreign\";a:4:{s:7:\"columns\";a:1:{i:0;s:8:\"purok_id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:2:\"id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}}s:12:\"foreign_keys\";a:2:{i:0;a:7:{s:4:\"name\";s:27:\"patients_created_by_foreign\";s:7:\"columns\";a:1:{i:0;s:10:\"created_by\";}s:14:\"foreign_schema\";s:15:\"tacunan_hims_db\";s:13:\"foreign_table\";s:5:\"users\";s:15:\"foreign_columns\";a:1:{i:0;s:2:\"id\";}s:9:\"on_update\";s:8:\"restrict\";s:9:\"on_delete\";s:8:\"set null\";}i:1;a:7:{s:4:\"name\";s:25:\"patients_purok_id_foreign\";s:7:\"columns\";a:1:{i:0;s:8:\"purok_id\";}s:14:\"foreign_schema\";s:15:\"tacunan_hims_db\";s:13:\"foreign_table\";s:6:\"puroks\";s:15:\"foreign_columns\";a:1:{i:0;s:2:\"id\";}s:9:\"on_update\";s:8:\"restrict\";s:9:\"on_delete\";s:8:\"restrict\";}}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:6:\"puroks\";a:5:{s:7:\"columns\";a:5:{s:2:\"id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:4:\"name\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:11:\"description\";a:1:{s:4:\"type\";s:4:\"text\";}s:10:\"created_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}s:10:\"updated_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}}s:7:\"indexes\";a:2:{s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:2:\"id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}s:18:\"puroks_name_unique\";a:4:{s:7:\"columns\";a:1:{i:0;s:4:\"name\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:0;}}s:12:\"foreign_keys\";a:0:{}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:8:\"sessions\";a:5:{s:7:\"columns\";a:6:{s:2:\"id\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:7:\"user_id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:10:\"ip_address\";a:1:{s:4:\"type\";s:11:\"varchar(45)\";}s:10:\"user_agent\";a:1:{s:4:\"type\";s:4:\"text\";}s:7:\"payload\";a:1:{s:4:\"type\";s:8:\"longtext\";}s:13:\"last_activity\";a:1:{s:4:\"type\";s:7:\"int(11)\";}}s:7:\"indexes\";a:3:{s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:2:\"id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}s:28:\"sessions_last_activity_index\";a:4:{s:7:\"columns\";a:1:{i:0;s:13:\"last_activity\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}s:22:\"sessions_user_id_index\";a:4:{s:7:\"columns\";a:1:{i:0;s:7:\"user_id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:0;s:10:\"is_primary\";b:0;}}s:12:\"foreign_keys\";a:0:{}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}s:5:\"users\";a:5:{s:7:\"columns\";a:11:{s:2:\"id\";a:1:{s:4:\"type\";s:19:\"bigint(20) unsigned\";}s:4:\"name\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:5:\"email\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:17:\"email_verified_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}s:8:\"password\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:4:\"role\";a:1:{s:4:\"type\";s:12:\"varchar(255)\";}s:14:\"contact_number\";a:1:{s:4:\"type\";s:11:\"varchar(20)\";}s:9:\"is_active\";a:1:{s:4:\"type\";s:10:\"tinyint(1)\";}s:14:\"remember_token\";a:1:{s:4:\"type\";s:12:\"varchar(100)\";}s:10:\"created_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}s:10:\"updated_at\";a:1:{s:4:\"type\";s:9:\"timestamp\";}}s:7:\"indexes\";a:2:{s:7:\"primary\";a:4:{s:7:\"columns\";a:1:{i:0;s:2:\"id\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:1;}s:18:\"users_email_unique\";a:4:{s:7:\"columns\";a:1:{i:0;s:5:\"email\";}s:4:\"type\";s:5:\"btree\";s:9:\"is_unique\";b:1;s:10:\"is_primary\";b:0;}}s:12:\"foreign_keys\";a:0:{}s:8:\"triggers\";a:0:{}s:17:\"check_constraints\";a:0:{}}}}',1791538696),('tacunan-integrated-health-system-cache-roster:project:v3:a05571976009475d41bdcb264a602c77','O:26:\"Laravel\\Roster\\ProjectScan\":8:{s:8:\"basePath\";s:24:\"C:\\FinalProj\\BHCProject\\\";s:3:\"php\";O:35:\"Laravel\\Roster\\Ecosystems\\Ecosystem\":2:{s:9:\"\0*\0byName\";a:133:{s:10:\"brick/math\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"brick/math\";s:10:\"\0*\0version\";s:6:\"0.19.1\";s:9:\"\0*\0source\";E:43:\"Laravel\\Roster\\Enums\\PackageSource:Composer\";s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:41:\"C:\\FinalProj\\BHCProject\\vendor\\brick\\math\";}s:31:\"carbonphp/carbon-doctrine-types\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:31:\"carbonphp/carbon-doctrine-types\";s:10:\"\0*\0version\";s:5:\"3.2.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:62:\"C:\\FinalProj\\BHCProject\\vendor\\carbonphp\\carbon-doctrine-types\";}s:23:\"dflydev/dot-access-data\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:23:\"dflydev/dot-access-data\";s:10:\"\0*\0version\";s:5:\"3.0.3\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:54:\"C:\\FinalProj\\BHCProject\\vendor\\dflydev\\dot-access-data\";}s:18:\"doctrine/inflector\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:18:\"doctrine/inflector\";s:10:\"\0*\0version\";s:5:\"2.1.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\vendor\\doctrine\\inflector\";}s:14:\"doctrine/lexer\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"doctrine/lexer\";s:10:\"\0*\0version\";s:5:\"3.0.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\vendor\\doctrine\\lexer\";}s:29:\"dragonmantank/cron-expression\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:29:\"dragonmantank/cron-expression\";s:10:\"\0*\0version\";s:5:\"3.6.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:60:\"C:\\FinalProj\\BHCProject\\vendor\\dragonmantank\\cron-expression\";}s:23:\"egulias/email-validator\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:23:\"egulias/email-validator\";s:10:\"\0*\0version\";s:5:\"4.0.4\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:54:\"C:\\FinalProj\\BHCProject\\vendor\\egulias\\email-validator\";}s:18:\"fruitcake/php-cors\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:18:\"fruitcake/php-cors\";s:10:\"\0*\0version\";s:5:\"1.4.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\vendor\\fruitcake\\php-cors\";}s:27:\"graham-campbell/result-type\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:27:\"graham-campbell/result-type\";s:10:\"\0*\0version\";s:5:\"1.2.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:58:\"C:\\FinalProj\\BHCProject\\vendor\\graham-campbell\\result-type\";}s:17:\"guzzlehttp/guzzle\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:17:\"guzzlehttp/guzzle\";s:10:\"\0*\0version\";s:5:\"8.2.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\vendor\\guzzlehttp\\guzzle\";}s:19:\"guzzlehttp/promises\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:19:\"guzzlehttp/promises\";s:10:\"\0*\0version\";s:5:\"3.0.2\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\vendor\\guzzlehttp\\promises\";}s:15:\"guzzlehttp/psr7\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:15:\"guzzlehttp/psr7\";s:10:\"\0*\0version\";s:5:\"3.1.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\vendor\\guzzlehttp\\psr7\";}s:23:\"guzzlehttp/uri-template\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:23:\"guzzlehttp/uri-template\";s:10:\"\0*\0version\";s:5:\"2.0.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:54:\"C:\\FinalProj\\BHCProject\\vendor\\guzzlehttp\\uri-template\";}s:17:\"laravel/framework\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:17:\"laravel/framework\";s:10:\"\0*\0version\";s:7:\"13.32.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:6:\"^13.17\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\vendor\\laravel\\framework\";}s:15:\"laravel/prompts\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:15:\"laravel/prompts\";s:10:\"\0*\0version\";s:6:\"0.3.24\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\vendor\\laravel\\prompts\";}s:28:\"laravel/serializable-closure\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:28:\"laravel/serializable-closure\";s:10:\"\0*\0version\";s:6:\"2.0.16\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:59:\"C:\\FinalProj\\BHCProject\\vendor\\laravel\\serializable-closure\";}s:14:\"laravel/tinker\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"laravel/tinker\";s:10:\"\0*\0version\";s:5:\"3.0.2\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:4:\"^3.0\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\vendor\\laravel\\tinker\";}s:17:\"league/commonmark\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:17:\"league/commonmark\";s:10:\"\0*\0version\";s:6:\"2.10.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\vendor\\league\\commonmark\";}s:13:\"league/config\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:13:\"league/config\";s:10:\"\0*\0version\";s:5:\"1.2.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:44:\"C:\\FinalProj\\BHCProject\\vendor\\league\\config\";}s:16:\"league/flysystem\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:16:\"league/flysystem\";s:10:\"\0*\0version\";s:6:\"3.36.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\vendor\\league\\flysystem\";}s:22:\"league/flysystem-local\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:22:\"league/flysystem-local\";s:10:\"\0*\0version\";s:6:\"3.35.3\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:53:\"C:\\FinalProj\\BHCProject\\vendor\\league\\flysystem-local\";}s:26:\"league/mime-type-detection\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:26:\"league/mime-type-detection\";s:10:\"\0*\0version\";s:6:\"1.17.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:57:\"C:\\FinalProj\\BHCProject\\vendor\\league\\mime-type-detection\";}s:10:\"league/uri\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"league/uri\";s:10:\"\0*\0version\";s:5:\"7.8.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:41:\"C:\\FinalProj\\BHCProject\\vendor\\league\\uri\";}s:21:\"league/uri-interfaces\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:21:\"league/uri-interfaces\";s:10:\"\0*\0version\";s:5:\"7.8.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:52:\"C:\\FinalProj\\BHCProject\\vendor\\league\\uri-interfaces\";}s:15:\"monolog/monolog\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:15:\"monolog/monolog\";s:10:\"\0*\0version\";s:6:\"3.12.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\vendor\\monolog\\monolog\";}s:13:\"nesbot/carbon\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:13:\"nesbot/carbon\";s:10:\"\0*\0version\";s:6:\"3.14.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:44:\"C:\\FinalProj\\BHCProject\\vendor\\nesbot\\carbon\";}s:12:\"nette/schema\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"nette/schema\";s:10:\"\0*\0version\";s:5:\"1.3.6\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:43:\"C:\\FinalProj\\BHCProject\\vendor\\nette\\schema\";}s:11:\"nette/utils\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"nette/utils\";s:10:\"\0*\0version\";s:5:\"4.1.5\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:42:\"C:\\FinalProj\\BHCProject\\vendor\\nette\\utils\";}s:16:\"nikic/php-parser\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:16:\"nikic/php-parser\";s:10:\"\0*\0version\";s:5:\"5.9.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\vendor\\nikic\\php-parser\";}s:19:\"nunomaduro/termwind\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:19:\"nunomaduro/termwind\";s:10:\"\0*\0version\";s:5:\"2.4.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\vendor\\nunomaduro\\termwind\";}s:19:\"phpoption/phpoption\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:19:\"phpoption/phpoption\";s:10:\"\0*\0version\";s:6:\"1.10.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\vendor\\phpoption\\phpoption\";}s:9:\"psr/clock\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:9:\"psr/clock\";s:10:\"\0*\0version\";s:5:\"1.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:40:\"C:\\FinalProj\\BHCProject\\vendor\\psr\\clock\";}s:13:\"psr/container\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:13:\"psr/container\";s:10:\"\0*\0version\";s:5:\"2.0.2\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:44:\"C:\\FinalProj\\BHCProject\\vendor\\psr\\container\";}s:20:\"psr/event-dispatcher\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:20:\"psr/event-dispatcher\";s:10:\"\0*\0version\";s:5:\"1.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:51:\"C:\\FinalProj\\BHCProject\\vendor\\psr\\event-dispatcher\";}s:15:\"psr/http-client\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:15:\"psr/http-client\";s:10:\"\0*\0version\";s:5:\"1.0.3\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\vendor\\psr\\http-client\";}s:16:\"psr/http-factory\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:16:\"psr/http-factory\";s:10:\"\0*\0version\";s:5:\"1.1.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\vendor\\psr\\http-factory\";}s:16:\"psr/http-message\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:16:\"psr/http-message\";s:10:\"\0*\0version\";s:3:\"2.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\vendor\\psr\\http-message\";}s:7:\"psr/log\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:7:\"psr/log\";s:10:\"\0*\0version\";s:5:\"3.0.2\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:38:\"C:\\FinalProj\\BHCProject\\vendor\\psr\\log\";}s:16:\"psr/simple-cache\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:16:\"psr/simple-cache\";s:10:\"\0*\0version\";s:5:\"3.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\vendor\\psr\\simple-cache\";}s:9:\"psy/psysh\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:9:\"psy/psysh\";s:10:\"\0*\0version\";s:7:\"0.12.24\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:40:\"C:\\FinalProj\\BHCProject\\vendor\\psy\\psysh\";}s:17:\"ramsey/collection\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:17:\"ramsey/collection\";s:10:\"\0*\0version\";s:5:\"2.1.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\vendor\\ramsey\\collection\";}s:11:\"ramsey/uuid\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"ramsey/uuid\";s:10:\"\0*\0version\";s:5:\"4.9.4\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:42:\"C:\\FinalProj\\BHCProject\\vendor\\ramsey\\uuid\";}s:13:\"symfony/clock\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:13:\"symfony/clock\";s:10:\"\0*\0version\";s:5:\"8.1.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:44:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\clock\";}s:15:\"symfony/console\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:15:\"symfony/console\";s:10:\"\0*\0version\";s:5:\"8.1.7\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\console\";}s:20:\"symfony/css-selector\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:20:\"symfony/css-selector\";s:10:\"\0*\0version\";s:5:\"8.1.6\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:51:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\css-selector\";}s:29:\"symfony/deprecation-contracts\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:29:\"symfony/deprecation-contracts\";s:10:\"\0*\0version\";s:5:\"3.7.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:60:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\deprecation-contracts\";}s:21:\"symfony/error-handler\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:21:\"symfony/error-handler\";s:10:\"\0*\0version\";s:5:\"8.1.5\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:52:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\error-handler\";}s:24:\"symfony/event-dispatcher\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:24:\"symfony/event-dispatcher\";s:10:\"\0*\0version\";s:5:\"8.1.5\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:55:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\event-dispatcher\";}s:34:\"symfony/event-dispatcher-contracts\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:34:\"symfony/event-dispatcher-contracts\";s:10:\"\0*\0version\";s:5:\"3.7.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:65:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\event-dispatcher-contracts\";}s:14:\"symfony/finder\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"symfony/finder\";s:10:\"\0*\0version\";s:5:\"8.1.7\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\finder\";}s:23:\"symfony/http-foundation\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:23:\"symfony/http-foundation\";s:10:\"\0*\0version\";s:5:\"8.1.7\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:54:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\http-foundation\";}s:19:\"symfony/http-kernel\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:19:\"symfony/http-kernel\";s:10:\"\0*\0version\";s:5:\"8.1.7\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\http-kernel\";}s:14:\"symfony/mailer\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"symfony/mailer\";s:10:\"\0*\0version\";s:5:\"8.1.7\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\mailer\";}s:12:\"symfony/mime\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"symfony/mime\";s:10:\"\0*\0version\";s:5:\"8.1.7\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:43:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\mime\";}s:22:\"symfony/polyfill-ctype\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:22:\"symfony/polyfill-ctype\";s:10:\"\0*\0version\";s:6:\"1.37.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:53:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\polyfill-ctype\";}s:30:\"symfony/polyfill-intl-grapheme\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:30:\"symfony/polyfill-intl-grapheme\";s:10:\"\0*\0version\";s:6:\"1.41.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:61:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\polyfill-intl-grapheme\";}s:25:\"symfony/polyfill-intl-idn\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:25:\"symfony/polyfill-intl-idn\";s:10:\"\0*\0version\";s:6:\"1.42.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:56:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\polyfill-intl-idn\";}s:32:\"symfony/polyfill-intl-normalizer\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:32:\"symfony/polyfill-intl-normalizer\";s:10:\"\0*\0version\";s:6:\"1.42.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:63:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\polyfill-intl-normalizer\";}s:25:\"symfony/polyfill-mbstring\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:25:\"symfony/polyfill-mbstring\";s:10:\"\0*\0version\";s:6:\"1.38.2\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:56:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\polyfill-mbstring\";}s:22:\"symfony/polyfill-php80\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:22:\"symfony/polyfill-php80\";s:10:\"\0*\0version\";s:6:\"1.37.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:53:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\polyfill-php80\";}s:22:\"symfony/polyfill-php82\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:22:\"symfony/polyfill-php82\";s:10:\"\0*\0version\";s:6:\"1.38.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:53:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\polyfill-php82\";}s:22:\"symfony/polyfill-php84\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:22:\"symfony/polyfill-php84\";s:10:\"\0*\0version\";s:6:\"1.38.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:53:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\polyfill-php84\";}s:22:\"symfony/polyfill-php85\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:22:\"symfony/polyfill-php85\";s:10:\"\0*\0version\";s:6:\"1.41.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:53:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\polyfill-php85\";}s:22:\"symfony/polyfill-php86\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:22:\"symfony/polyfill-php86\";s:10:\"\0*\0version\";s:6:\"1.41.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:53:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\polyfill-php86\";}s:21:\"symfony/polyfill-uuid\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:21:\"symfony/polyfill-uuid\";s:10:\"\0*\0version\";s:6:\"1.37.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:52:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\polyfill-uuid\";}s:15:\"symfony/process\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:15:\"symfony/process\";s:10:\"\0*\0version\";s:5:\"8.1.7\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\process\";}s:15:\"symfony/routing\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:15:\"symfony/routing\";s:10:\"\0*\0version\";s:5:\"8.1.6\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\routing\";}s:25:\"symfony/service-contracts\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:25:\"symfony/service-contracts\";s:10:\"\0*\0version\";s:5:\"3.7.3\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:56:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\service-contracts\";}s:14:\"symfony/string\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"symfony/string\";s:10:\"\0*\0version\";s:5:\"8.1.7\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\string\";}s:19:\"symfony/translation\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:19:\"symfony/translation\";s:10:\"\0*\0version\";s:5:\"8.1.5\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\translation\";}s:29:\"symfony/translation-contracts\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:29:\"symfony/translation-contracts\";s:10:\"\0*\0version\";s:5:\"3.7.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:60:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\translation-contracts\";}s:11:\"symfony/uid\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"symfony/uid\";s:10:\"\0*\0version\";s:5:\"8.1.5\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:42:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\uid\";}s:18:\"symfony/var-dumper\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:18:\"symfony/var-dumper\";s:10:\"\0*\0version\";s:5:\"8.1.7\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\var-dumper\";}s:33:\"tijsverkoyen/css-to-inline-styles\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:33:\"tijsverkoyen/css-to-inline-styles\";s:10:\"\0*\0version\";s:5:\"2.4.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:64:\"C:\\FinalProj\\BHCProject\\vendor\\tijsverkoyen\\css-to-inline-styles\";}s:16:\"vlucas/phpdotenv\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:16:\"vlucas/phpdotenv\";s:10:\"\0*\0version\";s:5:\"5.7.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\vendor\\vlucas\\phpdotenv\";}s:19:\"voku/portable-ascii\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:19:\"voku/portable-ascii\";s:10:\"\0*\0version\";s:5:\"2.1.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\vendor\\voku\\portable-ascii\";}s:17:\"brianium/paratest\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:17:\"brianium/paratest\";s:10:\"\0*\0version\";s:6:\"7.24.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\vendor\\brianium\\paratest\";}s:15:\"composer/semver\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:15:\"composer/semver\";s:10:\"\0*\0version\";s:5:\"3.4.4\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\vendor\\composer\\semver\";}s:21:\"doctrine/deprecations\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:21:\"doctrine/deprecations\";s:10:\"\0*\0version\";s:5:\"1.1.6\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:52:\"C:\\FinalProj\\BHCProject\\vendor\\doctrine\\deprecations\";}s:14:\"fakerphp/faker\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"fakerphp/faker\";s:10:\"\0*\0version\";s:6:\"1.24.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:5:\"^1.23\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\vendor\\fakerphp\\faker\";}s:22:\"fidry/cpu-core-counter\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:22:\"fidry/cpu-core-counter\";s:10:\"\0*\0version\";s:5:\"1.3.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:53:\"C:\\FinalProj\\BHCProject\\vendor\\fidry\\cpu-core-counter\";}s:11:\"filp/whoops\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"filp/whoops\";s:10:\"\0*\0version\";s:6:\"2.18.5\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:42:\"C:\\FinalProj\\BHCProject\\vendor\\filp\\whoops\";}s:21:\"hamcrest/hamcrest-php\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:21:\"hamcrest/hamcrest-php\";s:10:\"\0*\0version\";s:5:\"3.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:52:\"C:\\FinalProj\\BHCProject\\vendor\\hamcrest\\hamcrest-php\";}s:30:\"jean85/pretty-package-versions\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:30:\"jean85/pretty-package-versions\";s:10:\"\0*\0version\";s:5:\"2.1.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:61:\"C:\\FinalProj\\BHCProject\\vendor\\jean85\\pretty-package-versions\";}s:22:\"laravel/agent-detector\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:22:\"laravel/agent-detector\";s:10:\"\0*\0version\";s:5:\"2.0.2\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:53:\"C:\\FinalProj\\BHCProject\\vendor\\laravel\\agent-detector\";}s:13:\"laravel/boost\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:13:\"laravel/boost\";s:10:\"\0*\0version\";s:5:\"2.9.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:4:\"^2.2\";s:7:\"\0*\0path\";s:44:\"C:\\FinalProj\\BHCProject\\vendor\\laravel\\boost\";}s:14:\"laravel/breeze\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"laravel/breeze\";s:10:\"\0*\0version\";s:5:\"2.4.2\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:4:\"^2.4\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\vendor\\laravel\\breeze\";}s:11:\"laravel/mcp\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"laravel/mcp\";s:10:\"\0*\0version\";s:5:\"1.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:42:\"C:\\FinalProj\\BHCProject\\vendor\\laravel\\mcp\";}s:12:\"laravel/pail\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"laravel/pail\";s:10:\"\0*\0version\";s:5:\"1.2.7\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:6:\"^1.2.5\";s:7:\"\0*\0path\";s:43:\"C:\\FinalProj\\BHCProject\\vendor\\laravel\\pail\";}s:11:\"laravel/pao\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"laravel/pao\";s:10:\"\0*\0version\";s:5:\"1.1.5\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:6:\"^1.0.6\";s:7:\"\0*\0path\";s:42:\"C:\\FinalProj\\BHCProject\\vendor\\laravel\\pao\";}s:12:\"laravel/pint\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"laravel/pint\";s:10:\"\0*\0version\";s:6:\"1.32.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:5:\"^1.27\";s:7:\"\0*\0path\";s:43:\"C:\\FinalProj\\BHCProject\\vendor\\laravel\\pint\";}s:14:\"laravel/roster\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"laravel/roster\";s:10:\"\0*\0version\";s:5:\"1.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\vendor\\laravel\\roster\";}s:15:\"mockery/mockery\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:15:\"mockery/mockery\";s:10:\"\0*\0version\";s:6:\"1.6.15\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:4:\"^1.6\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\vendor\\mockery\\mockery\";}s:17:\"myclabs/deep-copy\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:17:\"myclabs/deep-copy\";s:10:\"\0*\0version\";s:6:\"1.14.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\vendor\\myclabs\\deep-copy\";}s:20:\"nunomaduro/collision\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:20:\"nunomaduro/collision\";s:10:\"\0*\0version\";s:5:\"8.9.5\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:4:\"^8.6\";s:7:\"\0*\0path\";s:51:\"C:\\FinalProj\\BHCProject\\vendor\\nunomaduro\\collision\";}s:12:\"pestphp/pest\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"pestphp/pest\";s:10:\"\0*\0version\";s:5:\"5.2.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:4:\"^5.2\";s:7:\"\0*\0path\";s:43:\"C:\\FinalProj\\BHCProject\\vendor\\pestphp\\pest\";}s:19:\"pestphp/pest-plugin\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:19:\"pestphp/pest-plugin\";s:10:\"\0*\0version\";s:5:\"5.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\vendor\\pestphp\\pest-plugin\";}s:24:\"pestphp/pest-plugin-arch\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:24:\"pestphp/pest-plugin-arch\";s:10:\"\0*\0version\";s:5:\"5.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:55:\"C:\\FinalProj\\BHCProject\\vendor\\pestphp\\pest-plugin-arch\";}s:27:\"pestphp/pest-plugin-laravel\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:27:\"pestphp/pest-plugin-laravel\";s:10:\"\0*\0version\";s:5:\"5.0.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:4:\"^5.0\";s:7:\"\0*\0path\";s:58:\"C:\\FinalProj\\BHCProject\\vendor\\pestphp\\pest-plugin-laravel\";}s:26:\"pestphp/pest-plugin-mutate\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:26:\"pestphp/pest-plugin-mutate\";s:10:\"\0*\0version\";s:5:\"5.0.2\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:57:\"C:\\FinalProj\\BHCProject\\vendor\\pestphp\\pest-plugin-mutate\";}s:29:\"pestphp/pest-plugin-profanity\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:29:\"pestphp/pest-plugin-profanity\";s:10:\"\0*\0version\";s:5:\"5.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:60:\"C:\\FinalProj\\BHCProject\\vendor\\pestphp\\pest-plugin-profanity\";}s:16:\"phar-io/manifest\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:16:\"phar-io/manifest\";s:10:\"\0*\0version\";s:5:\"2.0.4\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\vendor\\phar-io\\manifest\";}s:15:\"phar-io/version\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:15:\"phar-io/version\";s:10:\"\0*\0version\";s:5:\"3.2.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\vendor\\phar-io\\version\";}s:31:\"phpdocumentor/reflection-common\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:31:\"phpdocumentor/reflection-common\";s:10:\"\0*\0version\";s:5:\"2.2.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:62:\"C:\\FinalProj\\BHCProject\\vendor\\phpdocumentor\\reflection-common\";}s:33:\"phpdocumentor/reflection-docblock\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:33:\"phpdocumentor/reflection-docblock\";s:10:\"\0*\0version\";s:5:\"6.0.3\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:64:\"C:\\FinalProj\\BHCProject\\vendor\\phpdocumentor\\reflection-docblock\";}s:27:\"phpdocumentor/type-resolver\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:27:\"phpdocumentor/type-resolver\";s:10:\"\0*\0version\";s:5:\"2.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:58:\"C:\\FinalProj\\BHCProject\\vendor\\phpdocumentor\\type-resolver\";}s:21:\"phpstan/phpdoc-parser\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:21:\"phpstan/phpdoc-parser\";s:10:\"\0*\0version\";s:5:\"2.3.5\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:52:\"C:\\FinalProj\\BHCProject\\vendor\\phpstan\\phpdoc-parser\";}s:25:\"phpunit/php-code-coverage\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:25:\"phpunit/php-code-coverage\";s:10:\"\0*\0version\";s:6:\"14.3.3\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:56:\"C:\\FinalProj\\BHCProject\\vendor\\phpunit\\php-code-coverage\";}s:25:\"phpunit/php-file-iterator\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:25:\"phpunit/php-file-iterator\";s:10:\"\0*\0version\";s:5:\"7.0.2\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:56:\"C:\\FinalProj\\BHCProject\\vendor\\phpunit\\php-file-iterator\";}s:19:\"phpunit/php-invoker\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:19:\"phpunit/php-invoker\";s:10:\"\0*\0version\";s:5:\"7.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\vendor\\phpunit\\php-invoker\";}s:25:\"phpunit/php-text-template\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:25:\"phpunit/php-text-template\";s:10:\"\0*\0version\";s:5:\"6.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:56:\"C:\\FinalProj\\BHCProject\\vendor\\phpunit\\php-text-template\";}s:17:\"phpunit/php-timer\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:17:\"phpunit/php-timer\";s:10:\"\0*\0version\";s:5:\"9.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\vendor\\phpunit\\php-timer\";}s:15:\"phpunit/phpunit\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:15:\"phpunit/phpunit\";s:10:\"\0*\0version\";s:6:\"13.3.4\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\vendor\\phpunit\\phpunit\";}s:20:\"sebastian/cli-parser\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:20:\"sebastian/cli-parser\";s:10:\"\0*\0version\";s:5:\"5.0.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:51:\"C:\\FinalProj\\BHCProject\\vendor\\sebastian\\cli-parser\";}s:20:\"sebastian/comparator\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:20:\"sebastian/comparator\";s:10:\"\0*\0version\";s:5:\"8.4.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:51:\"C:\\FinalProj\\BHCProject\\vendor\\sebastian\\comparator\";}s:20:\"sebastian/complexity\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:20:\"sebastian/complexity\";s:10:\"\0*\0version\";s:5:\"6.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:51:\"C:\\FinalProj\\BHCProject\\vendor\\sebastian\\complexity\";}s:14:\"sebastian/diff\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"sebastian/diff\";s:10:\"\0*\0version\";s:5:\"9.0.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\vendor\\sebastian\\diff\";}s:21:\"sebastian/environment\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:21:\"sebastian/environment\";s:10:\"\0*\0version\";s:5:\"9.3.2\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:52:\"C:\\FinalProj\\BHCProject\\vendor\\sebastian\\environment\";}s:18:\"sebastian/exporter\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:18:\"sebastian/exporter\";s:10:\"\0*\0version\";s:5:\"8.2.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\vendor\\sebastian\\exporter\";}s:21:\"sebastian/file-filter\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:21:\"sebastian/file-filter\";s:10:\"\0*\0version\";s:5:\"1.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:52:\"C:\\FinalProj\\BHCProject\\vendor\\sebastian\\file-filter\";}s:19:\"sebastian/git-state\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:19:\"sebastian/git-state\";s:10:\"\0*\0version\";s:5:\"1.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\vendor\\sebastian\\git-state\";}s:22:\"sebastian/global-state\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:22:\"sebastian/global-state\";s:10:\"\0*\0version\";s:5:\"9.0.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:53:\"C:\\FinalProj\\BHCProject\\vendor\\sebastian\\global-state\";}s:23:\"sebastian/lines-of-code\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:23:\"sebastian/lines-of-code\";s:10:\"\0*\0version\";s:5:\"5.0.2\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:54:\"C:\\FinalProj\\BHCProject\\vendor\\sebastian\\lines-of-code\";}s:27:\"sebastian/object-enumerator\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:27:\"sebastian/object-enumerator\";s:10:\"\0*\0version\";s:5:\"8.1.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:58:\"C:\\FinalProj\\BHCProject\\vendor\\sebastian\\object-enumerator\";}s:26:\"sebastian/object-reflector\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:26:\"sebastian/object-reflector\";s:10:\"\0*\0version\";s:5:\"6.1.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:57:\"C:\\FinalProj\\BHCProject\\vendor\\sebastian\\object-reflector\";}s:27:\"sebastian/recursion-context\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:27:\"sebastian/recursion-context\";s:10:\"\0*\0version\";s:5:\"8.0.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:58:\"C:\\FinalProj\\BHCProject\\vendor\\sebastian\\recursion-context\";}s:14:\"sebastian/type\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"sebastian/type\";s:10:\"\0*\0version\";s:5:\"7.0.2\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\vendor\\sebastian\\type\";}s:17:\"sebastian/version\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:17:\"sebastian/version\";s:10:\"\0*\0version\";s:5:\"7.0.0\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\vendor\\sebastian\\version\";}s:28:\"staabm/side-effects-detector\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:28:\"staabm/side-effects-detector\";s:10:\"\0*\0version\";s:5:\"1.0.5\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:59:\"C:\\FinalProj\\BHCProject\\vendor\\staabm\\side-effects-detector\";}s:12:\"symfony/yaml\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"symfony/yaml\";s:10:\"\0*\0version\";s:5:\"8.1.6\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:43:\"C:\\FinalProj\\BHCProject\\vendor\\symfony\\yaml\";}s:35:\"ta-tikoma/phpunit-architecture-test\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:35:\"ta-tikoma/phpunit-architecture-test\";s:10:\"\0*\0version\";s:5:\"0.8.7\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:66:\"C:\\FinalProj\\BHCProject\\vendor\\ta-tikoma\\phpunit-architecture-test\";}s:17:\"theseer/tokenizer\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:17:\"theseer/tokenizer\";s:10:\"\0*\0version\";s:5:\"2.0.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\vendor\\theseer\\tokenizer\";}s:16:\"webmozart/assert\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:16:\"webmozart/assert\";s:10:\"\0*\0version\";s:5:\"2.4.1\";s:9:\"\0*\0source\";r:8;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\vendor\\webmozart\\assert\";}}s:11:\"\0*\0packages\";O:32:\"Laravel\\Roster\\PackageCollection\":2:{s:8:\"\0*\0items\";a:133:{i:0;r:5;i:1;r:13;i:2;r:21;i:3;r:29;i:4;r:37;i:5;r:45;i:6;r:53;i:7;r:61;i:8;r:69;i:9;r:77;i:10;r:85;i:11;r:93;i:12;r:101;i:13;r:109;i:14;r:117;i:15;r:125;i:16;r:133;i:17;r:141;i:18;r:149;i:19;r:157;i:20;r:165;i:21;r:173;i:22;r:181;i:23;r:189;i:24;r:197;i:25;r:205;i:26;r:213;i:27;r:221;i:28;r:229;i:29;r:237;i:30;r:245;i:31;r:253;i:32;r:261;i:33;r:269;i:34;r:277;i:35;r:285;i:36;r:293;i:37;r:301;i:38;r:309;i:39;r:317;i:40;r:325;i:41;r:333;i:42;r:341;i:43;r:349;i:44;r:357;i:45;r:365;i:46;r:373;i:47;r:381;i:48;r:389;i:49;r:397;i:50;r:405;i:51;r:413;i:52;r:421;i:53;r:429;i:54;r:437;i:55;r:445;i:56;r:453;i:57;r:461;i:58;r:469;i:59;r:477;i:60;r:485;i:61;r:493;i:62;r:501;i:63;r:509;i:64;r:517;i:65;r:525;i:66;r:533;i:67;r:541;i:68;r:549;i:69;r:557;i:70;r:565;i:71;r:573;i:72;r:581;i:73;r:589;i:74;r:597;i:75;r:605;i:76;r:613;i:77;r:621;i:78;r:629;i:79;r:637;i:80;r:645;i:81;r:653;i:82;r:661;i:83;r:669;i:84;r:677;i:85;r:685;i:86;r:693;i:87;r:701;i:88;r:709;i:89;r:717;i:90;r:725;i:91;r:733;i:92;r:741;i:93;r:749;i:94;r:757;i:95;r:765;i:96;r:773;i:97;r:781;i:98;r:789;i:99;r:797;i:100;r:805;i:101;r:813;i:102;r:821;i:103;r:829;i:104;r:837;i:105;r:845;i:106;r:853;i:107;r:861;i:108;r:869;i:109;r:877;i:110;r:885;i:111;r:893;i:112;r:901;i:113;r:909;i:114;r:917;i:115;r:925;i:116;r:933;i:117;r:941;i:118;r:949;i:119;r:957;i:120;r:965;i:121;r:973;i:122;r:981;i:123;r:989;i:124;r:997;i:125;r:1005;i:126;r:1013;i:127;r:1021;i:128;r:1029;i:129;r:1037;i:130;r:1045;i:131;r:1053;i:132;r:1061;}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}}s:2:\"js\";O:37:\"Laravel\\Roster\\Ecosystems\\JsEcosystem\":3:{s:9:\"\0*\0byName\";a:189:{s:24:\"@alcalzone/ansi-tokenize\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:24:\"@alcalzone/ansi-tokenize\";s:10:\"\0*\0version\";s:5:\"0.3.1\";s:9:\"\0*\0source\";E:38:\"Laravel\\Roster\\Enums\\PackageSource:Npm\";s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:61:\"C:\\FinalProj\\BHCProject\\node_modules\\@alcalzone\\ansi-tokenize\";}s:18:\"@laravel/multiplex\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:18:\"@laravel/multiplex\";s:10:\"\0*\0version\";s:5:\"0.4.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:6:\"^0.4.1\";s:7:\"\0*\0path\";s:55:\"C:\\FinalProj\\BHCProject\\node_modules\\@laravel\\multiplex\";}s:12:\"ansi-escapes\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"ansi-escapes\";s:10:\"\0*\0version\";s:5:\"7.3.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\node_modules\\ansi-escapes\";}s:10:\"ansi-regex\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"ansi-regex\";s:10:\"\0*\0version\";s:5:\"6.3.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\node_modules\\ansi-regex\";}s:11:\"ansi-styles\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"ansi-styles\";s:10:\"\0*\0version\";s:5:\"6.2.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\ansi-styles\";}s:9:\"auto-bind\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:9:\"auto-bind\";s:10:\"\0*\0version\";s:5:\"5.0.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\node_modules\\auto-bind\";}s:5:\"chalk\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:5:\"chalk\";s:10:\"\0*\0version\";s:5:\"5.6.2\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:42:\"C:\\FinalProj\\BHCProject\\node_modules\\chalk\";}s:9:\"cli-boxes\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:9:\"cli-boxes\";s:10:\"\0*\0version\";s:5:\"4.0.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\node_modules\\cli-boxes\";}s:10:\"cli-cursor\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"cli-cursor\";s:10:\"\0*\0version\";s:5:\"4.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\node_modules\\cli-cursor\";}s:12:\"cli-truncate\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"cli-truncate\";s:10:\"\0*\0version\";s:5:\"6.1.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\node_modules\\cli-truncate\";}s:12:\"code-excerpt\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"code-excerpt\";s:10:\"\0*\0version\";s:5:\"4.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\node_modules\\code-excerpt\";}s:9:\"commander\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:9:\"commander\";s:10:\"\0*\0version\";s:6:\"15.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\node_modules\\commander\";}s:17:\"convert-to-spaces\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:17:\"convert-to-spaces\";s:10:\"\0*\0version\";s:5:\"2.0.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:54:\"C:\\FinalProj\\BHCProject\\node_modules\\convert-to-spaces\";}s:11:\"environment\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"environment\";s:10:\"\0*\0version\";s:5:\"1.1.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\environment\";}s:10:\"es-toolkit\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"es-toolkit\";s:10:\"\0*\0version\";s:6:\"1.52.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\node_modules\\es-toolkit\";}s:20:\"escape-string-regexp\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:20:\"escape-string-regexp\";s:10:\"\0*\0version\";s:5:\"2.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:57:\"C:\\FinalProj\\BHCProject\\node_modules\\escape-string-regexp\";}s:20:\"get-east-asian-width\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:20:\"get-east-asian-width\";s:10:\"\0*\0version\";s:5:\"1.7.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:57:\"C:\\FinalProj\\BHCProject\\node_modules\\get-east-asian-width\";}s:13:\"indent-string\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:13:\"indent-string\";s:10:\"\0*\0version\";s:5:\"5.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\node_modules\\indent-string\";}s:3:\"ink\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:3:\"ink\";s:10:\"\0*\0version\";s:5:\"7.1.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:40:\"C:\\FinalProj\\BHCProject\\node_modules\\ink\";}s:23:\"is-fullwidth-code-point\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:23:\"is-fullwidth-code-point\";s:10:\"\0*\0version\";s:5:\"5.1.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:60:\"C:\\FinalProj\\BHCProject\\node_modules\\is-fullwidth-code-point\";}s:8:\"is-in-ci\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:8:\"is-in-ci\";s:10:\"\0*\0version\";s:5:\"2.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\node_modules\\is-in-ci\";}s:8:\"mimic-fn\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:8:\"mimic-fn\";s:10:\"\0*\0version\";s:5:\"2.1.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\node_modules\\mimic-fn\";}s:7:\"onetime\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:7:\"onetime\";s:10:\"\0*\0version\";s:5:\"5.1.2\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:44:\"C:\\FinalProj\\BHCProject\\node_modules\\onetime\";}s:13:\"patch-console\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:13:\"patch-console\";s:10:\"\0*\0version\";s:5:\"2.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\node_modules\\patch-console\";}s:5:\"react\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:5:\"react\";s:10:\"\0*\0version\";s:6:\"19.3.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:42:\"C:\\FinalProj\\BHCProject\\node_modules\\react\";}s:16:\"react-reconciler\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:16:\"react-reconciler\";s:10:\"\0*\0version\";s:6:\"0.33.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:53:\"C:\\FinalProj\\BHCProject\\node_modules\\react-reconciler\";}s:14:\"restore-cursor\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"restore-cursor\";s:10:\"\0*\0version\";s:5:\"4.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:51:\"C:\\FinalProj\\BHCProject\\node_modules\\restore-cursor\";}s:9:\"scheduler\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:9:\"scheduler\";s:10:\"\0*\0version\";s:6:\"0.27.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\node_modules\\scheduler\";}s:11:\"signal-exit\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"signal-exit\";s:10:\"\0*\0version\";s:5:\"3.0.7\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\signal-exit\";}s:10:\"slice-ansi\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"slice-ansi\";s:10:\"\0*\0version\";s:5:\"9.0.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\node_modules\\slice-ansi\";}s:11:\"stack-utils\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"stack-utils\";s:10:\"\0*\0version\";s:5:\"2.0.6\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\stack-utils\";}s:12:\"string-width\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"string-width\";s:10:\"\0*\0version\";s:5:\"8.2.2\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\node_modules\\string-width\";}s:10:\"strip-ansi\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"strip-ansi\";s:10:\"\0*\0version\";s:5:\"7.2.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\node_modules\\strip-ansi\";}s:10:\"tagged-tag\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"tagged-tag\";s:10:\"\0*\0version\";s:5:\"1.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\node_modules\\tagged-tag\";}s:13:\"terminal-size\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:13:\"terminal-size\";s:10:\"\0*\0version\";s:5:\"4.0.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\node_modules\\terminal-size\";}s:9:\"type-fest\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:9:\"type-fest\";s:10:\"\0*\0version\";s:6:\"5.10.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\node_modules\\type-fest\";}s:11:\"widest-line\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"widest-line\";s:10:\"\0*\0version\";s:5:\"6.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\widest-line\";}s:9:\"wrap-ansi\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:9:\"wrap-ansi\";s:10:\"\0*\0version\";s:6:\"10.0.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\node_modules\\wrap-ansi\";}s:2:\"ws\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:2:\"ws\";s:10:\"\0*\0version\";s:6:\"8.21.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:39:\"C:\\FinalProj\\BHCProject\\node_modules\\ws\";}s:11:\"yoga-layout\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"yoga-layout\";s:10:\"\0*\0version\";s:5:\"3.2.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:0;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\yoga-layout\";}s:16:\"@alloc/quick-lru\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:16:\"@alloc/quick-lru\";s:10:\"\0*\0version\";s:5:\"5.3.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:53:\"C:\\FinalProj\\BHCProject\\node_modules\\@alloc\\quick-lru\";}s:23:\"@jridgewell/gen-mapping\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:23:\"@jridgewell/gen-mapping\";s:10:\"\0*\0version\";s:6:\"0.3.13\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:60:\"C:\\FinalProj\\BHCProject\\node_modules\\@jridgewell\\gen-mapping\";}s:21:\"@jridgewell/remapping\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:21:\"@jridgewell/remapping\";s:10:\"\0*\0version\";s:5:\"2.3.5\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:58:\"C:\\FinalProj\\BHCProject\\node_modules\\@jridgewell\\remapping\";}s:23:\"@jridgewell/resolve-uri\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:23:\"@jridgewell/resolve-uri\";s:10:\"\0*\0version\";s:5:\"3.1.2\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:60:\"C:\\FinalProj\\BHCProject\\node_modules\\@jridgewell\\resolve-uri\";}s:27:\"@jridgewell/sourcemap-codec\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:27:\"@jridgewell/sourcemap-codec\";s:10:\"\0*\0version\";s:5:\"1.6.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:64:\"C:\\FinalProj\\BHCProject\\node_modules\\@jridgewell\\sourcemap-codec\";}s:25:\"@jridgewell/trace-mapping\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:25:\"@jridgewell/trace-mapping\";s:10:\"\0*\0version\";s:6:\"0.3.31\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:62:\"C:\\FinalProj\\BHCProject\\node_modules\\@jridgewell\\trace-mapping\";}s:19:\"@nodelib/fs.scandir\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:19:\"@nodelib/fs.scandir\";s:10:\"\0*\0version\";s:5:\"2.1.5\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:56:\"C:\\FinalProj\\BHCProject\\node_modules\\@nodelib\\fs.scandir\";}s:16:\"@nodelib/fs.stat\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:16:\"@nodelib/fs.stat\";s:10:\"\0*\0version\";s:5:\"2.0.5\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:53:\"C:\\FinalProj\\BHCProject\\node_modules\\@nodelib\\fs.stat\";}s:16:\"@nodelib/fs.walk\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:16:\"@nodelib/fs.walk\";s:10:\"\0*\0version\";s:5:\"1.2.8\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:53:\"C:\\FinalProj\\BHCProject\\node_modules\\@nodelib\\fs.walk\";}s:18:\"@oxc-project/types\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:18:\"@oxc-project/types\";s:10:\"\0*\0version\";s:7:\"0.150.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:55:\"C:\\FinalProj\\BHCProject\\node_modules\\@oxc-project\\types\";}s:34:\"@rolldown/binding-android-arm-eabi\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:34:\"@rolldown/binding-android-arm-eabi\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:71:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\binding-android-arm-eabi\";}s:31:\"@rolldown/binding-android-arm64\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:31:\"@rolldown/binding-android-arm64\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:68:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\binding-android-arm64\";}s:30:\"@rolldown/binding-darwin-arm64\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:30:\"@rolldown/binding-darwin-arm64\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:67:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\binding-darwin-arm64\";}s:28:\"@rolldown/binding-darwin-x64\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:28:\"@rolldown/binding-darwin-x64\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:65:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\binding-darwin-x64\";}s:29:\"@rolldown/binding-freebsd-x64\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:29:\"@rolldown/binding-freebsd-x64\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:66:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\binding-freebsd-x64\";}s:37:\"@rolldown/binding-linux-arm-gnueabihf\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:37:\"@rolldown/binding-linux-arm-gnueabihf\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:74:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\binding-linux-arm-gnueabihf\";}s:33:\"@rolldown/binding-linux-arm64-gnu\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:33:\"@rolldown/binding-linux-arm64-gnu\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:70:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\binding-linux-arm64-gnu\";}s:34:\"@rolldown/binding-linux-arm64-musl\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:34:\"@rolldown/binding-linux-arm64-musl\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:71:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\binding-linux-arm64-musl\";}s:33:\"@rolldown/binding-linux-ppc64-gnu\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:33:\"@rolldown/binding-linux-ppc64-gnu\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:70:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\binding-linux-ppc64-gnu\";}s:33:\"@rolldown/binding-linux-s390x-gnu\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:33:\"@rolldown/binding-linux-s390x-gnu\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:70:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\binding-linux-s390x-gnu\";}s:31:\"@rolldown/binding-linux-x64-gnu\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:31:\"@rolldown/binding-linux-x64-gnu\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:68:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\binding-linux-x64-gnu\";}s:32:\"@rolldown/binding-linux-x64-musl\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:32:\"@rolldown/binding-linux-x64-musl\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:69:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\binding-linux-x64-musl\";}s:35:\"@rolldown/binding-openharmony-arm64\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:35:\"@rolldown/binding-openharmony-arm64\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:72:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\binding-openharmony-arm64\";}s:34:\"@rolldown/binding-win32-arm64-msvc\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:34:\"@rolldown/binding-win32-arm64-msvc\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:71:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\binding-win32-arm64-msvc\";}s:32:\"@rolldown/binding-win32-x64-msvc\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:32:\"@rolldown/binding-win32-x64-msvc\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:69:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\binding-win32-x64-msvc\";}s:21:\"@rolldown/pluginutils\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:21:\"@rolldown/pluginutils\";s:10:\"\0*\0version\";s:5:\"1.0.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:58:\"C:\\FinalProj\\BHCProject\\node_modules\\@rolldown\\pluginutils\";}s:18:\"@tailwindcss/forms\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:18:\"@tailwindcss/forms\";s:10:\"\0*\0version\";s:6:\"0.5.11\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:6:\"^0.5.2\";s:7:\"\0*\0path\";s:55:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\forms\";}s:17:\"@tailwindcss/node\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:17:\"@tailwindcss/node\";s:10:\"\0*\0version\";s:5:\"4.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:54:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\node\";}s:18:\"@tailwindcss/oxide\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:18:\"@tailwindcss/oxide\";s:10:\"\0*\0version\";s:5:\"4.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:55:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\oxide\";}s:32:\"@tailwindcss/oxide-android-arm64\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:32:\"@tailwindcss/oxide-android-arm64\";s:10:\"\0*\0version\";s:5:\"4.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:69:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\oxide-android-arm64\";}s:31:\"@tailwindcss/oxide-darwin-arm64\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:31:\"@tailwindcss/oxide-darwin-arm64\";s:10:\"\0*\0version\";s:5:\"4.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:68:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\oxide-darwin-arm64\";}s:29:\"@tailwindcss/oxide-darwin-x64\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:29:\"@tailwindcss/oxide-darwin-x64\";s:10:\"\0*\0version\";s:5:\"4.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:66:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\oxide-darwin-x64\";}s:30:\"@tailwindcss/oxide-freebsd-x64\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:30:\"@tailwindcss/oxide-freebsd-x64\";s:10:\"\0*\0version\";s:5:\"4.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:67:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\oxide-freebsd-x64\";}s:38:\"@tailwindcss/oxide-linux-arm-gnueabihf\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:38:\"@tailwindcss/oxide-linux-arm-gnueabihf\";s:10:\"\0*\0version\";s:5:\"4.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:75:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\oxide-linux-arm-gnueabihf\";}s:34:\"@tailwindcss/oxide-linux-arm64-gnu\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:34:\"@tailwindcss/oxide-linux-arm64-gnu\";s:10:\"\0*\0version\";s:5:\"4.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:71:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\oxide-linux-arm64-gnu\";}s:35:\"@tailwindcss/oxide-linux-arm64-musl\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:35:\"@tailwindcss/oxide-linux-arm64-musl\";s:10:\"\0*\0version\";s:5:\"4.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:72:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\oxide-linux-arm64-musl\";}s:32:\"@tailwindcss/oxide-linux-x64-gnu\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:32:\"@tailwindcss/oxide-linux-x64-gnu\";s:10:\"\0*\0version\";s:5:\"4.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:69:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\oxide-linux-x64-gnu\";}s:33:\"@tailwindcss/oxide-linux-x64-musl\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:33:\"@tailwindcss/oxide-linux-x64-musl\";s:10:\"\0*\0version\";s:5:\"4.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:70:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\oxide-linux-x64-musl\";}s:30:\"@tailwindcss/oxide-wasm32-wasi\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:30:\"@tailwindcss/oxide-wasm32-wasi\";s:10:\"\0*\0version\";s:5:\"4.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:67:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\oxide-wasm32-wasi\";}s:35:\"@tailwindcss/oxide-win32-arm64-msvc\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:35:\"@tailwindcss/oxide-win32-arm64-msvc\";s:10:\"\0*\0version\";s:5:\"4.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:72:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\oxide-win32-arm64-msvc\";}s:33:\"@tailwindcss/oxide-win32-x64-msvc\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:33:\"@tailwindcss/oxide-win32-x64-msvc\";s:10:\"\0*\0version\";s:5:\"4.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:70:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\oxide-win32-x64-msvc\";}s:17:\"@tailwindcss/vite\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:17:\"@tailwindcss/vite\";s:10:\"\0*\0version\";s:5:\"4.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:6:\"^4.0.0\";s:7:\"\0*\0path\";s:54:\"C:\\FinalProj\\BHCProject\\node_modules\\@tailwindcss\\vite\";}s:15:\"@vue/reactivity\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:15:\"@vue/reactivity\";s:10:\"\0*\0version\";s:6:\"3.5.43\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:52:\"C:\\FinalProj\\BHCProject\\node_modules\\@vue\\reactivity\";}s:11:\"@vue/shared\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"@vue/shared\";s:10:\"\0*\0version\";s:6:\"3.5.43\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\@vue\\shared\";}s:8:\"alpinejs\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:8:\"alpinejs\";s:10:\"\0*\0version\";s:6:\"3.17.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:6:\"^3.4.2\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\node_modules\\alpinejs\";}s:11:\"any-promise\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"any-promise\";s:10:\"\0*\0version\";s:5:\"1.3.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\any-promise\";}s:8:\"anymatch\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:8:\"anymatch\";s:10:\"\0*\0version\";s:5:\"3.1.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\node_modules\\anymatch\";}s:3:\"arg\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:3:\"arg\";s:10:\"\0*\0version\";s:5:\"5.0.2\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:40:\"C:\\FinalProj\\BHCProject\\node_modules\\arg\";}s:12:\"autoprefixer\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"autoprefixer\";s:10:\"\0*\0version\";s:6:\"10.6.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:7:\"^10.4.2\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\node_modules\\autoprefixer\";}s:24:\"baseline-browser-mapping\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:24:\"baseline-browser-mapping\";s:10:\"\0*\0version\";s:7:\"2.11.25\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:61:\"C:\\FinalProj\\BHCProject\\node_modules\\baseline-browser-mapping\";}s:17:\"binary-extensions\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:17:\"binary-extensions\";s:10:\"\0*\0version\";s:5:\"2.3.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:54:\"C:\\FinalProj\\BHCProject\\node_modules\\binary-extensions\";}s:6:\"braces\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:6:\"braces\";s:10:\"\0*\0version\";s:5:\"3.0.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:43:\"C:\\FinalProj\\BHCProject\\node_modules\\braces\";}s:12:\"browserslist\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"browserslist\";s:10:\"\0*\0version\";s:6:\"4.29.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\node_modules\\browserslist\";}s:13:\"camelcase-css\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:13:\"camelcase-css\";s:10:\"\0*\0version\";s:5:\"2.0.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\node_modules\\camelcase-css\";}s:12:\"caniuse-lite\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"caniuse-lite\";s:10:\"\0*\0version\";s:12:\"1.0.30001810\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\node_modules\\caniuse-lite\";}s:8:\"chokidar\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:8:\"chokidar\";s:10:\"\0*\0version\";s:5:\"3.6.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\node_modules\\chokidar\";}s:5:\"cliui\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:5:\"cliui\";s:10:\"\0*\0version\";s:5:\"9.0.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:42:\"C:\\FinalProj\\BHCProject\\node_modules\\cliui\";}s:12:\"concurrently\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"concurrently\";s:10:\"\0*\0version\";s:6:\"10.0.5\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:7:\"^10.0.3\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\node_modules\\concurrently\";}s:6:\"cssesc\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:6:\"cssesc\";s:10:\"\0*\0version\";s:5:\"3.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:43:\"C:\\FinalProj\\BHCProject\\node_modules\\cssesc\";}s:11:\"detect-libc\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"detect-libc\";s:10:\"\0*\0version\";s:5:\"2.1.2\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\detect-libc\";}s:10:\"didyoumean\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"didyoumean\";s:10:\"\0*\0version\";s:5:\"1.2.2\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\node_modules\\didyoumean\";}s:3:\"dlv\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:3:\"dlv\";s:10:\"\0*\0version\";s:5:\"1.1.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:40:\"C:\\FinalProj\\BHCProject\\node_modules\\dlv\";}s:20:\"electron-to-chromium\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:20:\"electron-to-chromium\";s:10:\"\0*\0version\";s:7:\"1.5.433\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:57:\"C:\\FinalProj\\BHCProject\\node_modules\\electron-to-chromium\";}s:11:\"emoji-regex\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"emoji-regex\";s:10:\"\0*\0version\";s:6:\"10.6.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\emoji-regex\";}s:16:\"enhanced-resolve\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:16:\"enhanced-resolve\";s:10:\"\0*\0version\";s:6:\"5.25.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:53:\"C:\\FinalProj\\BHCProject\\node_modules\\enhanced-resolve\";}s:9:\"es-errors\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:9:\"es-errors\";s:10:\"\0*\0version\";s:5:\"1.3.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\node_modules\\es-errors\";}s:8:\"escalade\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:8:\"escalade\";s:10:\"\0*\0version\";s:5:\"3.2.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\node_modules\\escalade\";}s:9:\"fast-glob\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:9:\"fast-glob\";s:10:\"\0*\0version\";s:5:\"3.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\node_modules\\fast-glob\";}s:5:\"fastq\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:5:\"fastq\";s:10:\"\0*\0version\";s:6:\"1.20.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:42:\"C:\\FinalProj\\BHCProject\\node_modules\\fastq\";}s:4:\"fdir\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:4:\"fdir\";s:10:\"\0*\0version\";s:5:\"6.5.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:41:\"C:\\FinalProj\\BHCProject\\node_modules\\fdir\";}s:10:\"fill-range\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"fill-range\";s:10:\"\0*\0version\";s:5:\"7.1.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\node_modules\\fill-range\";}s:11:\"fraction.js\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"fraction.js\";s:10:\"\0*\0version\";s:5:\"5.3.4\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\fraction.js\";}s:8:\"fsevents\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:8:\"fsevents\";s:10:\"\0*\0version\";s:5:\"2.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\node_modules\\fsevents\";}s:13:\"function-bind\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:13:\"function-bind\";s:10:\"\0*\0version\";s:5:\"1.1.2\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\node_modules\\function-bind\";}s:15:\"get-caller-file\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:15:\"get-caller-file\";s:10:\"\0*\0version\";s:5:\"2.0.5\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:52:\"C:\\FinalProj\\BHCProject\\node_modules\\get-caller-file\";}s:11:\"glob-parent\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"glob-parent\";s:10:\"\0*\0version\";s:5:\"6.0.2\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\glob-parent\";}s:11:\"graceful-fs\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"graceful-fs\";s:10:\"\0*\0version\";s:6:\"4.2.11\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\graceful-fs\";}s:6:\"hasown\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:6:\"hasown\";s:10:\"\0*\0version\";s:5:\"2.0.4\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:43:\"C:\\FinalProj\\BHCProject\\node_modules\\hasown\";}s:14:\"is-binary-path\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"is-binary-path\";s:10:\"\0*\0version\";s:5:\"2.1.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:51:\"C:\\FinalProj\\BHCProject\\node_modules\\is-binary-path\";}s:14:\"is-core-module\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"is-core-module\";s:10:\"\0*\0version\";s:6:\"2.17.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:51:\"C:\\FinalProj\\BHCProject\\node_modules\\is-core-module\";}s:10:\"is-extglob\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"is-extglob\";s:10:\"\0*\0version\";s:5:\"2.1.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\node_modules\\is-extglob\";}s:7:\"is-glob\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:7:\"is-glob\";s:10:\"\0*\0version\";s:5:\"4.0.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:44:\"C:\\FinalProj\\BHCProject\\node_modules\\is-glob\";}s:9:\"is-number\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:9:\"is-number\";s:10:\"\0*\0version\";s:5:\"7.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\node_modules\\is-number\";}s:4:\"jiti\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:4:\"jiti\";s:10:\"\0*\0version\";s:5:\"2.7.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:41:\"C:\\FinalProj\\BHCProject\\node_modules\\jiti\";}s:19:\"laravel-vite-plugin\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:19:\"laravel-vite-plugin\";s:10:\"\0*\0version\";s:5:\"3.2.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:4:\"^3.1\";s:7:\"\0*\0path\";s:56:\"C:\\FinalProj\\BHCProject\\node_modules\\laravel-vite-plugin\";}s:12:\"lightningcss\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"lightningcss\";s:10:\"\0*\0version\";s:6:\"1.32.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\node_modules\\lightningcss\";}s:26:\"lightningcss-android-arm64\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:26:\"lightningcss-android-arm64\";s:10:\"\0*\0version\";s:6:\"1.32.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:63:\"C:\\FinalProj\\BHCProject\\node_modules\\lightningcss-android-arm64\";}s:25:\"lightningcss-darwin-arm64\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:25:\"lightningcss-darwin-arm64\";s:10:\"\0*\0version\";s:6:\"1.32.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:62:\"C:\\FinalProj\\BHCProject\\node_modules\\lightningcss-darwin-arm64\";}s:23:\"lightningcss-darwin-x64\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:23:\"lightningcss-darwin-x64\";s:10:\"\0*\0version\";s:6:\"1.32.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:60:\"C:\\FinalProj\\BHCProject\\node_modules\\lightningcss-darwin-x64\";}s:24:\"lightningcss-freebsd-x64\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:24:\"lightningcss-freebsd-x64\";s:10:\"\0*\0version\";s:6:\"1.32.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:61:\"C:\\FinalProj\\BHCProject\\node_modules\\lightningcss-freebsd-x64\";}s:32:\"lightningcss-linux-arm-gnueabihf\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:32:\"lightningcss-linux-arm-gnueabihf\";s:10:\"\0*\0version\";s:6:\"1.32.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:69:\"C:\\FinalProj\\BHCProject\\node_modules\\lightningcss-linux-arm-gnueabihf\";}s:28:\"lightningcss-linux-arm64-gnu\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:28:\"lightningcss-linux-arm64-gnu\";s:10:\"\0*\0version\";s:6:\"1.32.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:65:\"C:\\FinalProj\\BHCProject\\node_modules\\lightningcss-linux-arm64-gnu\";}s:29:\"lightningcss-linux-arm64-musl\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:29:\"lightningcss-linux-arm64-musl\";s:10:\"\0*\0version\";s:6:\"1.32.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:66:\"C:\\FinalProj\\BHCProject\\node_modules\\lightningcss-linux-arm64-musl\";}s:26:\"lightningcss-linux-x64-gnu\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:26:\"lightningcss-linux-x64-gnu\";s:10:\"\0*\0version\";s:6:\"1.32.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:63:\"C:\\FinalProj\\BHCProject\\node_modules\\lightningcss-linux-x64-gnu\";}s:27:\"lightningcss-linux-x64-musl\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:27:\"lightningcss-linux-x64-musl\";s:10:\"\0*\0version\";s:6:\"1.32.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:64:\"C:\\FinalProj\\BHCProject\\node_modules\\lightningcss-linux-x64-musl\";}s:29:\"lightningcss-win32-arm64-msvc\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:29:\"lightningcss-win32-arm64-msvc\";s:10:\"\0*\0version\";s:6:\"1.32.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:66:\"C:\\FinalProj\\BHCProject\\node_modules\\lightningcss-win32-arm64-msvc\";}s:27:\"lightningcss-win32-x64-msvc\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:27:\"lightningcss-win32-x64-msvc\";s:10:\"\0*\0version\";s:6:\"1.32.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:64:\"C:\\FinalProj\\BHCProject\\node_modules\\lightningcss-win32-x64-msvc\";}s:9:\"lilconfig\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:9:\"lilconfig\";s:10:\"\0*\0version\";s:5:\"3.1.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\node_modules\\lilconfig\";}s:17:\"lines-and-columns\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:17:\"lines-and-columns\";s:10:\"\0*\0version\";s:5:\"1.2.4\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:54:\"C:\\FinalProj\\BHCProject\\node_modules\\lines-and-columns\";}s:12:\"magic-string\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"magic-string\";s:10:\"\0*\0version\";s:7:\"0.30.21\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\node_modules\\magic-string\";}s:6:\"merge2\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:6:\"merge2\";s:10:\"\0*\0version\";s:5:\"1.4.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:43:\"C:\\FinalProj\\BHCProject\\node_modules\\merge2\";}s:10:\"micromatch\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"micromatch\";s:10:\"\0*\0version\";s:5:\"4.0.8\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\node_modules\\micromatch\";}s:17:\"mini-svg-data-uri\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:17:\"mini-svg-data-uri\";s:10:\"\0*\0version\";s:5:\"1.4.4\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:54:\"C:\\FinalProj\\BHCProject\\node_modules\\mini-svg-data-uri\";}s:2:\"mz\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:2:\"mz\";s:10:\"\0*\0version\";s:5:\"2.7.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:39:\"C:\\FinalProj\\BHCProject\\node_modules\\mz\";}s:6:\"nanoid\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:6:\"nanoid\";s:10:\"\0*\0version\";s:6:\"3.3.19\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:43:\"C:\\FinalProj\\BHCProject\\node_modules\\nanoid\";}s:13:\"node-releases\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:13:\"node-releases\";s:10:\"\0*\0version\";s:6:\"2.0.56\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\node_modules\\node-releases\";}s:14:\"normalize-path\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"normalize-path\";s:10:\"\0*\0version\";s:5:\"3.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:51:\"C:\\FinalProj\\BHCProject\\node_modules\\normalize-path\";}s:13:\"object-assign\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:13:\"object-assign\";s:10:\"\0*\0version\";s:5:\"4.1.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\node_modules\\object-assign\";}s:11:\"object-hash\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"object-hash\";s:10:\"\0*\0version\";s:5:\"3.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\object-hash\";}s:10:\"path-parse\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"path-parse\";s:10:\"\0*\0version\";s:5:\"1.0.7\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\node_modules\\path-parse\";}s:10:\"picocolors\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"picocolors\";s:10:\"\0*\0version\";s:5:\"1.1.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\node_modules\\picocolors\";}s:9:\"picomatch\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:9:\"picomatch\";s:10:\"\0*\0version\";s:5:\"4.0.7\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\node_modules\\picomatch\";}s:7:\"pirates\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:7:\"pirates\";s:10:\"\0*\0version\";s:5:\"4.0.7\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:44:\"C:\\FinalProj\\BHCProject\\node_modules\\pirates\";}s:7:\"postcss\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:7:\"postcss\";s:10:\"\0*\0version\";s:6:\"8.5.28\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:7:\"^8.4.31\";s:7:\"\0*\0path\";s:44:\"C:\\FinalProj\\BHCProject\\node_modules\\postcss\";}s:14:\"postcss-import\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"postcss-import\";s:10:\"\0*\0version\";s:6:\"15.1.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:51:\"C:\\FinalProj\\BHCProject\\node_modules\\postcss-import\";}s:10:\"postcss-js\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"postcss-js\";s:10:\"\0*\0version\";s:5:\"4.1.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\node_modules\\postcss-js\";}s:19:\"postcss-load-config\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:19:\"postcss-load-config\";s:10:\"\0*\0version\";s:5:\"6.0.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:56:\"C:\\FinalProj\\BHCProject\\node_modules\\postcss-load-config\";}s:14:\"postcss-nested\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"postcss-nested\";s:10:\"\0*\0version\";s:5:\"6.2.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:51:\"C:\\FinalProj\\BHCProject\\node_modules\\postcss-nested\";}s:23:\"postcss-selector-parser\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:23:\"postcss-selector-parser\";s:10:\"\0*\0version\";s:5:\"6.1.4\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:60:\"C:\\FinalProj\\BHCProject\\node_modules\\postcss-selector-parser\";}s:20:\"postcss-value-parser\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:20:\"postcss-value-parser\";s:10:\"\0*\0version\";s:5:\"4.2.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:57:\"C:\\FinalProj\\BHCProject\\node_modules\\postcss-value-parser\";}s:15:\"queue-microtask\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:15:\"queue-microtask\";s:10:\"\0*\0version\";s:5:\"1.2.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:52:\"C:\\FinalProj\\BHCProject\\node_modules\\queue-microtask\";}s:10:\"read-cache\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"read-cache\";s:10:\"\0*\0version\";s:5:\"1.0.2\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\node_modules\\read-cache\";}s:8:\"readdirp\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:8:\"readdirp\";s:10:\"\0*\0version\";s:5:\"3.6.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\node_modules\\readdirp\";}s:7:\"resolve\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:7:\"resolve\";s:10:\"\0*\0version\";s:7:\"1.22.12\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:44:\"C:\\FinalProj\\BHCProject\\node_modules\\resolve\";}s:7:\"reusify\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:7:\"reusify\";s:10:\"\0*\0version\";s:5:\"1.1.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:44:\"C:\\FinalProj\\BHCProject\\node_modules\\reusify\";}s:8:\"rolldown\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:8:\"rolldown\";s:10:\"\0*\0version\";s:5:\"1.2.9\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:45:\"C:\\FinalProj\\BHCProject\\node_modules\\rolldown\";}s:12:\"run-parallel\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"run-parallel\";s:10:\"\0*\0version\";s:5:\"1.2.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\node_modules\\run-parallel\";}s:4:\"rxjs\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:4:\"rxjs\";s:10:\"\0*\0version\";s:5:\"7.8.2\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:41:\"C:\\FinalProj\\BHCProject\\node_modules\\rxjs\";}s:11:\"shell-quote\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"shell-quote\";s:10:\"\0*\0version\";s:5:\"1.9.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\shell-quote\";}s:13:\"source-map-js\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:13:\"source-map-js\";s:10:\"\0*\0version\";s:5:\"1.2.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:50:\"C:\\FinalProj\\BHCProject\\node_modules\\source-map-js\";}s:7:\"sucrase\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:7:\"sucrase\";s:10:\"\0*\0version\";s:6:\"3.35.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:44:\"C:\\FinalProj\\BHCProject\\node_modules\\sucrase\";}s:14:\"supports-color\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"supports-color\";s:10:\"\0*\0version\";s:6:\"10.2.2\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:51:\"C:\\FinalProj\\BHCProject\\node_modules\\supports-color\";}s:31:\"supports-preserve-symlinks-flag\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:31:\"supports-preserve-symlinks-flag\";s:10:\"\0*\0version\";s:5:\"1.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:68:\"C:\\FinalProj\\BHCProject\\node_modules\\supports-preserve-symlinks-flag\";}s:11:\"tailwindcss\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"tailwindcss\";s:10:\"\0*\0version\";s:6:\"3.4.19\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:6:\"^3.1.0\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\tailwindcss\";}s:7:\"tapable\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:7:\"tapable\";s:10:\"\0*\0version\";s:5:\"2.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:44:\"C:\\FinalProj\\BHCProject\\node_modules\\tapable\";}s:7:\"thenify\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:7:\"thenify\";s:10:\"\0*\0version\";s:5:\"3.3.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:44:\"C:\\FinalProj\\BHCProject\\node_modules\\thenify\";}s:11:\"thenify-all\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:11:\"thenify-all\";s:10:\"\0*\0version\";s:5:\"1.6.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:48:\"C:\\FinalProj\\BHCProject\\node_modules\\thenify-all\";}s:10:\"tinyglobby\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:10:\"tinyglobby\";s:10:\"\0*\0version\";s:6:\"0.2.17\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:47:\"C:\\FinalProj\\BHCProject\\node_modules\\tinyglobby\";}s:14:\"to-regex-range\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"to-regex-range\";s:10:\"\0*\0version\";s:5:\"5.0.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:51:\"C:\\FinalProj\\BHCProject\\node_modules\\to-regex-range\";}s:9:\"tree-kill\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:9:\"tree-kill\";s:10:\"\0*\0version\";s:5:\"1.2.2\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:46:\"C:\\FinalProj\\BHCProject\\node_modules\\tree-kill\";}s:20:\"ts-interface-checker\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:20:\"ts-interface-checker\";s:10:\"\0*\0version\";s:6:\"0.1.13\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:57:\"C:\\FinalProj\\BHCProject\\node_modules\\ts-interface-checker\";}s:5:\"tslib\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:5:\"tslib\";s:10:\"\0*\0version\";s:5:\"2.8.1\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:42:\"C:\\FinalProj\\BHCProject\\node_modules\\tslib\";}s:22:\"update-browserslist-db\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:22:\"update-browserslist-db\";s:10:\"\0*\0version\";s:5:\"1.3.3\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:59:\"C:\\FinalProj\\BHCProject\\node_modules\\update-browserslist-db\";}s:14:\"util-deprecate\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:14:\"util-deprecate\";s:10:\"\0*\0version\";s:5:\"1.0.2\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:51:\"C:\\FinalProj\\BHCProject\\node_modules\\util-deprecate\";}s:4:\"vite\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:4:\"vite\";s:10:\"\0*\0version\";s:5:\"8.3.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:6:\"^8.0.0\";s:7:\"\0*\0path\";s:41:\"C:\\FinalProj\\BHCProject\\node_modules\\vite\";}s:23:\"vite-plugin-full-reload\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:23:\"vite-plugin-full-reload\";s:10:\"\0*\0version\";s:5:\"1.2.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:60:\"C:\\FinalProj\\BHCProject\\node_modules\\vite-plugin-full-reload\";}s:4:\"y18n\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:4:\"y18n\";s:10:\"\0*\0version\";s:5:\"5.0.8\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:41:\"C:\\FinalProj\\BHCProject\\node_modules\\y18n\";}s:5:\"yargs\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:5:\"yargs\";s:10:\"\0*\0version\";s:6:\"18.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:42:\"C:\\FinalProj\\BHCProject\\node_modules\\yargs\";}s:12:\"yargs-parser\";O:22:\"Laravel\\Roster\\Package\":7:{s:7:\"\0*\0name\";s:12:\"yargs-parser\";s:10:\"\0*\0version\";s:6:\"22.0.0\";s:9:\"\0*\0source\";r:1210;s:6:\"\0*\0dev\";b:1;s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:7:\"\0*\0path\";s:49:\"C:\\FinalProj\\BHCProject\\node_modules\\yargs-parser\";}}s:11:\"\0*\0packages\";O:32:\"Laravel\\Roster\\PackageCollection\":2:{s:8:\"\0*\0items\";a:189:{i:0;r:1207;i:1;r:1215;i:2;r:1223;i:3;r:1231;i:4;r:1239;i:5;r:1247;i:6;r:1255;i:7;r:1263;i:8;r:1271;i:9;r:1279;i:10;r:1287;i:11;r:1295;i:12;r:1303;i:13;r:1311;i:14;r:1319;i:15;r:1327;i:16;r:1335;i:17;r:1343;i:18;r:1351;i:19;r:1359;i:20;r:1367;i:21;r:1375;i:22;r:1383;i:23;r:1391;i:24;r:1399;i:25;r:1407;i:26;r:1415;i:27;r:1423;i:28;r:1431;i:29;r:1439;i:30;r:1447;i:31;r:1455;i:32;r:1463;i:33;r:1471;i:34;r:1479;i:35;r:1487;i:36;r:1495;i:37;r:1503;i:38;r:1511;i:39;r:1519;i:40;r:1527;i:41;r:1535;i:42;r:1543;i:43;r:1551;i:44;r:1559;i:45;r:1567;i:46;r:1575;i:47;r:1583;i:48;r:1591;i:49;r:1599;i:50;r:1607;i:51;r:1615;i:52;r:1623;i:53;r:1631;i:54;r:1639;i:55;r:1647;i:56;r:1655;i:57;r:1663;i:58;r:1671;i:59;r:1679;i:60;r:1687;i:61;r:1695;i:62;r:1703;i:63;r:1711;i:64;r:1719;i:65;r:1727;i:66;r:1735;i:67;r:1743;i:68;r:1751;i:69;r:1759;i:70;r:1767;i:71;r:1775;i:72;r:1783;i:73;r:1791;i:74;r:1799;i:75;r:1807;i:76;r:1815;i:77;r:1823;i:78;r:1831;i:79;r:1839;i:80;r:1847;i:81;r:1855;i:82;r:1863;i:83;r:1871;i:84;r:1879;i:85;r:1887;i:86;r:1895;i:87;r:1903;i:88;r:1911;i:89;r:1919;i:90;r:1927;i:91;r:1935;i:92;r:1943;i:93;r:1951;i:94;r:1959;i:95;r:1967;i:96;r:1975;i:97;r:1983;i:98;r:1991;i:99;r:1999;i:100;r:2007;i:101;r:2015;i:102;r:2023;i:103;r:2031;i:104;r:2039;i:105;r:2047;i:106;r:2055;i:107;r:2063;i:108;r:2071;i:109;r:2079;i:110;r:2087;i:111;r:2095;i:112;r:2103;i:113;r:2111;i:114;r:2119;i:115;r:2127;i:116;r:2135;i:117;r:2143;i:118;r:2151;i:119;r:2159;i:120;r:2167;i:121;r:2175;i:122;r:2183;i:123;r:2191;i:124;r:2199;i:125;r:2207;i:126;r:2215;i:127;r:2223;i:128;r:2231;i:129;r:2239;i:130;r:2247;i:131;r:2255;i:132;r:2263;i:133;r:2271;i:134;r:2279;i:135;r:2287;i:136;r:2295;i:137;r:2303;i:138;r:2311;i:139;r:2319;i:140;r:2327;i:141;r:2335;i:142;r:2343;i:143;r:2351;i:144;r:2359;i:145;r:2367;i:146;r:2375;i:147;r:2383;i:148;r:2391;i:149;r:2399;i:150;r:2407;i:151;r:2415;i:152;r:2423;i:153;r:2431;i:154;r:2439;i:155;r:2447;i:156;r:2455;i:157;r:2463;i:158;r:2471;i:159;r:2479;i:160;r:2487;i:161;r:2495;i:162;r:2503;i:163;r:2511;i:164;r:2519;i:165;r:2527;i:166;r:2535;i:167;r:2543;i:168;r:2551;i:169;r:2559;i:170;r:2567;i:171;r:2575;i:172;r:2583;i:173;r:2591;i:174;r:2599;i:175;r:2607;i:176;r:2615;i:177;r:2623;i:178;r:2631;i:179;r:2639;i:180;r:2647;i:181;r:2655;i:182;r:2663;i:183;r:2671;i:184;r:2679;i:185;r:2687;i:186;r:2695;i:187;r:2703;i:188;r:2711;}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}s:17:\"\0*\0packageManager\";E:41:\"Laravel\\Roster\\Enums\\JsPackageManager:Npm\";}s:6:\"stacks\";O:30:\"Laravel\\Roster\\Support\\EnumSet\":1:{s:8:\"\0*\0cases\";a:1:{i:0;E:32:\"Laravel\\Roster\\Enums\\Stack:Blade\";}}s:21:\"browserTestFrameworks\";O:30:\"Laravel\\Roster\\Support\\EnumSet\":1:{s:8:\"\0*\0cases\";a:0:{}}s:9:\"frontends\";O:30:\"Laravel\\Roster\\Support\\EnumSet\":1:{s:8:\"\0*\0cases\";a:0:{}}s:6:\"agents\";O:30:\"Laravel\\Roster\\Support\\EnumSet\":1:{s:8:\"\0*\0cases\";a:2:{i:0;E:37:\"Laravel\\Roster\\Enums\\Agent:ClaudeCode\";i:1;E:32:\"Laravel\\Roster\\Enums\\Agent:Codex\";}}s:7:\"editors\";O:30:\"Laravel\\Roster\\Support\\EnumSet\":1:{s:8:\"\0*\0cases\";a:0:{}}}',1791365695);
+/*!40000 ALTER TABLE `cache` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `cache_locks`
 --
 
+DROP TABLE IF EXISTS `cache_locks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cache_locks` (
   `key` varchar(255) NOT NULL,
   `owner` varchar(255) NOT NULL,
-  `expiration` bigint(20) NOT NULL
+  `expiration` bigint(20) NOT NULL,
+  PRIMARY KEY (`key`),
+  KEY `cache_locks_expiration_index` (`expiration`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `cache_locks`
+--
+
+LOCK TABLES `cache_locks` WRITE;
+/*!40000 ALTER TABLE `cache_locks` DISABLE KEYS */;
+/*!40000 ALTER TABLE `cache_locks` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `failed_jobs`
 --
 
+DROP TABLE IF EXISTS `failed_jobs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `failed_jobs` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `uuid` varchar(255) NOT NULL,
   `connection` varchar(255) NOT NULL,
   `queue` varchar(255) NOT NULL,
   `payload` longtext NOT NULL,
   `exception` longtext NOT NULL,
-  `failed_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `failed_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`),
+  KEY `failed_jobs_connection_queue_failed_at_index` (`connection`,`queue`,`failed_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `failed_jobs`
+--
+
+LOCK TABLES `failed_jobs` WRITE;
+/*!40000 ALTER TABLE `failed_jobs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `failed_jobs` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `health_assessments`
 --
 
+DROP TABLE IF EXISTS `health_assessments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `health_assessments` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `patient_id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `patient_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
   `assessment_date` date NOT NULL,
   `weight_kg` decimal(5,2) DEFAULT NULL,
   `height_cm` decimal(5,2) DEFAULT NULL,
   `bmi` decimal(4,1) DEFAULT NULL,
-  `systolic_bp` smallint(5) UNSIGNED DEFAULT NULL,
-  `diastolic_bp` smallint(5) UNSIGNED DEFAULT NULL,
-  `pulse_rate` smallint(5) UNSIGNED DEFAULT NULL,
-  `respiratory_rate` smallint(5) UNSIGNED DEFAULT NULL,
+  `systolic_bp` smallint(5) unsigned DEFAULT NULL,
+  `diastolic_bp` smallint(5) unsigned DEFAULT NULL,
+  `pulse_rate` smallint(5) unsigned DEFAULT NULL,
+  `respiratory_rate` smallint(5) unsigned DEFAULT NULL,
   `temperature_celsius` decimal(4,2) DEFAULT NULL,
   `nutritional_status` varchar(50) DEFAULT NULL,
   `notes` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `health_assessments_patient_id_foreign` (`patient_id`),
+  KEY `health_assessments_user_id_foreign` (`user_id`),
+  CONSTRAINT `health_assessments_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `health_assessments_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `health_assessments`
 --
 
-INSERT INTO `health_assessments` (`id`, `patient_id`, `user_id`, `assessment_date`, `weight_kg`, `height_cm`, `bmi`, `systolic_bp`, `diastolic_bp`, `pulse_rate`, `respiratory_rate`, `temperature_celsius`, `nutritional_status`, `notes`, `created_at`, `updated_at`) VALUES
-(1, 1, 2, '2026-09-06', 74.00, 168.00, 26.2, 140, 90, 78, 18, 36.60, 'Overweight', 'Patient reports occasional morning occipital headache. Advised low-salt diet.', '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(2, 2, 3, '2026-08-31', 58.50, 155.00, 24.3, 110, 70, 74, 16, 36.50, 'Normal', '2nd Trimester Prenatal checkup. Fetal heart tone good.', '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(3, 3, 2, '2026-08-21', 7.40, 66.00, 17.0, NULL, NULL, 110, 30, 36.70, 'Underweight', '6-month well baby check. Active, alert, good milestones.', '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(4, 4, 2, '2026-09-13', 62.00, 150.00, 27.6, 130, 85, 76, 17, 36.40, 'Overweight', 'Senior citizen PhilPEN health assessment. Known Type 2 Diabetes.', '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(5, 5, 3, '2026-07-22', 54.00, 153.00, 23.1, 115, 75, 72, 16, 36.50, 'Normal', 'FP client for routine DMPA re-injection.', '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(6, 6, 4, '2026-09-15', 13.80, 94.00, 15.6, NULL, NULL, 95, 24, 36.60, 'Underweight', 'Operation Timbang (OPT) Plus quarterly child measurement.', '2026-09-20 04:02:58', '2026-09-20 04:02:58');
-
--- --------------------------------------------------------
+LOCK TABLES `health_assessments` WRITE;
+/*!40000 ALTER TABLE `health_assessments` DISABLE KEYS */;
+INSERT INTO `health_assessments` VALUES (1,1,2,'2026-09-06',74.00,168.00,26.2,140,90,78,18,36.60,'Overweight','Patient reports occasional morning occipital headache. Advised low-salt diet.','2026-09-20 04:02:58','2026-09-20 04:02:58'),(2,2,3,'2026-08-31',58.50,155.00,24.3,110,70,74,16,36.50,'Normal','2nd Trimester Prenatal checkup. Fetal heart tone good.','2026-09-20 04:02:58','2026-09-20 04:02:58'),(3,3,2,'2026-08-21',7.40,66.00,17.0,NULL,NULL,110,30,36.70,'Underweight','6-month well baby check. Active, alert, good milestones.','2026-09-20 04:02:58','2026-09-20 04:02:58'),(4,4,2,'2026-09-13',62.00,150.00,27.6,130,85,76,17,36.40,'Overweight','Senior citizen PhilPEN health assessment. Known Type 2 Diabetes.','2026-09-20 04:02:58','2026-09-20 04:02:58'),(5,5,3,'2026-07-22',54.00,153.00,23.1,115,75,72,16,36.50,'Normal','FP client for routine DMPA re-injection.','2026-09-20 04:02:58','2026-09-20 04:02:58'),(6,6,5,'2026-09-15',13.80,94.00,15.6,NULL,NULL,95,24,36.60,'Underweight','Operation Timbang (OPT) Plus quarterly child measurement.','2026-09-20 04:02:58','2026-09-26 03:20:22'),(7,9,1,'2026-09-28',60.00,161.30,23.1,50,30,30,10,30.00,'Normal','Normal','2026-09-27 17:52:51','2026-09-27 17:52:51'),(8,2,2,'2026-10-09',72.00,157.00,29.2,120,80,80,20,36.00,'Overweight',NULL,'2026-10-08 18:31:21','2026-10-08 18:31:21'),(9,5,3,'2026-10-12',60.00,160.00,23.4,100,56,81,20,30.30,'Normal',NULL,'2026-10-11 17:46:34','2026-10-11 17:46:34');
+/*!40000 ALTER TABLE `health_assessments` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `health_service_records`
 --
 
+DROP TABLE IF EXISTS `health_service_records`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `health_service_records` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `patient_id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `patient_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
   `service_type` varchar(50) NOT NULL,
   `service_date` date NOT NULL,
   `complaint_or_reason` text DEFAULT NULL,
@@ -171,147 +191,151 @@ CREATE TABLE `health_service_records` (
   `service_specific_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`service_specific_data`)),
   `next_follow_up_date` date DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `health_service_records_patient_id_foreign` (`patient_id`),
+  KEY `health_service_records_user_id_foreign` (`user_id`),
+  KEY `health_service_records_service_type_index` (`service_type`),
+  CONSTRAINT `health_service_records_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `health_service_records_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `health_service_records`
 --
 
-INSERT INTO `health_service_records` (`id`, `patient_id`, `user_id`, `service_type`, `service_date`, `complaint_or_reason`, `findings_and_notes`, `service_specific_data`, `next_follow_up_date`, `created_at`, `updated_at`) VALUES
-(1, 1, 2, 'cvd_screening', '2026-09-06', 'Routine adult blood pressure check', 'Elevated BP 140/90. Stage 1 Hypertension. Prescribed Losartan 50mg OD.', '{\"has_hypertension_history\":\"yes\",\"has_diabetes_history\":\"no\",\"smoker_status\":\"non_smoker\",\"systolic_bp\":140,\"diastolic_bp\":90,\"cvd_risk_level\":\"Moderate Risk (10-20%)\"}', '2026-09-20', '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(2, 2, 3, 'prenatal_care', '2026-08-31', '2nd Trimester regular follow-up', 'Gravida 1 Para 0. AOG 24 weeks. Fundic height 23cm. FHT 142 bpm. Prescribed Ferrous Sulfate with Folic Acid.', '{\"gravida\":\"1\",\"para\":\"0\",\"lmp\":\"2026-04-05\",\"edc\":\"2027-01-10\",\"trimester\":\"2nd Trimester\",\"fundic_height_cm\":23,\"fetal_heart_tone\":\"142 bpm\",\"tetanus_toxoid_status\":\"Td 2 Given\"}', '2026-09-30', '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(3, 3, 2, 'immunization', '2026-08-21', 'Routine EPI Infant Immunization', 'Administered Pentavalent Vaccine (Dose 2) left anterolateral thigh, OPV 2 oral drops.', '{\"vaccine_administered\":\"Pentavalent + OPV\",\"dose_sequence\":\"Dose 2\",\"batch_lot_number\":\"LOT-2026-PENT-001\",\"site_of_injection\":\"Left vastus lateralis (IM)\",\"adverse_events\":\"None observed in 15 min monitoring\"}', '2026-09-20', '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(4, 4, 2, 'philpen', '2026-09-13', 'Annual PhilPEN Non-Communicable Disease Risk Evaluation', 'FBS: 126 mg/dL. Moderately controlled. Refilled Metformin 500mg #60.', '{\"tobacco_use\":\"Non-smoker\",\"alcohol_consumption\":\"None\",\"fasting_blood_sugar\":\"126 mg\\/dL\",\"total_cholesterol\":\"190 mg\\/dL\",\"risk_stratification\":\"Low to Moderate (<10%)\"}', '2026-10-13', '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(5, 5, 3, 'family_planning', '2026-07-22', 'Family planning renewal', 'Current user, no complaints or side effects. Administered DMPA 150mg/mL IM right deltoid.', '{\"client_type\":\"Current User\",\"method_accepted\":\"DMPA (Injectable)\",\"drop_out_reason\":null,\"source\":\"Barangay Health Center\"}', '2026-10-20', '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(6, 6, 4, 'bns_program', '2026-09-15', 'Quarterly BNS nutrition and growth monitoring', 'Normal nutritional status for age. Administered Vitamin A capsule 200,000 IU and Albendazole 400mg deworming tablet.', '{\"target_group\":\"Preschool child (12-59 months)\",\"weight_for_age\":\"Normal\",\"height_for_age\":\"Normal\",\"weight_for_length\":\"Normal\",\"vitamin_a_given\":\"Yes (200,000 IU)\",\"deworming_given\":\"Yes (Albendazole 400mg)\"}', '2026-12-20', '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(7, 7, 2, 'ntp_tb', '2026-09-08', 'Cough for 3 weeks and afternoon chills', 'Presumptive TB evaluated. GeneXpert test performed: MTB NOT DETECTED (Negative). Diagnosed with Acute Bronchitis. Prescribed Amoxicillin 500mg TID x 7 days.', '{\"tb_presumptive\":\"Yes\",\"cough_duration\":\"3 weeks\",\"sputum_genexpert_result\":\"MTB Not Detected (Negative)\",\"chest_xray_findings\":\"Clear lung fields\",\"treatment_regimen\":\"Symptomatic \\/ Antibiotics for Bronchitis\"}', NULL, '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(8, 8, 5, 'purok_kalusugan', '2026-09-17', 'Purok Kalusugan community home visit', 'Household health survey completed. Environmental sanitation check (clean water source, sanitary toilet, dengue prevention/water container inspection). Health education on proper handwashing provided.', '{\"activity_type\":\"Household Health Education & Sanitation Visit\",\"household_members_screened\":4,\"sanitation_status\":\"Satisfactory (Water sealed toilet, covered water storage)\",\"health_education_topic\":\"Dengue 4S Strategy & Hand Hygiene\"}', NULL, '2026-09-20 04:02:58', '2026-09-20 04:02:58');
-
--- --------------------------------------------------------
+LOCK TABLES `health_service_records` WRITE;
+/*!40000 ALTER TABLE `health_service_records` DISABLE KEYS */;
+INSERT INTO `health_service_records` VALUES (1,1,2,'cvd_screening','2026-09-06','Routine adult blood pressure check','Elevated BP 140/90. Stage 1 Hypertension. Prescribed Losartan 50mg OD.','{\"has_hypertension_history\":\"yes\",\"has_diabetes_history\":\"no\",\"smoker_status\":\"non_smoker\",\"systolic_bp\":140,\"diastolic_bp\":90,\"cvd_risk_level\":\"Moderate Risk (10-20%)\"}','2026-09-20','2026-09-20 04:02:58','2026-09-20 04:02:58'),(2,2,3,'prenatal_care','2026-08-31','2nd Trimester regular follow-up','Gravida 1 Para 0. AOG 24 weeks. Fundic height 23cm. FHT 142 bpm. Prescribed Ferrous Sulfate with Folic Acid.','{\"gravida\":\"1\",\"para\":\"0\",\"lmp\":\"2026-04-05\",\"edc\":\"2027-01-10\",\"trimester\":\"2nd Trimester\",\"fundic_height_cm\":23,\"fetal_heart_tone\":\"142 bpm\",\"tetanus_toxoid_status\":\"Td 2 Given\"}','2026-09-30','2026-09-20 04:02:58','2026-09-20 04:02:58'),(3,3,2,'immunization','2026-08-21','Routine EPI Infant Immunization','Administered Pentavalent Vaccine (Dose 2) left anterolateral thigh, OPV 2 oral drops.','{\"vaccine_administered\":\"Pentavalent + OPV\",\"dose_sequence\":\"Dose 2\",\"batch_lot_number\":\"LOT-2026-PENT-001\",\"site_of_injection\":\"Left vastus lateralis (IM)\",\"adverse_events\":\"None observed in 15 min monitoring\"}','2026-09-20','2026-09-20 04:02:58','2026-09-20 04:02:58'),(4,4,2,'philpen','2026-09-13','Annual PhilPEN Non-Communicable Disease Risk Evaluation','FBS: 126 mg/dL. Moderately controlled. Refilled Metformin 500mg #60.','{\"tobacco_use\":\"Non-smoker\",\"alcohol_consumption\":\"None\",\"fasting_blood_sugar\":\"126 mg\\/dL\",\"total_cholesterol\":\"190 mg\\/dL\",\"risk_stratification\":\"Low to Moderate (<10%)\"}','2026-10-13','2026-09-20 04:02:58','2026-09-20 04:02:58'),(5,5,3,'family_planning','2026-07-22','Family planning renewal','Current user, no complaints or side effects. Administered DMPA 150mg/mL IM right deltoid.','{\"client_type\":\"Current User\",\"method_accepted\":\"DMPA (Injectable)\",\"drop_out_reason\":null,\"source\":\"Barangay Health Center\"}','2026-10-20','2026-09-20 04:02:58','2026-09-20 04:02:58'),(6,6,5,'bns_program','2026-09-15','Quarterly BNS nutrition and growth monitoring','Normal nutritional status for age. Administered Vitamin A capsule 200,000 IU and Albendazole 400mg deworming tablet.','{\"target_group\":\"Preschool child (12-59 months)\",\"weight_for_age\":\"Normal\",\"height_for_age\":\"Normal\",\"weight_for_length\":\"Normal\",\"vitamin_a_given\":\"Yes (200,000 IU)\",\"deworming_given\":\"Yes (Albendazole 400mg)\"}','2026-12-20','2026-09-20 04:02:58','2026-09-26 03:20:22'),(7,7,2,'ntp_tb','2026-09-08','Cough for 3 weeks and afternoon chills','Presumptive TB evaluated. GeneXpert test performed: MTB NOT DETECTED (Negative). Diagnosed with Acute Bronchitis. Prescribed Amoxicillin 500mg TID x 7 days.','{\"tb_presumptive\":\"Yes\",\"cough_duration\":\"3 weeks\",\"sputum_genexpert_result\":\"MTB Not Detected (Negative)\",\"chest_xray_findings\":\"Clear lung fields\",\"treatment_regimen\":\"Symptomatic \\/ Antibiotics for Bronchitis\"}',NULL,'2026-09-20 04:02:58','2026-09-20 04:02:58'),(8,8,5,'purok_kalusugan','2026-09-17','Purok Kalusugan community home visit','Household health survey completed. Environmental sanitation check (clean water source, sanitary toilet, dengue prevention/water container inspection). Health education on proper handwashing provided.','{\"activity_type\":\"Household Health Education & Sanitation Visit\",\"household_members_screened\":4,\"sanitation_status\":\"Satisfactory (Water sealed toilet, covered water storage)\",\"health_education_topic\":\"Dengue 4S Strategy & Hand Hygiene\"}',NULL,'2026-09-20 04:02:58','2026-09-20 04:02:58'),(9,9,1,'purok_kalusugan','2026-09-28','Routine Check up','jsblj','{\"method\":null,\"client_type\":\"New Acceptor\",\"lmp\":null,\"edc\":null,\"trimester\":\"1st Trimester (Visit 1)\",\"vaccine_name\":\"BCG\",\"dose_sequence\":\"Dose 1\",\"admin_site\":null,\"cvd_risk\":\"Low (<10%)\",\"organ_damage\":null,\"tobacco_use\":\"Non-smoker\",\"alcohol_use\":\"None\",\"fbs\":null,\"cough_duration\":\"No cough\",\"tb_testing\":null,\"outreach_activity\":\"Purok Household Check\",\"bns_intervention\":\"Supplementary Feeding Intake\",\"bns_category\":null}','2026-09-30','2026-09-27 17:53:53','2026-09-27 17:53:53'),(10,4,3,'cvd_screening','2026-10-09','Check up',NULL,'{\"cvd_risk\":\"Low (<10%)\"}',NULL,'2026-10-08 17:45:02','2026-10-08 17:45:02');
+/*!40000 ALTER TABLE `health_service_records` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `inventory_batches`
 --
 
+DROP TABLE IF EXISTS `inventory_batches`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `inventory_batches` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `inventory_item_id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `inventory_item_id` bigint(20) unsigned NOT NULL,
   `batch_number` varchar(100) NOT NULL,
   `date_received` date NOT NULL,
   `expiration_date` date NOT NULL,
-  `quantity_received` int(10) UNSIGNED NOT NULL,
-  `current_quantity` int(10) UNSIGNED NOT NULL,
+  `quantity_received` int(10) unsigned NOT NULL,
+  `current_quantity` int(10) unsigned NOT NULL,
   `supplier_or_source` varchar(150) DEFAULT NULL,
   `status` enum('active','depleted','expired') NOT NULL DEFAULT 'active',
   `remarks` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `inventory_batches_inventory_item_id_foreign` (`inventory_item_id`),
+  KEY `inventory_batches_batch_number_index` (`batch_number`),
+  KEY `inventory_batches_expiration_date_index` (`expiration_date`),
+  CONSTRAINT `inventory_batches_inventory_item_id_foreign` FOREIGN KEY (`inventory_item_id`) REFERENCES `inventory_items` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `inventory_batches`
 --
 
-INSERT INTO `inventory_batches` (`id`, `inventory_item_id`, `batch_number`, `date_received`, `expiration_date`, `quantity_received`, `current_quantity`, `supplier_or_source`, `status`, `remarks`, `created_at`, `updated_at`) VALUES
-(1, 1, 'AMX-2026-01', '2026-08-19', '2027-11-19', 500, 350, 'City Health Office (CHO) Davao', 'active', NULL, '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(2, 2, 'PCM-2026-A1', '2026-07-19', '2026-11-03', 200, 45, 'City Health Office (CHO) Davao', 'active', NULL, '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(3, 3, 'LST-2026-88', '2026-08-29', '2028-03-19', 300, 260, 'DOH Regional Office XI', 'active', NULL, '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(4, 4, 'ORS-2026-B', '2026-08-19', '2027-09-19', 150, 120, 'City Health Office (CHO) Davao', 'active', NULL, '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(5, 5, 'BCG-2026-09', '2026-09-05', '2027-05-19', 30, 24, 'DOH Cold Chain Facility', 'active', NULL, '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(6, 6, 'PENT-2026-44', '2026-08-19', '2027-07-19', 40, 32, 'DOH Cold Chain Facility', 'active', NULL, '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(7, 7, 'MMR-2026-12', '2026-07-19', '2027-03-19', 25, 18, 'City Health Office (CHO) Davao', 'active', NULL, '2026-09-19 07:32:26', '2026-09-19 07:32:26');
-
--- --------------------------------------------------------
+LOCK TABLES `inventory_batches` WRITE;
+/*!40000 ALTER TABLE `inventory_batches` DISABLE KEYS */;
+INSERT INTO `inventory_batches` VALUES (1,1,'AMX-2026-01','2026-08-19','2027-11-19',500,308,'City Health Office (CHO) Davao','active',NULL,'2026-09-19 07:32:26','2026-10-08 18:52:16'),(2,2,'PCM-2026-A1','2026-07-19','2026-11-03',200,45,'City Health Office (CHO) Davao','active',NULL,'2026-09-19 07:32:26','2026-09-19 07:32:26'),(3,3,'LST-2026-88','2026-08-29','2028-03-19',300,260,'DOH Regional Office XI','active',NULL,'2026-09-19 07:32:26','2026-09-19 07:32:26'),(4,4,'ORS-2026-B','2026-08-19','2027-09-19',150,120,'City Health Office (CHO) Davao','active',NULL,'2026-09-19 07:32:26','2026-09-19 07:32:26'),(5,5,'BCG-2026-09','2026-09-05','2027-05-19',30,24,'DOH Cold Chain Facility','active',NULL,'2026-09-19 07:32:26','2026-09-19 07:32:26'),(6,6,'PENT-2026-44','2026-08-19','2027-07-19',40,32,'DOH Cold Chain Facility','active',NULL,'2026-09-19 07:32:26','2026-09-19 07:32:26'),(7,7,'MMR-2026-12','2026-07-19','2027-03-19',25,18,'City Health Office (CHO) Davao','active',NULL,'2026-09-19 07:32:26','2026-09-19 07:32:26'),(8,1,'AMX-2026-2','2026-09-28','2027-12-01',150,150,'City Health Office (CHO) Davao','active',NULL,'2026-09-27 19:52:02','2026-09-27 19:52:02'),(9,3,'lot 0120','2026-10-09','2028-12-31',1000,1000,'RHU mintal','active',NULL,'2026-10-08 18:54:41','2026-10-08 18:54:41');
+/*!40000 ALTER TABLE `inventory_batches` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `inventory_items`
 --
 
+DROP TABLE IF EXISTS `inventory_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `inventory_items` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `item_code` varchar(50) NOT NULL,
   `name` varchar(150) NOT NULL,
   `generic_name` varchar(150) DEFAULT NULL,
   `category` enum('medicine','vaccine') NOT NULL,
   `dosage_form` varchar(100) DEFAULT NULL,
   `unit_of_measure` varchar(50) NOT NULL,
-  `minimum_stock_alert` int(10) UNSIGNED NOT NULL DEFAULT 20,
+  `minimum_stock_alert` int(10) unsigned NOT NULL DEFAULT 20,
   `is_cold_chain` tinyint(1) NOT NULL DEFAULT 0,
   `storage_temperature_note` varchar(100) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `inventory_items_item_code_unique` (`item_code`),
+  KEY `inventory_items_category_index` (`category`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `inventory_items`
 --
 
-INSERT INTO `inventory_items` (`id`, `item_code`, `name`, `generic_name`, `category`, `dosage_form`, `unit_of_measure`, `minimum_stock_alert`, `is_cold_chain`, `storage_temperature_note`, `description`, `created_at`, `updated_at`) VALUES
-(1, 'MED-AMX-500', 'Amoxicillin 500mg', 'Amoxicillin Trihydrate', 'medicine', 'Capsule', 'Capsule', 100, 0, 'Store at temperature not exceeding 30°C', 'First-line oral antibiotic for bacterial infections', '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(2, 'MED-PCM-500', 'Paracetamol 500mg', 'Paracetamol', 'medicine', 'Tablet', 'Tablet', 150, 0, 'Store below 30°C', 'Antipyretic and analgesic for pain and fever', '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(3, 'MED-LST-50', 'Losartan Potassium 50mg', 'Losartan Potassium', 'medicine', 'Tablet', 'Tablet', 50, 0, 'Store at 15°C to 30°C', 'Antihypertensive maintenance medication', '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(4, 'MED-ORS-S1', 'Oral Rehydration Salts', 'Oral Rehydration Salts', 'medicine', 'Powder for Oral Solution', 'Sachet', 50, 0, 'Store in dry place below 30°C', 'Electrolyte replenishment for acute diarrhea and dehydration', '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(5, 'VAC-BCG-01', 'BCG Vaccine', 'Bacillus Calmette-Guérin Vaccine', 'vaccine', 'Freeze-dried powder with diluent', 'Vial', 10, 1, 'Cold Chain: +2°C to +8°C (Protect from light)', 'Tuberculosis vaccine given at birth / early infancy', '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(6, 'VAC-PENT-01', 'Pentavalent Vaccine', 'DTP-HepB-Hib Vaccine', 'vaccine', 'Liquid suspension', 'Vial', 15, 1, 'Cold Chain: +2°C to +8°C (Do Not Freeze)', 'Protection against Diphtheria, Tetanus, Pertussis, Hepatitis B, and Hib', '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(7, 'VAC-MMR-01', 'MMR Vaccine', 'Measles, Mumps, and Rubella Vaccine', 'vaccine', 'Lyophilized powder with diluent', 'Vial', 15, 1, 'Cold Chain: +2°C to +8°C', 'Routine childhood immunization for MMR', '2026-09-19 07:32:26', '2026-09-19 07:32:26');
-
--- --------------------------------------------------------
+LOCK TABLES `inventory_items` WRITE;
+/*!40000 ALTER TABLE `inventory_items` DISABLE KEYS */;
+INSERT INTO `inventory_items` VALUES (1,'MED-AMX-500','Amoxicillin 500mg','Amoxicillin Trihydrate','medicine','Capsule','Capsule',100,0,'Store at temperature not exceeding 30°C','First-line oral antibiotic for bacterial infections','2026-09-19 07:32:26','2026-09-19 07:32:26'),(2,'MED-PCM-500','Paracetamol 500mg','Paracetamol','medicine','Tablet','Tablet',150,0,'Store below 30°C','Antipyretic and analgesic for pain and fever','2026-09-19 07:32:26','2026-09-19 07:32:26'),(3,'MED-LST-50','Losartan Potassium 50mg','Losartan Potassium','medicine','Tablet','Tablet',50,0,'Store at 15°C to 30°C','Antihypertensive maintenance medication','2026-09-19 07:32:26','2026-09-19 07:32:26'),(4,'MED-ORS-S1','Oral Rehydration Salts','Oral Rehydration Salts','medicine','Powder for Oral Solution','Sachet',50,0,'Store in dry place below 30°C','Electrolyte replenishment for acute diarrhea and dehydration','2026-09-19 07:32:26','2026-09-19 07:32:26'),(5,'VAC-BCG-01','BCG Vaccine','Bacillus Calmette-Guérin Vaccine','vaccine','Freeze-dried powder with diluent','Vial',10,1,'Cold Chain: +2°C to +8°C (Protect from light)','Tuberculosis vaccine given at birth / early infancy','2026-09-19 07:32:26','2026-09-19 07:32:26'),(6,'VAC-PENT-01','Pentavalent Vaccine','DTP-HepB-Hib Vaccine','vaccine','Liquid suspension','Vial',15,1,'Cold Chain: +2°C to +8°C (Do Not Freeze)','Protection against Diphtheria, Tetanus, Pertussis, Hepatitis B, and Hib','2026-09-19 07:32:26','2026-09-19 07:32:26'),(7,'VAC-MMR-01','MMR Vaccine','Measles, Mumps, and Rubella Vaccine','vaccine','Lyophilized powder with diluent','Vial',15,1,'Cold Chain: +2°C to +8°C','Routine childhood immunization for MMR','2026-09-19 07:32:26','2026-09-19 07:32:26');
+/*!40000 ALTER TABLE `inventory_items` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `inventory_transactions`
 --
 
+DROP TABLE IF EXISTS `inventory_transactions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `inventory_transactions` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `inventory_item_id` bigint(20) UNSIGNED NOT NULL,
-  `inventory_batch_id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `patient_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `inventory_item_id` bigint(20) unsigned NOT NULL,
+  `inventory_batch_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `patient_id` bigint(20) unsigned DEFAULT NULL,
   `transaction_type` enum('received','dispensed','disposed_expired','adjustment') NOT NULL,
-  `quantity` int(10) UNSIGNED NOT NULL,
+  `quantity` int(10) unsigned NOT NULL,
   `transaction_date` date NOT NULL,
   `remarks` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `inventory_transactions_inventory_item_id_foreign` (`inventory_item_id`),
+  KEY `inventory_transactions_inventory_batch_id_foreign` (`inventory_batch_id`),
+  KEY `inventory_transactions_user_id_foreign` (`user_id`),
+  KEY `inventory_transactions_patient_id_foreign` (`patient_id`),
+  KEY `inventory_transactions_transaction_type_index` (`transaction_type`),
+  KEY `inventory_transactions_transaction_date_index` (`transaction_date`),
+  CONSTRAINT `inventory_transactions_inventory_batch_id_foreign` FOREIGN KEY (`inventory_batch_id`) REFERENCES `inventory_batches` (`id`),
+  CONSTRAINT `inventory_transactions_inventory_item_id_foreign` FOREIGN KEY (`inventory_item_id`) REFERENCES `inventory_items` (`id`),
+  CONSTRAINT `inventory_transactions_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `inventory_transactions_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `inventory_transactions`
 --
 
-INSERT INTO `inventory_transactions` (`id`, `inventory_item_id`, `inventory_batch_id`, `user_id`, `patient_id`, `transaction_type`, `quantity`, `transaction_date`, `remarks`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 1, NULL, 'received', 500, '2026-08-19', 'Initial stock intake from City Health Office (CHO) Davao', '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(2, 2, 2, 1, NULL, 'received', 200, '2026-07-19', 'Initial stock intake from City Health Office (CHO) Davao', '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(3, 3, 3, 1, NULL, 'received', 300, '2026-08-29', 'Initial stock intake from DOH Regional Office XI', '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(4, 4, 4, 1, NULL, 'received', 150, '2026-08-19', 'Initial stock intake from City Health Office (CHO) Davao', '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(5, 5, 5, 1, NULL, 'received', 30, '2026-09-05', 'Initial stock intake from DOH Cold Chain Facility', '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(6, 6, 6, 1, NULL, 'received', 40, '2026-08-19', 'Initial stock intake from DOH Cold Chain Facility', '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(7, 7, 7, 1, NULL, 'received', 25, '2026-07-19', 'Initial stock intake from City Health Office (CHO) Davao', '2026-09-19 07:32:26', '2026-09-19 07:32:26');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `jobs`
---
-
-CREATE TABLE `jobs` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `queue` varchar(255) NOT NULL,
-  `payload` longtext NOT NULL,
-  `attempts` smallint(5) UNSIGNED NOT NULL,
-  `reserved_at` int(10) UNSIGNED DEFAULT NULL,
-  `available_at` int(10) UNSIGNED NOT NULL,
-  `created_at` int(10) UNSIGNED NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
+LOCK TABLES `inventory_transactions` WRITE;
+/*!40000 ALTER TABLE `inventory_transactions` DISABLE KEYS */;
+INSERT INTO `inventory_transactions` VALUES (1,1,1,1,NULL,'received',500,'2026-08-19','Initial stock intake from City Health Office (CHO) Davao','2026-09-19 07:32:26','2026-09-19 07:32:26'),(2,2,2,1,NULL,'received',200,'2026-07-19','Initial stock intake from City Health Office (CHO) Davao','2026-09-19 07:32:26','2026-09-19 07:32:26'),(3,3,3,1,NULL,'received',300,'2026-08-29','Initial stock intake from DOH Regional Office XI','2026-09-19 07:32:26','2026-09-19 07:32:26'),(4,4,4,1,NULL,'received',150,'2026-08-19','Initial stock intake from City Health Office (CHO) Davao','2026-09-19 07:32:26','2026-09-19 07:32:26'),(5,5,5,1,NULL,'received',30,'2026-09-05','Initial stock intake from DOH Cold Chain Facility','2026-09-19 07:32:26','2026-09-19 07:32:26'),(6,6,6,1,NULL,'received',40,'2026-08-19','Initial stock intake from DOH Cold Chain Facility','2026-09-19 07:32:26','2026-09-19 07:32:26'),(7,7,7,1,NULL,'received',25,'2026-07-19','Initial stock intake from City Health Office (CHO) Davao','2026-09-19 07:32:26','2026-09-19 07:32:26'),(8,1,8,1,NULL,'received',150,'2026-09-28','Stock received from City Health Office (CHO) Davao','2026-09-27 19:52:02','2026-09-27 19:52:02'),(9,1,1,2,NULL,'dispensed',21,'2026-10-09','Dispensed for health service','2026-10-08 18:51:35','2026-10-08 18:51:35'),(10,1,1,2,NULL,'dispensed',21,'2026-10-09','Dispensed for health service','2026-10-08 18:52:16','2026-10-08 18:52:16'),(11,3,9,2,NULL,'received',1000,'2026-10-09','Stock received from RHU mintal','2026-10-08 18:54:41','2026-10-08 18:54:41');
+/*!40000 ALTER TABLE `inventory_transactions` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `job_batches`
 --
 
+DROP TABLE IF EXISTS `job_batches`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `job_batches` (
   `id` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -322,59 +346,107 @@ CREATE TABLE `job_batches` (
   `options` mediumtext DEFAULT NULL,
   `cancelled_at` int(11) DEFAULT NULL,
   `created_at` int(11) NOT NULL,
-  `finished_at` int(11) DEFAULT NULL
+  `finished_at` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `job_batches`
+--
+
+LOCK TABLES `job_batches` WRITE;
+/*!40000 ALTER TABLE `job_batches` DISABLE KEYS */;
+/*!40000 ALTER TABLE `job_batches` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `jobs`
+--
+
+DROP TABLE IF EXISTS `jobs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `jobs` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `queue` varchar(255) NOT NULL,
+  `payload` longtext NOT NULL,
+  `attempts` smallint(5) unsigned NOT NULL,
+  `reserved_at` int(10) unsigned DEFAULT NULL,
+  `available_at` int(10) unsigned NOT NULL,
+  `created_at` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `jobs_queue_index` (`queue`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `jobs`
+--
+
+LOCK TABLES `jobs` WRITE;
+/*!40000 ALTER TABLE `jobs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `jobs` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `migrations`
 --
 
+DROP TABLE IF EXISTS `migrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `migrations` (
-  `id` int(10) UNSIGNED NOT NULL,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `migration` varchar(255) NOT NULL,
-  `batch` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `batch` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `migrations`
 --
 
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
-(1, '0001_01_01_000000_create_users_table', 1),
-(2, '0001_01_01_000001_create_cache_table', 1),
-(3, '0001_01_01_000002_create_jobs_table', 1),
-(4, '2026_09_19_152734_create_puroks_table', 1),
-(5, '2026_09_19_152807_create_patients_table', 1),
-(6, '2026_09_19_152808_create_health_assessments_table', 1),
-(7, '2026_09_19_152809_create_health_service_records_table', 1),
-(8, '2026_09_19_152810_create_appointments_table', 1),
-(9, '2026_09_19_152811_create_inventory_items_table', 1),
-(10, '2026_09_19_152812_create_inventory_batches_table', 1),
-(11, '2026_09_19_152813_create_inventory_transactions_table', 1),
-(13, '2026_09_19_152814_create_audit_logs_table', 2);
-
--- --------------------------------------------------------
+LOCK TABLES `migrations` WRITE;
+/*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
+INSERT INTO `migrations` VALUES (1,'0001_01_01_000000_create_users_table',1),(2,'0001_01_01_000001_create_cache_table',1),(3,'0001_01_01_000002_create_jobs_table',1),(4,'2026_09_19_152734_create_puroks_table',1),(5,'2026_09_19_152807_create_patients_table',1),(6,'2026_09_19_152808_create_health_assessments_table',1),(7,'2026_09_19_152809_create_health_service_records_table',1),(8,'2026_09_19_152810_create_appointments_table',1),(9,'2026_09_19_152811_create_inventory_items_table',1),(10,'2026_09_19_152812_create_inventory_batches_table',1),(11,'2026_09_19_152813_create_inventory_transactions_table',1),(13,'2026_09_19_152814_create_audit_logs_table',2),(14,'2026_10_07_124027_add_deleted_at_to_patients_table',3),(15,'2026_10_08_035232_populate_puroks_up_to_22',4),(17,'2026_10_09_182500_drop_appointments_table',5);
+/*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `password_reset_tokens`
 --
 
+DROP TABLE IF EXISTS `password_reset_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `password_reset_tokens` (
   `email` varchar(255) NOT NULL,
   `token` varchar(255) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL
+  `created_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `password_reset_tokens`
+--
+
+LOCK TABLES `password_reset_tokens` WRITE;
+/*!40000 ALTER TABLE `password_reset_tokens` DISABLE KEYS */;
+/*!40000 ALTER TABLE `password_reset_tokens` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `patients`
 --
 
+DROP TABLE IF EXISTS `patients`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `patients` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `patient_control_number` varchar(255) NOT NULL,
   `first_name` varchar(255) NOT NULL,
   `middle_name` varchar(255) DEFAULT NULL,
@@ -383,96 +455,103 @@ CREATE TABLE `patients` (
   `sex` enum('Male','Female') NOT NULL,
   `date_of_birth` date NOT NULL,
   `civil_status` varchar(30) DEFAULT NULL,
-  `purok_id` bigint(20) UNSIGNED NOT NULL,
+  `purok_id` bigint(20) unsigned NOT NULL,
   `street_address` varchar(255) DEFAULT NULL,
   `contact_number` varchar(30) DEFAULT NULL,
   `philhealth_number` varchar(50) DEFAULT NULL,
   `blood_type` varchar(10) DEFAULT NULL,
   `emergency_contact_name` varchar(255) DEFAULT NULL,
   `emergency_contact_number` varchar(30) DEFAULT NULL,
-  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_by` bigint(20) unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `patients_patient_control_number_unique` (`patient_control_number`),
+  KEY `patients_purok_id_foreign` (`purok_id`),
+  KEY `patients_created_by_foreign` (`created_by`),
+  CONSTRAINT `patients_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `patients_purok_id_foreign` FOREIGN KEY (`purok_id`) REFERENCES `puroks` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `patients`
 --
 
-INSERT INTO `patients` (`id`, `patient_control_number`, `first_name`, `middle_name`, `last_name`, `suffix`, `sex`, `date_of_birth`, `civil_status`, `purok_id`, `street_address`, `contact_number`, `philhealth_number`, `blood_type`, `emergency_contact_name`, `emergency_contact_number`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 'TAC-2026-0001', 'Juan', 'Mercado', 'Dela Cruz', NULL, 'Male', '1981-04-12', 'Married', 3, 'Km. 14, Purok 3', '09171234567', '01-234567890-1', 'O+', 'Maria Dela Cruz (Spouse)', '09171234568', 5, '2026-09-20 04:02:57', '2026-09-20 04:02:57'),
-(2, 'TAC-2026-0002', 'Maria Clara', 'Reyes', 'Santos', NULL, 'Female', '1998-09-24', 'Married', 1, 'Near Chapel, Purok 1', '09289876543', '02-345678901-2', 'A+', 'Crisostomo Santos (Husband)', '09289876544', 3, '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(3, 'TAC-2026-0003', 'Ethan Gabriel', 'Cruz', 'Reyes', NULL, 'Male', '2026-03-20', 'Single', 2, 'Block 4, Purok 2', '09195554321', NULL, 'B+', 'Elena Reyes (Mother)', '09195554321', 2, '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(4, 'TAC-2026-0004', 'Teresa', 'Aquino', 'Bautista', NULL, 'Female', '1962-11-05', 'Widowed', 5, 'Purok 5, Upper Tacunan', '09391238901', '05-998877665-3', 'O+', 'Grace Bautista (Daughter)', '09391238902', 5, '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(5, 'TAC-2026-0005', 'Rosa', 'Dimagiba', 'Batungbakal', NULL, 'Female', '1992-06-18', 'Married', 4, 'Sitio Central, Purok 4', '09187778899', '04-112233445-4', 'AB+', 'Fernando Batungbakal (Husband)', '09187778800', 3, '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(6, 'TAC-2026-0006', 'Totoy', 'Cruz', 'Magtanggol', NULL, 'Male', '2023-09-20', 'Single', 6, 'Near Purok 6 Hall', '09223344556', NULL, 'O+', 'Lourdes Magtanggol (Mother)', '09223344556', 4, '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(7, 'TAC-2026-0007', 'Ricardo', 'Valdez', 'Dalisay', NULL, 'Male', '1985-02-14', 'Married', 7, 'Purok 7 Riverside', '09276543210', '07-334455667-7', 'B+', 'Alyana Dalisay (Spouse)', '09276543211', 2, '2026-09-20 04:02:58', '2026-09-20 04:02:58'),
-(8, 'TAC-2026-0008', 'Elena', 'Manalo', 'Villanueva', NULL, 'Female', '1995-10-30', 'Single', 8, 'Purok 8 Extension', '09451122334', NULL, 'A+', 'Corazon Villanueva (Mother)', '09451122335', 5, '2026-09-20 04:02:58', '2026-09-20 04:02:58');
-
--- --------------------------------------------------------
+LOCK TABLES `patients` WRITE;
+/*!40000 ALTER TABLE `patients` DISABLE KEYS */;
+INSERT INTO `patients` VALUES (1,'TAC-2026-0001','Juan','Mercado','Dela Cruz',NULL,'Male','1981-04-12','Married',3,'Km. 14, Purok 3','09171234567','01-234567890-1','O+','Maria Dela Cruz (Spouse)','09171234568',5,'2026-09-20 04:02:57','2026-09-20 04:02:57',NULL),(2,'TAC-2026-0002','Maria Clara','Reyes','Santos',NULL,'Female','1998-09-24','Married',1,'Near Chapel, Purok 1','09289876543','02-345678901-2','A+','Crisostomo Santos (Husband)','09289876544',3,'2026-09-20 04:02:58','2026-09-20 04:02:58',NULL),(3,'TAC-2026-0003','Ethan Gabriel','Cruz','Reyes',NULL,'Male','2026-03-20','Single',2,'Block 4, Purok 2','09195554321',NULL,'B+','Elena Reyes (Mother)','09195554321',2,'2026-09-20 04:02:58','2026-09-20 04:02:58',NULL),(4,'TAC-2026-0004','Teresa','Aquino','Bautista',NULL,'Female','1962-11-05','Widowed',5,'Purok 5, Upper Tacunan','09391238901','05-998877665-3','O+','Grace Bautista (Daughter)','09391238902',5,'2026-09-20 04:02:58','2026-09-20 04:02:58',NULL),(5,'TAC-2026-0005','Rosa','Dimagiba','Batungbakal',NULL,'Female','1992-06-18','Married',4,'Sitio Central, Purok 4','09187778899','04-112233445-4','AB+','Fernando Batungbakal (Husband)','09187778800',3,'2026-09-20 04:02:58','2026-09-20 04:02:58',NULL),(6,'TAC-2026-0006','Totoy','Cruz','Magtanggol',NULL,'Male','2023-09-20','Single',6,'Near Purok 6 Hall','09223344556',NULL,'O+','Lourdes Magtanggol (Mother)','09223344556',5,'2026-09-20 04:02:58','2026-09-26 03:20:22',NULL),(7,'TAC-2026-0007','Ricardo','Valdez','Dalisay',NULL,'Male','1985-02-14','Married',7,'Purok 7 Riverside','09276543210','07-334455667-7','B+','Alyana Dalisay (Spouse)','09276543211',2,'2026-09-20 04:02:58','2026-09-20 04:02:58',NULL),(8,'TAC-2026-0008','Elena','Manalo','Villanueva',NULL,'Female','1995-10-30','Single',8,'Purok 8 Extension','09451122334',NULL,'A+','Corazon Villanueva (Mother)','09451122335',5,'2026-09-20 04:02:58','2026-09-20 04:02:58',NULL),(9,'TAC-2026-0009','Jillian Grace','Caalim','Nacasabug',NULL,'Female','2006-07-15','Single',4,'Block 5, Madapo Don Isidro Village','09977225987',NULL,'A+','Kurt Christian Ramos','09123456789',1,'2026-09-27 17:51:51','2026-10-07 03:33:43',NULL),(10,'TAC-2026-0010','JM',NULL,'Neoda',NULL,'Male','2004-03-21','Live-in',8,NULL,'09091008080',NULL,'O+','Jesierie','09098001010',1,'2026-09-27 19:00:05','2026-09-27 19:00:05',NULL),(11,'TAC-2026-0011','McCoy',NULL,'Duzal',NULL,'Male','2004-03-21','Single',8,'Block 5, Madapo Don Isidro Village','09638375354','12-867489574-3','O+',NULL,'09546798677',3,'2026-10-08 17:29:04','2026-10-08 17:29:52',NULL),(12,'TAC-2026-0012','hazel','acopiado','panilag',NULL,'Female','1972-12-09','Married',4,'blk8 lot4 phase 2   4b','09055134125',NULL,'B-','julito  panilag','09182729722',5,'2026-10-08 19:14:56','2026-10-08 19:14:56',NULL),(13,'TAC-2026-0013','Jannelle','Diosdado','Dingal',NULL,'Female','2006-02-07','Single',9,'Matina Crossing','09123456789',NULL,'A+','Maria Dingal','09786543219',3,'2026-10-11 19:18:29','2026-10-11 19:18:29',NULL);
+/*!40000 ALTER TABLE `patients` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `puroks`
 --
 
+DROP TABLE IF EXISTS `puroks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `puroks` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `puroks_name_unique` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `puroks`
 --
 
-INSERT INTO `puroks` (`id`, `name`, `description`, `created_at`, `updated_at`) VALUES
-(1, 'Purok 1', 'Barangay Tacunan, Davao City', '2026-09-19 07:32:23', '2026-09-19 07:32:23'),
-(2, 'Purok 2', 'Barangay Tacunan, Davao City', '2026-09-19 07:32:23', '2026-09-19 07:32:23'),
-(3, 'Purok 3', 'Barangay Tacunan, Davao City', '2026-09-19 07:32:23', '2026-09-19 07:32:23'),
-(4, 'Purok 4', 'Barangay Tacunan, Davao City', '2026-09-19 07:32:23', '2026-09-19 07:32:23'),
-(5, 'Purok 5', 'Barangay Tacunan, Davao City', '2026-09-19 07:32:23', '2026-09-19 07:32:23'),
-(6, 'Purok 6', 'Barangay Tacunan, Davao City', '2026-09-19 07:32:23', '2026-09-19 07:32:23'),
-(7, 'Purok 7', 'Barangay Tacunan, Davao City', '2026-09-19 07:32:23', '2026-09-19 07:32:23'),
-(8, 'Purok 8', 'Barangay Tacunan, Davao City', '2026-09-19 07:32:23', '2026-09-19 07:32:23'),
-(9, 'Purok 9', 'Barangay Tacunan, Davao City', '2026-09-19 07:32:23', '2026-09-19 07:32:23'),
-(10, 'Purok 10', 'Barangay Tacunan, Davao City', '2026-09-19 07:32:23', '2026-09-19 07:32:23'),
-(11, 'Purok 11', 'Barangay Tacunan, Davao City', '2026-09-19 07:32:23', '2026-09-19 07:32:23'),
-(12, 'Purok 12', 'Barangay Tacunan, Davao City', '2026-09-19 07:32:23', '2026-09-19 07:32:23');
-
--- --------------------------------------------------------
+LOCK TABLES `puroks` WRITE;
+/*!40000 ALTER TABLE `puroks` DISABLE KEYS */;
+INSERT INTO `puroks` VALUES (1,'Purok 1','Barangay Tacunan, Davao City','2026-09-19 07:32:23','2026-09-19 07:32:23'),(2,'Purok 2','Barangay Tacunan, Davao City','2026-09-19 07:32:23','2026-09-19 07:32:23'),(3,'Purok 3','Barangay Tacunan, Davao City','2026-09-19 07:32:23','2026-09-19 07:32:23'),(4,'Purok 4','Barangay Tacunan, Davao City','2026-09-19 07:32:23','2026-09-19 07:32:23'),(5,'Purok 5','Barangay Tacunan, Davao City','2026-09-19 07:32:23','2026-09-19 07:32:23'),(6,'Purok 6','Barangay Tacunan, Davao City','2026-09-19 07:32:23','2026-09-19 07:32:23'),(7,'Purok 7','Barangay Tacunan, Davao City','2026-09-19 07:32:23','2026-09-19 07:32:23'),(8,'Purok 8','Barangay Tacunan, Davao City','2026-09-19 07:32:23','2026-09-19 07:32:23'),(9,'Purok 9','Barangay Tacunan, Davao City','2026-09-19 07:32:23','2026-09-19 07:32:23'),(10,'Purok 10','Barangay Tacunan, Davao City','2026-09-19 07:32:23','2026-09-19 07:32:23'),(11,'Purok 11','Barangay Tacunan, Davao City','2026-09-19 07:32:23','2026-09-19 07:32:23'),(12,'Purok 12','Barangay Tacunan, Davao City','2026-09-19 07:32:23','2026-09-19 07:32:23'),(13,'Purok 13','Barangay Tacunan, Davao City','2026-10-07 19:53:10','2026-10-07 19:53:10'),(14,'Purok 14','Barangay Tacunan, Davao City','2026-10-07 19:53:10','2026-10-07 19:53:10'),(15,'Purok 15','Barangay Tacunan, Davao City','2026-10-07 19:53:10','2026-10-07 19:53:10'),(16,'Purok 16','Barangay Tacunan, Davao City','2026-10-07 19:53:10','2026-10-07 19:53:10'),(17,'Purok 17','Barangay Tacunan, Davao City','2026-10-07 19:53:10','2026-10-07 19:53:10'),(18,'Purok 18','Barangay Tacunan, Davao City','2026-10-07 19:53:11','2026-10-07 19:53:11'),(19,'Purok 19','Barangay Tacunan, Davao City','2026-10-07 19:53:11','2026-10-07 19:53:11'),(20,'Purok 20','Barangay Tacunan, Davao City','2026-10-07 19:53:11','2026-10-07 19:53:11'),(21,'Purok 21','Barangay Tacunan, Davao City','2026-10-07 19:53:11','2026-10-07 19:53:11'),(22,'Purok 22','Barangay Tacunan, Davao City','2026-10-07 19:53:11','2026-10-07 19:53:11');
+/*!40000 ALTER TABLE `puroks` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `sessions`
 --
 
+DROP TABLE IF EXISTS `sessions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `sessions` (
   `id` varchar(255) NOT NULL,
-  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
   `ip_address` varchar(45) DEFAULT NULL,
   `user_agent` text DEFAULT NULL,
   `payload` longtext NOT NULL,
-  `last_activity` int(11) NOT NULL
+  `last_activity` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `sessions_user_id_index` (`user_id`),
+  KEY `sessions_last_activity_index` (`last_activity`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `sessions`
 --
 
-INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('LiS8OXk5xIIUwqnU9RKjBSLoWiskjTHzEmFFsqpZ', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJyZWFtWFFBSTl3RjZ0dzJkeUVKQ2taVmwwOHhWUnBtRVJrT05XYlA0IiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDAwXC9sb2dpbiIsInJvdXRlIjoibG9naW4ifSwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1790086313),
-('PB4VPFqD7o8zm1SmonJcjZsTk7Hxj1ERlQ96v7rY', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJlR09VemRnRUxtcWxMSkVaYTFsUWtmRzA4UlFnUTNkZXJhRU1WNnRrIiwidXJsIjp7ImludGVuZGVkIjoiaHR0cDpcL1wvbG9jYWxob3N0OjgwMDBcL2Rhc2hib2FyZCJ9LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvbG9jYWxob3N0OjgwMDBcL2xvZ2luIiwicm91dGUiOiJsb2dpbiJ9LCJfZmxhc2giOnsib2xkIjpbXSwibmV3IjpbXX19', 1790069524),
-('s2Jx49Lyq3D8KiEUXJU0E3wYPoXXcZKxILw5GLha', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJha0F2NjQwMDVUWlplNWNpRGJIMVVwQ284WUZNVzZBY2QxUWlvWm9sIiwidXJsIjpbXSwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cL2xvY2FsaG9zdDo4MDAwXC9kYXNoYm9hcmQiLCJyb3V0ZSI6ImRhc2hib2FyZCJ9LCJfZmxhc2giOnsib2xkIjpbXSwibmV3IjpbXX0sImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjoxfQ==', 1790052112);
-
--- --------------------------------------------------------
+LOCK TABLES `sessions` WRITE;
+/*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
+INSERT INTO `sessions` VALUES ('4DvNbeV1zUZKgoKOVpHsIX8uBfPEs4JxO2DIEPj6',3,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36','eyJfdG9rZW4iOiJIaFhoWlRqT3B0cTNobVZKZm9tMjNjTEJDU3VYZkRrZEpFTEFDMVdHIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvbG9jYWxob3N0OjgwMDBcL2Rhc2hib2FyZCIsInJvdXRlIjoiZGFzaGJvYXJkIn0sImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjozfQ==',1791780545),('kKo6B2KwUoUNSIaDfG8rKQU4mLco1ZvDjSdSe1pr',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36','eyJfdG9rZW4iOiJrbGNiZmNHUm4xTE9kbVVPRlRJMlFLSklqdGFqSkI0TjJDT0Fmd2pOIiwidXJsIjp7ImludGVuZGVkIjoiaHR0cDpcL1wvbG9jYWxob3N0OjgwMDBcL2Rhc2hib2FyZCJ9LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvbG9jYWxob3N0OjgwMDBcL2xvZ2luIiwicm91dGUiOiJsb2dpbiJ9LCJfZmxhc2giOnsib2xkIjpbXSwibmV3IjpbXX19',1791863980);
+/*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `users`
 --
 
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
@@ -482,304 +561,29 @@ CREATE TABLE `users` (
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `remember_token` varchar(100) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_email_unique` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `role`, `contact_number`, `is_active`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Tacunan Health Admin', 'admin@tacunan.gov.ph', NULL, '$2y$12$QZsdOMPm3MTnSrOGhhnH9.Kef3r.25Wl9maqrOJwXCATlrtdbNRyW', 'admin', '09171234567', 1, NULL, '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(2, 'Maria Santos, RN', 'nurse@tacunan.gov.ph', NULL, '$2y$12$XjKUAzhdsaQYVDPTEmU9meTVnZyydTR4B24niccAB8pgbvm49haum', 'nurse', '09181234567', 1, NULL, '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(3, 'Elena Reyes, RMW', 'midwife@tacunan.gov.ph', NULL, '$2y$12$DkiWHMHSwRmI5f7EcZg1T.gOSf6pgbzIft3CJfRFTrL5iDIcIE65G', 'midwife', '09191234567', 1, NULL, '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(4, 'Juana Dela Cruz (BNS)', 'bns@tacunan.gov.ph', NULL, '$2y$12$IO9lbP6g1dkhHNnswRbUk.wxsXD6bUfmh4k17mOAniPNCs/yEyWJ.', 'bns', '09201234567', 1, NULL, '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(5, 'Rosa Flores (BHW)', 'bhw@tacunan.gov.ph', NULL, '$2y$12$6F8cOwfD9hDCMPVHrOl/B.8DNa/dYxPzWGfNgta48SotADjtmQfEu', 'bhw', '09211234567', 1, NULL, '2026-09-19 07:32:26', '2026-09-19 07:32:26'),
-(6, 'Carmen Lim (BHV)', 'bhv@tacunan.gov.ph', NULL, '$2y$12$Nke2v.k6ubQ9TyraccchWuRE3dq2L9ND0XXTCvMmne2uVADK3SJHy', 'bhv', '09221234567', 1, NULL, '2026-09-19 07:32:26', '2026-09-19 07:32:26');
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'Tacunan Health Admin','admin@tacunan.gov.ph',NULL,'$2y$12$QZsdOMPm3MTnSrOGhhnH9.Kef3r.25Wl9maqrOJwXCATlrtdbNRyW','admin','09171234567',1,NULL,'2026-09-19 07:32:26','2026-09-19 07:32:26'),(2,'Maria Santos, RN','nurse@tacunan.gov.ph',NULL,'$2y$12$XjKUAzhdsaQYVDPTEmU9meTVnZyydTR4B24niccAB8pgbvm49haum','nurse','09181234567',1,NULL,'2026-09-19 07:32:26','2026-09-19 07:32:26'),(3,'Elena Reyes, RMW','midwife@tacunan.gov.ph',NULL,'$2y$12$DkiWHMHSwRmI5f7EcZg1T.gOSf6pgbzIft3CJfRFTrL5iDIcIE65G','midwife','09191234567',1,NULL,'2026-09-19 07:32:26','2026-09-19 07:32:26'),(5,'Rosa Flores (BHW)','bhw@tacunan.gov.ph',NULL,'$2y$12$6F8cOwfD9hDCMPVHrOl/B.8DNa/dYxPzWGfNgta48SotADjtmQfEu','bhw','09211234567',1,NULL,'2026-09-19 07:32:26','2026-09-19 07:32:26');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `appointments`
---
-ALTER TABLE `appointments`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `appointments_patient_id_foreign` (`patient_id`),
-  ADD KEY `appointments_scheduled_by_foreign` (`scheduled_by`),
-  ADD KEY `appointments_appointment_date_index` (`appointment_date`);
-
---
--- Indexes for table `audit_logs`
---
-ALTER TABLE `audit_logs`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `audit_logs_user_id_foreign` (`user_id`),
-  ADD KEY `audit_logs_action_index` (`action`),
-  ADD KEY `audit_logs_module_index` (`module`),
-  ADD KEY `audit_logs_record_id_index` (`record_id`);
-
---
--- Indexes for table `cache`
---
-ALTER TABLE `cache`
-  ADD PRIMARY KEY (`key`),
-  ADD KEY `cache_expiration_index` (`expiration`);
-
---
--- Indexes for table `cache_locks`
---
-ALTER TABLE `cache_locks`
-  ADD PRIMARY KEY (`key`),
-  ADD KEY `cache_locks_expiration_index` (`expiration`);
-
---
--- Indexes for table `failed_jobs`
---
-ALTER TABLE `failed_jobs`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`),
-  ADD KEY `failed_jobs_connection_queue_failed_at_index` (`connection`,`queue`,`failed_at`);
-
---
--- Indexes for table `health_assessments`
---
-ALTER TABLE `health_assessments`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `health_assessments_patient_id_foreign` (`patient_id`),
-  ADD KEY `health_assessments_user_id_foreign` (`user_id`);
-
---
--- Indexes for table `health_service_records`
---
-ALTER TABLE `health_service_records`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `health_service_records_patient_id_foreign` (`patient_id`),
-  ADD KEY `health_service_records_user_id_foreign` (`user_id`),
-  ADD KEY `health_service_records_service_type_index` (`service_type`);
-
---
--- Indexes for table `inventory_batches`
---
-ALTER TABLE `inventory_batches`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `inventory_batches_inventory_item_id_foreign` (`inventory_item_id`),
-  ADD KEY `inventory_batches_batch_number_index` (`batch_number`),
-  ADD KEY `inventory_batches_expiration_date_index` (`expiration_date`);
-
---
--- Indexes for table `inventory_items`
---
-ALTER TABLE `inventory_items`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `inventory_items_item_code_unique` (`item_code`),
-  ADD KEY `inventory_items_category_index` (`category`);
-
---
--- Indexes for table `inventory_transactions`
---
-ALTER TABLE `inventory_transactions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `inventory_transactions_inventory_item_id_foreign` (`inventory_item_id`),
-  ADD KEY `inventory_transactions_inventory_batch_id_foreign` (`inventory_batch_id`),
-  ADD KEY `inventory_transactions_user_id_foreign` (`user_id`),
-  ADD KEY `inventory_transactions_patient_id_foreign` (`patient_id`),
-  ADD KEY `inventory_transactions_transaction_type_index` (`transaction_type`),
-  ADD KEY `inventory_transactions_transaction_date_index` (`transaction_date`);
-
---
--- Indexes for table `jobs`
---
-ALTER TABLE `jobs`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `jobs_queue_index` (`queue`);
-
---
--- Indexes for table `job_batches`
---
-ALTER TABLE `job_batches`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `migrations`
---
-ALTER TABLE `migrations`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `password_reset_tokens`
---
-ALTER TABLE `password_reset_tokens`
-  ADD PRIMARY KEY (`email`);
-
---
--- Indexes for table `patients`
---
-ALTER TABLE `patients`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `patients_patient_control_number_unique` (`patient_control_number`),
-  ADD KEY `patients_purok_id_foreign` (`purok_id`),
-  ADD KEY `patients_created_by_foreign` (`created_by`);
-
---
--- Indexes for table `puroks`
---
-ALTER TABLE `puroks`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `puroks_name_unique` (`name`);
-
---
--- Indexes for table `sessions`
---
-ALTER TABLE `sessions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `sessions_user_id_index` (`user_id`),
-  ADD KEY `sessions_last_activity_index` (`last_activity`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `users_email_unique` (`email`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `appointments`
---
-ALTER TABLE `appointments`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `audit_logs`
---
-ALTER TABLE `audit_logs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT for table `failed_jobs`
---
-ALTER TABLE `failed_jobs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `health_assessments`
---
-ALTER TABLE `health_assessments`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT for table `health_service_records`
---
-ALTER TABLE `health_service_records`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT for table `inventory_batches`
---
-ALTER TABLE `inventory_batches`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT for table `inventory_items`
---
-ALTER TABLE `inventory_items`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT for table `inventory_transactions`
---
-ALTER TABLE `inventory_transactions`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT for table `jobs`
---
-ALTER TABLE `jobs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `migrations`
---
-ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
-
---
--- AUTO_INCREMENT for table `patients`
---
-ALTER TABLE `patients`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT for table `puroks`
---
-ALTER TABLE `puroks`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `appointments`
---
-ALTER TABLE `appointments`
-  ADD CONSTRAINT `appointments_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `appointments_scheduled_by_foreign` FOREIGN KEY (`scheduled_by`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `audit_logs`
---
-ALTER TABLE `audit_logs`
-  ADD CONSTRAINT `audit_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
-
---
--- Constraints for table `health_assessments`
---
-ALTER TABLE `health_assessments`
-  ADD CONSTRAINT `health_assessments_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `health_assessments_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `health_service_records`
---
-ALTER TABLE `health_service_records`
-  ADD CONSTRAINT `health_service_records_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `health_service_records_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `inventory_batches`
---
-ALTER TABLE `inventory_batches`
-  ADD CONSTRAINT `inventory_batches_inventory_item_id_foreign` FOREIGN KEY (`inventory_item_id`) REFERENCES `inventory_items` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `inventory_transactions`
---
-ALTER TABLE `inventory_transactions`
-  ADD CONSTRAINT `inventory_transactions_inventory_batch_id_foreign` FOREIGN KEY (`inventory_batch_id`) REFERENCES `inventory_batches` (`id`),
-  ADD CONSTRAINT `inventory_transactions_inventory_item_id_foreign` FOREIGN KEY (`inventory_item_id`) REFERENCES `inventory_items` (`id`),
-  ADD CONSTRAINT `inventory_transactions_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `inventory_transactions_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `patients`
---
-ALTER TABLE `patients`
-  ADD CONSTRAINT `patients_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `patients_purok_id_foreign` FOREIGN KEY (`purok_id`) REFERENCES `puroks` (`id`);
-COMMIT;
-
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-10-13 12:25:09

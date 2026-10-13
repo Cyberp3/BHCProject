@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-slate-900">
     <head>
         <meta charset="utf-8">
@@ -38,5 +38,15 @@
                 Systems Integration and Architecture Project &bull; 2026
             </p>
         </div>
+
+        <!-- Back-Button & BfCache Security Guard -->
+        <script>
+            // Invalidate browser Back-Forward cache to enforce live session check
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted || (window.performance && window.performance.getEntriesByType && window.performance.getEntriesByType('navigation')[0] && window.performance.getEntriesByType('navigation')[0].type === 'back_forward')) {
+                    window.location.reload();
+                }
+            });
+        </script>
     </body>
 </html>

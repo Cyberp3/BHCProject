@@ -10,6 +10,7 @@ use App\Models\Patient;
 use App\Models\Purok;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -53,10 +54,12 @@ class DashboardController extends Controller
             ->take(6)
             ->get();
 
-        $recentActivities = AuditLog::with('user')
-            ->latest()
-            ->take(6)
-            ->get();
+        $recentActivities = Auth::user()->isAdmin()
+            ? AuditLog::with('user')
+                ->latest()
+                ->take(6)
+                ->get()
+            : collect();
 
         return view('dashboard.index', compact(
             'totalPatients',
