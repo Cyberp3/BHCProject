@@ -17,9 +17,9 @@ COPY . .
 RUN npm run build
 
 # ------------------------------------------------------------------------------
-# Stage 2: PHP Application Container (Apache + PHP 8.3)
+# Stage 2: PHP Application Container (Apache + PHP 8.4)
 # ------------------------------------------------------------------------------
-FROM php:8.3-apache-bookworm
+FROM php:8.4-apache-bookworm
 
 WORKDIR /var/www/html
 
@@ -70,7 +70,7 @@ COPY --from=frontend /app/public/build /var/www/html/public/build
 
 # Install PHP dependencies without dev packages
 ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --ignore-platform-req=php+
 
 # Copy entrypoint script and ensure Unix line endings & executable permissions
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
