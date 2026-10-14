@@ -52,9 +52,9 @@ class ReportController extends Controller
         }
 
         $totalPatientsCount = (clone $patientsQuery)->count();
-        $perPage = $request->input('per_page', 25);
+        $perPage = $request->input('per_page', 10);
         $patientList = ($perPage === 'all' || $request->boolean('all'))
-            ? $patientsQuery->orderBy('last_name')->paginate($totalPatientsCount ?: 25)->withQueryString()
+            ? $patientsQuery->orderBy('last_name')->paginate($totalPatientsCount ?: 10)->withQueryString()
             : $patientsQuery->orderBy('last_name')->paginate((int) $perPage)->withQueryString();
 
         return view('reports.patients', compact(
@@ -85,9 +85,9 @@ class ReportController extends Controller
             ->orderBy('service_date', 'desc');
 
         $totalRecordsCount = (clone $recordsQuery)->count();
-        $perPage = $request->input('per_page', 25);
+        $perPage = $request->input('per_page', 10);
         $records = ($perPage === 'all' || $request->boolean('all'))
-            ? $recordsQuery->paginate($totalRecordsCount ?: 25)->withQueryString()
+            ? $recordsQuery->paginate($totalRecordsCount ?: 10)->withQueryString()
             : $recordsQuery->paginate((int) $perPage)->withQueryString();
 
         $allServices = HealthServiceRecord::SERVICES;
@@ -139,9 +139,9 @@ class ReportController extends Controller
         }])->orderBy('name');
 
         $totalItemsCount = (clone $itemsQuery)->count();
-        $perPage = $request->input('per_page', 25);
+        $perPage = $request->input('per_page', 10);
         $items = ($perPage === 'all' || $request->boolean('all'))
-            ? $itemsQuery->paginate($totalItemsCount ?: 25)->withQueryString()
+            ? $itemsQuery->paginate($totalItemsCount ?: 10)->withQueryString()
             : $itemsQuery->paginate((int) $perPage)->withQueryString();
 
         $lowStockItems = (clone $itemsQuery)->get()->filter(function ($item) {

@@ -48,7 +48,7 @@ class PatientController extends Controller
             $query->filterService($request->input('service_type'));
         }
 
-        $patients = $query->paginate(15)->withQueryString();
+        $patients = $query->paginate(10)->withQueryString();
         $puroks = Purok::orderBy('id')->get();
         $services = HealthServiceRecord::SERVICES;
 

@@ -32,7 +32,7 @@ class AuditLogController extends Controller
             });
         }
 
-        $logs = $query->paginate(20)->withQueryString();
+        $logs = $query->paginate(10)->withQueryString();
 
         $modules = AuditLog::select('module')->distinct()->pluck('module');
 

@@ -43,7 +43,7 @@ class AppointmentController extends Controller
 
         $appointments = $query->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         $services = HealthServiceRecord::SERVICES;

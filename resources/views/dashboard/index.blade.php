@@ -9,77 +9,77 @@
         <!-- Metric Stat Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <!-- Card 1: Total Patients -->
-            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs flex items-center justify-between min-w-0">
-                <div class="min-w-0 flex-1 mr-3">
-                    <div class="text-xs font-semibold uppercase text-slate-400 tracking-wider truncate">Total Patients</div>
-                    <div class="text-3xl font-extrabold text-slate-900 mt-1 truncate">{{ number_format($totalPatients) }}</div>
-                    <a href="{{ route('patients.index') }}" class="text-xs text-emerald-600 hover:text-emerald-700 font-medium inline-flex items-center gap-1 mt-2 truncate">
-                        View directory &rarr;
-                    </a>
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs flex flex-col justify-between min-w-0">
+                <div class="text-xs font-semibold uppercase text-slate-400 tracking-wider truncate">Total Patients</div>
+                <div class="flex items-center justify-between my-2">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 flex-shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <div class="text-3xl font-extrabold text-slate-900 truncate ml-3">{{ number_format($totalPatients) }}</div>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 flex-shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                </div>
+                <a href="{{ route('patients.index') }}" class="text-xs text-emerald-600 hover:text-emerald-700 font-medium inline-flex items-center gap-1 truncate">
+                    View directory &rarr;
+                </a>
             </div>
 
             <!-- Card 2: Total Consultations -->
-            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs flex items-center justify-between min-w-0">
-                <div class="min-w-0 flex-1 mr-3">
-                    <div class="text-xs font-semibold uppercase text-slate-400 tracking-wider truncate">Total Consultations</div>
-                    <div class="text-3xl font-extrabold text-slate-900 mt-1 truncate">{{ number_format($totalServicesCount) }}</div>
-                    <a href="{{ route('services.index') }}" class="text-xs text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-1 mt-2 truncate">
-                        View services &rarr;
-                    </a>
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs flex flex-col justify-between min-w-0">
+                <div class="text-xs font-semibold uppercase text-slate-400 tracking-wider truncate">Total Consultations</div>
+                <div class="flex items-center justify-between my-2">
+                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 flex-shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                    </div>
+                    <div class="text-3xl font-extrabold text-slate-900 truncate ml-3">{{ number_format($totalServicesCount) }}</div>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 flex-shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                    </svg>
-                </div>
+                <a href="{{ route('services.index') }}" class="text-xs text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-1 truncate">
+                    View services &rarr;
+                </a>
             </div>
 
             <!-- Card 3: Low Stock Items -->
-            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs flex items-center justify-between min-w-0">
-                <div class="min-w-0 flex-1 mr-3">
-                    <div class="text-xs font-semibold uppercase text-slate-400 tracking-wider truncate">Low Stock Items</div>
-                    <div class="text-3xl font-extrabold {{ $lowStockCount > 0 ? 'text-amber-600' : 'text-slate-900' }} mt-1 truncate">
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs flex flex-col justify-between min-w-0">
+                <div class="text-xs font-semibold uppercase text-slate-400 tracking-wider truncate">Low Stock Items</div>
+                <div class="flex items-center justify-between my-2">
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 flex-shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <div class="text-3xl font-extrabold {{ $lowStockCount > 0 ? 'text-amber-600' : 'text-slate-900' }} truncate ml-3">
                         {{ number_format($lowStockCount) }}
                     </div>
-                    <a href="{{ route('inventory.index') }}" class="text-xs text-amber-600 hover:text-amber-700 font-medium inline-flex items-center gap-1 mt-2 truncate">
-                        Check inventory &rarr;
-                    </a>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 flex-shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                </div>
+                <a href="{{ route('inventory.index') }}" class="text-xs text-amber-600 hover:text-amber-700 font-medium inline-flex items-center gap-1 truncate">
+                    Check inventory &rarr;
+                </a>
             </div>
 
             <!-- Card 4: Near Expiry Items -->
-            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs flex items-center justify-between min-w-0">
-                <div class="min-w-0 flex-1 mr-3">
-                    <div class="text-xs font-semibold uppercase text-slate-400 tracking-wider truncate">Near Expiry (&le; 90 Days)</div>
-                    <div class="text-3xl font-extrabold {{ $nearExpiryCount > 0 ? 'text-rose-600' : 'text-slate-900' }} mt-1 truncate">
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs flex flex-col justify-between min-w-0">
+                <div class="text-xs font-semibold uppercase text-slate-400 tracking-wider truncate">Near Expiry (&le; 90 Days)</div>
+                <div class="flex items-center justify-between my-2">
+                    <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 flex-shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="text-3xl font-extrabold {{ $nearExpiryCount > 0 ? 'text-rose-600' : 'text-slate-900' }} truncate ml-3">
                         {{ number_format($nearExpiryCount) }}
                     </div>
-                    @if(Auth::user()->canAccessReports())
-                        <a href="{{ route('reports.inventory') }}" class="text-xs text-rose-600 hover:text-rose-700 font-medium inline-flex items-center gap-1 mt-2 truncate">
-                            View batches &rarr;
-                        </a>
-                    @else
-                        <span class="text-xs text-slate-400 font-medium inline-flex items-center gap-1 mt-2 truncate">
-                            Stock monitored
-                        </span>
-                    @endif
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 flex-shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
+                @if(Auth::user()->canAccessReports())
+                    <a href="{{ route('reports.inventory') }}" class="text-xs text-rose-600 hover:text-rose-700 font-medium inline-flex items-center gap-1 truncate">
+                        View batches &rarr;
+                    </a>
+                @else
+                    <span class="text-xs text-slate-400 font-medium inline-flex items-center gap-1 truncate">
+                        Stock monitored
+                    </span>
+                @endif
             </div>
         </div>
 

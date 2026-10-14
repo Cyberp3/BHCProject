@@ -49,7 +49,7 @@ class InventoryController extends Controller
             });
         }
 
-        $items = $query->orderBy('name')->paginate(15)->withQueryString();
+        $items = $query->orderBy('name')->paginate(10)->withQueryString();
 
         // Count summary metrics based on valid dispensable stock
         $lowStockCount = InventoryItem::with(['batches' => function ($q) {

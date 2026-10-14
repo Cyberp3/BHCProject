@@ -460,8 +460,8 @@
                 @elseif (request('per_page') === 'all')
                     <div class="p-4 border-t border-slate-200 no-print flex items-center justify-between text-xs text-slate-500">
                         <span>Showing all {{ number_format($items->total()) }} catalog items (unpaginated complete view)</span>
-                        <a href="{{ request()->fullUrlWithQuery(['per_page' => 25]) }}" class="text-xs text-emerald-600 hover:text-emerald-700 font-semibold underline">
-                            Switch back to 25 items / page
+                        <a href="{{ request()->fullUrlWithQuery(['per_page' => 10]) }}" class="text-xs text-emerald-600 hover:text-emerald-700 font-semibold underline">
+                            Switch back to 10 items / page
                         </a>
                     </div>
                 @endif

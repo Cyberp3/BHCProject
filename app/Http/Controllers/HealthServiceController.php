@@ -36,7 +36,7 @@ class HealthServiceController extends Controller
             });
         }
 
-        $records = $query->paginate(15)->withQueryString();
+        $records = $query->paginate(10)->withQueryString();
         $services = HealthServiceRecord::SERVICES;
 
         $programCounts = HealthServiceRecord::select('service_type', DB::raw('count(*) as count'))

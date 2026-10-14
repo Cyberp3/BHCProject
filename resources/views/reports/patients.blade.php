@@ -82,6 +82,7 @@
                             @endforeach
                         </select>
                         <select name="per_page" class="py-1.5 px-3 text-xs rounded-lg border-slate-300">
+                            <option value="10" {{ request('per_page', 10) == '10' ? 'selected' : '' }}>10 / page</option>
                             <option value="25" {{ request('per_page') == '25' ? 'selected' : '' }}>25 / page</option>
                             <option value="50" {{ request('per_page') == '50' ? 'selected' : '' }}>50 / page</option>
                             <option value="100" {{ request('per_page') == '100' ? 'selected' : '' }}>100 / page</option>

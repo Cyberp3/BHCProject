@@ -139,16 +139,16 @@ test('reports support pagination and customizable page sizes', function () {
         ]);
     }
 
-    // Default 25 per page -> page 1 should have pagination controls
+    // Default 10 per page -> page 1 should have pagination controls
     $response = $this->actingAs($this->admin)->get(route('reports.patients'));
     $response->assertOk();
-    $response->assertSee('Showing 1 to 25 of');
+    $response->assertSee('Showing 1 to 10 of');
     $response->assertSee('page=2');
 
     // Page 2 should render next set of patients
     $page2Response = $this->actingAs($this->admin)->get(route('reports.patients', ['page' => 2]));
     $page2Response->assertOk();
-    $page2Response->assertSee('Showing 26 to 30 of');
+    $page2Response->assertSee('Showing 11 to 20 of');
 
     // Show All query param should show all records on a single page
     $allResponse = $this->actingAs($this->admin)->get(route('reports.patients', ['per_page' => 'all']));
